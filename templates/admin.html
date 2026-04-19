@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Trip.Name}} - Admin</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+<div class="container">
+    <h1>{{.Trip.Name}}</h1>
+
+    <section class="trip-info">
+        <h2>Share Link</h2>
+        <p>Send this to friends so they can follow your trip:</p>
+        <code class="copyable">{{.ShareURL}}</code>
+
+        <h2>OsmAnd Tracking URL</h2>
+        <p>Paste this into OsmAnd &rarr; Trip recording &rarr; Online tracking &rarr; Web address:</p>
+        <code class="copyable">{{.OsmandURL}}</code>
+
+        <h2>Stats</h2>
+        <p>Trackpoints: <strong>{{len .Trackpoints}}</strong> | Entries: <strong>{{len .Entries}}</strong></p>
+    </section>
+
+    <section class="new-entry">
+        <h2>New Entry</h2>
+        <form method="POST" action="/admin/{{.Trip.AdminToken}}/entries" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="photos">Photos</label>
+                <input type="file" id="photos" name="photos" multiple accept="image/*">
+            </div>
+            <div class="form-group">
+                <label for="body">Notes</label>
+                <textarea id="body" name="body" rows="3" placeholder="What's happening?"></textarea>
+            </div>
+            <button type="submit">Post Entry</button>
+        </form>
+    </section>
+
+    {{if .Entries}}
+    <section class="entries">
+        <h2>Entries</h2>
+        {{range .Entries}}
+        <div class="entry-card">
+            {{if .Photos}}
+            <div class="entry-photos">
+                {{range .Photos}}
+                <img src="/uploads/{{.FilePath}}" alt="" class="entry-thumb">
+                {{end}}
+            </div>
+            {{end}}
+            {{if .Body}}<p>{{.Body}}</p>{{end}}
+            <span class="date">{{.Timestamp}}</span>
+        </div>
+        {{end}}
+    </section>
+    {{end}}
+</div>
+</body>
+</html>

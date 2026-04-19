@@ -1,0 +1,18 @@
+{{define "entry"}}
+<div class="entry" data-lat="{{.Lat}}" data-lon="{{.Lon}}">
+    {{if .Photos}}
+    <div class="entry-photos">
+        {{range .Photos}}
+        <img src="/uploads/{{.FilePath}}" alt="">
+        {{end}}
+    </div>
+    {{end}}
+    {{if .Body}}
+    <p class="entry-body">{{.Body}}</p>
+    {{end}}
+    <span class="entry-meta">
+        {{if .LocationName}}{{.LocationName}} &middot; {{end}}
+        {{.Timestamp}}
+    </span>
+</div>
+{{end}}

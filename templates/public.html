@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Trip.Name}}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+</head>
+<body>
+<div class="trip-view">
+    <div id="timeline">
+        <div class="timeline-header">
+            <h1>{{.Trip.Name}}</h1>
+        </div>
+        {{if .Timeline}}
+        <div class="timeline-line">
+            {{range .Timeline}}
+            <div class="timeline-entry {{if gt .DistFromPrev 0.0}}has-distance{{end}}" data-entry-id="{{.Entry.ID}}" {{if .Entry.Lat}}data-lat="{{printf "%.6f" (deref .Entry.Lat)}}" data-lon="{{printf "%.6f" (deref .Entry.Lon)}}"{{end}}>
+                {{if gt .DistFromPrev 0.0}}
+                <span class="timeline-distance-label">{{formatDist .DistFromPrev}}</span>
+                {{end}}
+                <div class="timeline-date">
+                    <span class="timeline-date-day">{{formatDate .Entry.Timestamp}}</span>
+                    <span class="timeline-date-time">{{formatClock .Entry.Timestamp}}</span>
+                </div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    {{if .Entry.Photos}}
+                    <div class="timeline-photos">
+                        {{range .Entry.Photos}}
+                        <img src="/uploads/{{.FilePath}}" alt="">
+                        {{end}}
+                    </div>
+                    {{end}}
+                    {{if .Entry.Body}}<p class="timeline-body">{{.Entry.Body}}</p>{{end}}
+                </div>
+            </div>
+            {{end}}
+        </div>
+        {{else}}
+        <p class="muted">No entries yet. Check back soon!</p>
+        {{end}}
+    </div>
+    <div id="map"></div>
+</div>
+<script>
+    const shareToken = "{{.Trip.ShareToken}}";
+</script>
+<script src="/static/app.js"></script>
+</body>
+</html>

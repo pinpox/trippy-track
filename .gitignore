@@ -1,0 +1,7 @@
+*.db
+*.db-shm
+*.db-wal
+trip-track
+uploads/
+result
+.claude/
