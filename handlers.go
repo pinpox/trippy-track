@@ -58,6 +58,9 @@ func newServer(db *sql.DB, addr string) (*Server, error) {
 			}
 			return fmt.Sprintf("%.1f km", km)
 		},
+		"sub": func(a, b int) int {
+			return a - b
+		},
 		"index": func(s []float64, i int) float64 {
 			if i < 0 || i >= len(s) {
 				return 0

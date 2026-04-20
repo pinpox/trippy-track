@@ -32,10 +32,14 @@
                 <div class="timeline-dot"></div>
                 <div class="timeline-content">
                     {{if .Entry.Photos}}
-                    <div class="timeline-photos">
-                        {{range .Entry.Photos}}
-                        <img src="/uploads/{{.FilePath}}" alt="">
-                        {{end}}
+                    <div class="timeline-photos-wrap">
+                        <div class="scroll-arrow scroll-arrow-left">&lsaquo;</div>
+                        <div class="scroll-arrow scroll-arrow-right">&rsaquo;</div>
+                        <div class="timeline-photos">
+                            {{range .Entry.Photos}}
+                            <img src="/uploads/{{.FilePath}}" alt="">
+                            {{end}}
+                        </div>
                     </div>
                     {{end}}
                     {{if .Entry.Body}}<p class="timeline-body">{{.Entry.Body}}</p>{{end}}

@@ -167,9 +167,11 @@ code.copyable {
 }
 
 .timeline-header h1 {
-    font-size: 1.6rem;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 0;
+    margin-bottom: 4rem;
+    text-align: center;
 }
 
 /* Timeline vertical line */
@@ -278,27 +280,78 @@ code.copyable {
     box-shadow: 0 0 0 2px #1a1a1a, 0 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Photos */
+/* Photos - horizontal scroll strip */
+.timeline-photos-wrap {
+    position: relative;
+}
+
+.timeline-photos-wrap .scroll-arrow {
+    position: absolute;
+    top: 0;
+    bottom: 0.5rem;
+    width: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-size: 1.5rem;
+    color: white;
+    pointer-events: none;
+}
+
+.timeline-photos-wrap:hover .scroll-arrow.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.timeline-photos-wrap .scroll-arrow-left {
+    left: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.4), transparent);
+}
+
+.timeline-photos-wrap .scroll-arrow-right {
+    right: 0;
+    background: linear-gradient(to left, rgba(0,0,0,0.4), transparent);
+}
+
 .timeline-photos {
     display: flex;
-    gap: 2px;
+    gap: 3px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: 350px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
+    padding-bottom: 0.5rem;
 }
 
 .timeline-photos img {
-    width: 100%;
-    max-height: 280px;
+    height: 100%;
+    width: auto;
     object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    border-radius: 2px;
+}
+
+.timeline-photos img.hidden-photo {
     display: block;
 }
 
-.timeline-photos img:not(:only-child) {
-    width: calc(50% - 1px);
-    max-height: 200px;
+.timeline-photos .photos-more {
+    display: none;
 }
 
 /* Text content inside card */
 .timeline-body {
-    padding: 0.75rem 1rem 0;
+    padding: 0.75rem 0 0;
     font-family: 'Libre Baskerville', Georgia, serif;
     line-height: 1.7;
     font-size: 1.15rem;
@@ -334,6 +387,91 @@ code.copyable {
     color: #999;
     font-size: 0.9rem;
     padding: 1rem 2rem;
+}
+
+/* ========================================
+   Lightbox
+   ======================================== */
+#lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+#lightbox.active {
+    display: flex;
+}
+
+.lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.lightbox-img {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    z-index: 1;
+    border-radius: 4px;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 2;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2.5rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.25rem 0.5rem;
+}
+
+.lightbox-prev,
+.lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 3rem;
+    cursor: pointer;
+    padding: 1rem;
+    line-height: 1;
+}
+
+.lightbox-prev {
+    left: 1rem;
+}
+
+.lightbox-next {
+    right: 1rem;
+}
+
+.lightbox-prev:hover,
+.lightbox-next:hover,
+.lightbox-close:hover {
+    color: #ccc;
+    background: none;
+}
+
+.lightbox-counter {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #aaa;
+    font-size: 0.85rem;
+    z-index: 2;
 }
 
 /* ========================================

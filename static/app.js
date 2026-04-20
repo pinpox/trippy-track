@@ -133,6 +133,113 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // Lightbox
+    var lightbox = document.createElement("div");
+    lightbox.id = "lightbox";
+    lightbox.innerHTML =
+        '<div class="lightbox-backdrop"></div>' +
+        '<img class="lightbox-img" src="">' +
+        '<button class="lightbox-prev">&lsaquo;</button>' +
+        '<button class="lightbox-next">&rsaquo;</button>' +
+        '<button class="lightbox-close">&times;</button>' +
+        '<span class="lightbox-counter"></span>';
+    document.body.appendChild(lightbox);
+
+    var lightboxImg = lightbox.querySelector(".lightbox-img");
+    var lightboxCounter = lightbox.querySelector(".lightbox-counter");
+    var currentPhotos = [];
+    var currentIndex = 0;
+
+    function openLightbox(img) {
+        var container = img.closest(".timeline-photos");
+        if (!container) return;
+        // Include all photos, even hidden ones
+        currentPhotos = Array.from(container.querySelectorAll("img"));
+        currentIndex = currentPhotos.indexOf(img);
+        if (currentIndex === -1) currentIndex = 0;
+        showPhoto();
+        lightbox.classList.add("active");
+    }
+
+    function showPhoto() {
+        lightboxImg.src = currentPhotos[currentIndex].src;
+        lightboxCounter.textContent = (currentIndex + 1) + " / " + currentPhotos.length;
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove("active");
+    }
+
+    lightbox.querySelector(".lightbox-backdrop").addEventListener("click", closeLightbox);
+    lightbox.querySelector(".lightbox-close").addEventListener("click", closeLightbox);
+
+    lightbox.querySelector(".lightbox-prev").addEventListener("click", function (e) {
+        e.stopPropagation();
+        currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
+        showPhoto();
+    });
+
+    lightbox.querySelector(".lightbox-next").addEventListener("click", function (e) {
+        e.stopPropagation();
+        currentIndex = (currentIndex + 1) % currentPhotos.length;
+        showPhoto();
+    });
+
+    document.addEventListener("keydown", function (e) {
+        if (!lightbox.classList.contains("active")) return;
+        if (e.key === "Escape") closeLightbox();
+        if (e.key === "ArrowLeft") {
+            currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
+            showPhoto();
+        }
+        if (e.key === "ArrowRight") {
+            currentIndex = (currentIndex + 1) % currentPhotos.length;
+            showPhoto();
+        }
+    });
+
+    document.querySelectorAll(".timeline-photos img").forEach(function (img) {
+        img.style.cursor = "pointer";
+        img.addEventListener("click", function () {
+            openLightbox(img);
+        });
+    });
+
+    document.querySelectorAll(".photos-more").forEach(function (el) {
+        el.addEventListener("click", function () {
+            // Open lightbox at the 4th photo (first hidden one)
+            var container = el.closest(".timeline-photos");
+            var imgs = Array.from(container.querySelectorAll("img"));
+            if (imgs.length > 3) {
+                openLightbox(imgs[3]);
+            }
+        });
+    });
+
+    // Photo scroll arrows
+    document.querySelectorAll(".timeline-photos-wrap").forEach(function (wrap) {
+        var strip = wrap.querySelector(".timeline-photos");
+        var left = wrap.querySelector(".scroll-arrow-left");
+        var right = wrap.querySelector(".scroll-arrow-right");
+
+        function updateArrows() {
+            var canScrollLeft = strip.scrollLeft > 5;
+            var canScrollRight = strip.scrollLeft < strip.scrollWidth - strip.clientWidth - 5;
+            left.classList.toggle("visible", canScrollLeft);
+            right.classList.toggle("visible", canScrollRight);
+        }
+
+        strip.addEventListener("scroll", updateArrows);
+        updateArrows();
+
+        left.addEventListener("click", function () {
+            strip.scrollLeft -= strip.clientWidth * 0.7;
+        });
+        right.addEventListener("click", function () {
+            strip.scrollLeft += strip.clientWidth * 0.7;
+        });
+    });
+
     function highlightEntry(el) {
         document
             .querySelectorAll(".timeline-entry.active")
