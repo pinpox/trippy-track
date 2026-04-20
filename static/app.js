@@ -4,13 +4,47 @@ document.addEventListener("DOMContentLoaded", function () {
         style: "https://tiles.openfreemap.org/styles/liberty",
         center: [10, 50],
         zoom: 4,
+        pitch: 25,
     });
 
-    map.addControl(new maplibregl.NavigationControl());
+    map.addControl(new maplibregl.NavigationControl({
+        visualizePitch: true,
+    }));
+    map.addControl(new maplibregl.TerrainControl({
+        source: "terrain",
+        exaggeration: 1.5,
+    }));
 
     const markers = [];
 
     map.on("load", function () {
+        // 3D terrain
+        map.addSource("terrain", {
+            type: "raster-dem",
+            tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
+            encoding: "terrarium",
+            tileSize: 256,
+            maxzoom: 15,
+        });
+        map.setTerrain({ source: "terrain", exaggeration: 1.5 });
+
+        map.addSource("hillshade-source", {
+            type: "raster-dem",
+            tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
+            encoding: "terrarium",
+            tileSize: 256,
+            maxzoom: 15,
+        });
+        map.addLayer({
+            id: "hillshade",
+            type: "hillshade",
+            source: "hillshade-source",
+            paint: {
+                "hillshade-shadow-color": "#473B24",
+                "hillshade-illumination-anchor": "map",
+                "hillshade-exaggeration": 0.5,
+            },
+        }, "building");
         fetch("/t/" + shareToken + "/track")
             .then(function (r) {
                 return r.json();
