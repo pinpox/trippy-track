@@ -28,7 +28,7 @@
 
     <section class="new-entry">
         <h2>New Entry</h2>
-        <form method="POST" action="/admin/{{.Trip.Token}}/entries" enctype="multipart/form-data">
+        <form method="POST" action="/t/{{.Trip.Token}}/admin/entries" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="photos">Photos</label>
                 <input type="file" id="photos" name="photos" multiple accept="image/*,video/*">
@@ -54,13 +54,13 @@
                     {{else}}
                     <img src="/uploads/{{.FilePath}}" alt="" class="entry-thumb">
                     {{end}}
-                    <form method="POST" action="/admin/{{$.Trip.Token}}/photos/{{.ID}}/delete" class="photo-delete-form">
+                    <form method="POST" action="/t/{{$.Trip.Token}}/admin/photos/{{.ID}}/delete" class="photo-delete-form">
                         <button type="submit" class="photo-delete-btn" title="Delete">&times;</button>
                     </form>
                 </div>
                 {{end}}
                 <div class="entry-photo-add">
-                    <form method="POST" action="/admin/{{$.Trip.Token}}/entries/{{.ID}}/photos" enctype="multipart/form-data" class="photo-add-form">
+                    <form method="POST" action="/t/{{$.Trip.Token}}/admin/entries/{{.ID}}/photos" enctype="multipart/form-data" class="photo-add-form">
                         <label class="photo-add-btn" title="Add photos">
                             +
                             <input type="file" name="photos" multiple accept="image/*,video/*" onchange="this.form.submit()" hidden>

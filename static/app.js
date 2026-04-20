@@ -111,6 +111,25 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
                 });
 
+                // Current position marker (last point of the track)
+                var trackFeature = geojson.features.find(function (f) {
+                    return f.properties.type === "track";
+                });
+                var currentPosMarker = null;
+                if (trackFeature && trackFeature.geometry.coordinates.length > 0) {
+                    var lastCoord = trackFeature.geometry.coordinates[trackFeature.geometry.coordinates.length - 1];
+                    var el = document.createElement("div");
+                    el.className = "map-marker-current";
+                    el.innerHTML = '<svg width="36" height="48" viewBox="0 0 36 48" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                        '<path d="M18 0C8.06 0 0 8.06 0 18c0 12.6 18 30 18 30s18-17.4 18-30C36 8.06 27.94 0 18 0z" fill="#b85c38"/>' +
+                        '<circle cx="18" cy="18" r="8" fill="white"/>' +
+                        '<circle cx="18" cy="18" r="4" fill="#b85c38"/>' +
+                        '</svg>';
+                    currentPosMarker = new maplibregl.Marker({ element: el, anchor: "bottom" })
+                        .setLngLat(lastCoord)
+                        .addTo(map);
+                }
+
                 // Fit bounds to track + markers
                 fitMapBounds(geojson);
 
@@ -126,6 +145,10 @@ document.addEventListener("DOMContentLoaded", function () {
                             data.features[0].geometry.coordinates.push([point.lon, point.lat]);
                             trackSource.setData(data);
                         }
+                    }
+                    // Move current position marker
+                    if (currentPosMarker) {
+                        currentPosMarker.setLngLat([point.lon, point.lat]);
                     }
                 });
 

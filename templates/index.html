@@ -31,7 +31,7 @@
         <h2>Your Trips</h2>
         {{range .Trips}}
         <div class="trip-card">
-            <a href="/admin/{{.Token}}">
+            <a href="/t/{{.Token}}/admin">
                 <h3>{{.Name}}</h3>
                 <span class="date">{{.CreatedAt}}</span>
             </a>

@@ -107,10 +107,10 @@ func (s *Server) routes() http.Handler {
 	// Protected routes (require login)
 	mux.HandleFunc("GET /", s.handleIndex)
 	mux.HandleFunc("POST /trips", s.handleCreateTrip)
-	mux.HandleFunc("GET /admin/{token}", s.handleAdmin)
-	mux.HandleFunc("POST /admin/{token}/entries", s.handleCreateEntry)
-	mux.HandleFunc("POST /admin/{token}/entries/{entryID}/photos", s.handleAddPhotos)
-	mux.HandleFunc("POST /admin/{token}/photos/{photoID}/delete", s.handleDeletePhoto)
+	mux.HandleFunc("GET /t/{token}/admin", s.handleAdmin)
+	mux.HandleFunc("POST /t/{token}/admin/entries", s.handleCreateEntry)
+	mux.HandleFunc("POST /t/{token}/admin/entries/{entryID}/photos", s.handleAddPhotos)
+	mux.HandleFunc("POST /t/{token}/admin/photos/{photoID}/delete", s.handleDeletePhoto)
 
 	return s.auth.AuthMiddleware(mux)
 }
@@ -160,7 +160,7 @@ func (s *Server) handleCreateTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/admin/"+trip.Token, http.StatusSeeOther)
+	http.Redirect(w, r, "/t/"+trip.Token+"/admin", http.StatusSeeOther)
 }
 
 func (s *Server) verifyTripOwnership(w http.ResponseWriter, r *http.Request, trip *Trip) bool {
@@ -421,7 +421,7 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 		Data: "reload",
 	})
 
-	http.Redirect(w, r, "/admin/"+token, http.StatusSeeOther)
+	http.Redirect(w, r, "/t/"+token+"/admin", http.StatusSeeOther)
 }
 
 func (s *Server) handleDeletePhoto(w http.ResponseWriter, r *http.Request) {
@@ -457,7 +457,7 @@ func (s *Server) handleDeletePhoto(w http.ResponseWriter, r *http.Request) {
 	// Remove file from disk
 	os.Remove(filepath.Join("uploads", filePath))
 
-	http.Redirect(w, r, "/admin/"+token, http.StatusSeeOther)
+	http.Redirect(w, r, "/t/"+token+"/admin", http.StatusSeeOther)
 }
 
 func (s *Server) handleAddPhotos(w http.ResponseWriter, r *http.Request) {
@@ -524,7 +524,7 @@ func (s *Server) handleAddPhotos(w http.ResponseWriter, r *http.Request) {
 		order++
 	}
 
-	http.Redirect(w, r, "/admin/"+token, http.StatusSeeOther)
+	http.Redirect(w, r, "/t/"+token+"/admin", http.StatusSeeOther)
 }
 
 func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {

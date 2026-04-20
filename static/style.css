@@ -667,6 +667,22 @@ code.copyable {
     box-shadow: 0 3px 12px rgba(0,0,0,0.3);
 }
 
+.map-marker-current {
+    width: 36px;
+    height: 48px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.map-marker-current svg {
+    display: block;
+    animation: pin-bounce 2s ease-in-out infinite;
+}
+
+@keyframes pin-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
 .map-marker-photo.map-marker-active {
     border-color: var(--sienna);
     box-shadow: 0 2px 8px rgba(0,0,0,0.25), 0 0 0 3px var(--sienna-light);

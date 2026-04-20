@@ -202,12 +202,13 @@ func (a *AuthService) DeleteSession(sessionID string) error {
 
 func (a *AuthService) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Skip auth for public routes
+		// Skip auth for public routes (but not /t/{token}/admin)
+		isPublicTripPath := strings.HasPrefix(r.URL.Path, "/t/") && !strings.Contains(r.URL.Path, "/admin")
 		if strings.HasPrefix(r.URL.Path, "/login") ||
 			strings.HasPrefix(r.URL.Path, "/callback") ||
 			strings.HasPrefix(r.URL.Path, "/static/") ||
 			strings.HasPrefix(r.URL.Path, "/uploads/") ||
-			strings.HasPrefix(r.URL.Path, "/t/") ||
+			isPublicTripPath ||
 			strings.HasPrefix(r.URL.Path, "/api/") {
 			next.ServeHTTP(w, r)
 			return
