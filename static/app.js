@@ -175,12 +175,15 @@ document.addEventListener("DOMContentLoaded", function () {
         observer.observe(el);
     });
 
-    // Stop timeline line before current entry
+    // Stop timeline line at the current entry's dot
     var currentEntry = document.querySelector(".timeline-current");
     if (currentEntry) {
         var line = currentEntry.closest(".timeline-line");
         if (line) {
-            line.style.setProperty("--current-height", currentEntry.offsetHeight + "px");
+            var dot = currentEntry.querySelector(".timeline-dot");
+            var dotBottom = dot.getBoundingClientRect().bottom;
+            var lineBottom = line.getBoundingClientRect().bottom;
+            line.style.setProperty("--current-height", (lineBottom - dotBottom) + "px");
         }
     }
 

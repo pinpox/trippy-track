@@ -315,6 +315,7 @@ code.copyable {
 
 .timeline-current {
     padding-top: 2rem;
+    margin-bottom: 40vh;
 }
 
 /* Distance label - centered vertically in the gap above the entry */
