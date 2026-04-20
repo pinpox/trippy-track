@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS trips (
     id          TEXT PRIMARY KEY,
     name        TEXT NOT NULL,
     created_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
-    token TEXT NOT NULL UNIQUE,
+    view_token TEXT NOT NULL UNIQUE,
+    tracking_token TEXT NOT NULL UNIQUE,
     is_active   INTEGER NOT NULL DEFAULT 1,
     user_id     INTEGER REFERENCES users(id)
 );
@@ -105,9 +106,10 @@ type Trip struct {
 	ID         string
 	Name       string
 	CreatedAt  string
-	Token string
-	IsActive   bool
-	UserID     *int
+	ViewToken     string
+	TrackingToken string
+	IsActive      bool
+	UserID        *int
 }
 
 type Trackpoint struct {
@@ -145,31 +147,45 @@ type Photo struct {
 
 func createTrip(db *sql.DB, name string, userID int) (*Trip, error) {
 	id := randomToken(8)
-	token := randomToken(16)
+	viewToken := randomToken(16)
+	trackingToken := randomToken(16)
 
 	_, err := db.Exec(
-		"INSERT INTO trips (id, name, token, user_id) VALUES (?, ?, ?, ?)",
-		id, name, token, userID,
+		"INSERT INTO trips (id, name, view_token, tracking_token, user_id) VALUES (?, ?, ?, ?, ?)",
+		id, name, viewToken, trackingToken, userID,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("insert trip: %w", err)
 	}
 
 	return &Trip{
-		ID:         id,
-		Name:       name,
-		Token: token,
+		ID:            id,
+		Name:          name,
+		ViewToken:     viewToken,
+		TrackingToken: trackingToken,
 		IsActive:   true,
 		UserID:     &userID,
 	}, nil
 }
 
-func getTripByToken(db *sql.DB, token string) (*Trip, error) {
+func getTripByViewToken(db *sql.DB, viewToken string) (*Trip, error) {
 	t := &Trip{}
 	err := db.QueryRow(
-		"SELECT id, name, created_at, token, is_active, user_id FROM trips WHERE token = ?",
-		token,
-	).Scan(&t.ID, &t.Name, &t.CreatedAt, &t.Token, &t.IsActive, &t.UserID)
+		"SELECT id, name, created_at, view_token, tracking_token, is_active, user_id FROM trips WHERE view_token = ?",
+		viewToken,
+	).Scan(&t.ID, &t.Name, &t.CreatedAt, &t.ViewToken, &t.TrackingToken, &t.IsActive, &t.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return t, nil
+}
+
+func getTripByTrackingToken(db *sql.DB, trackingToken string) (*Trip, error) {
+	t := &Trip{}
+	err := db.QueryRow(
+		"SELECT id, name, created_at, view_token, tracking_token, is_active, user_id FROM trips WHERE tracking_token = ?",
+		trackingToken,
+	).Scan(&t.ID, &t.Name, &t.CreatedAt, &t.ViewToken, &t.TrackingToken, &t.IsActive, &t.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +194,7 @@ func getTripByToken(db *sql.DB, token string) (*Trip, error) {
 
 func listTripsByUser(db *sql.DB, userID int) ([]Trip, error) {
 	rows, err := db.Query(
-		"SELECT id, name, created_at, token, is_active, user_id FROM trips WHERE user_id = ? ORDER BY created_at DESC",
+		"SELECT id, name, created_at, view_token, tracking_token, is_active, user_id FROM trips WHERE user_id = ? ORDER BY created_at DESC",
 		userID,
 	)
 	if err != nil {
@@ -189,7 +205,7 @@ func listTripsByUser(db *sql.DB, userID int) ([]Trip, error) {
 	var trips []Trip
 	for rows.Next() {
 		var t Trip
-		if err := rows.Scan(&t.ID, &t.Name, &t.CreatedAt, &t.Token, &t.IsActive, &t.UserID); err != nil {
+		if err := rows.Scan(&t.ID, &t.Name, &t.CreatedAt, &t.ViewToken, &t.TrackingToken, &t.IsActive, &t.UserID); err != nil {
 			return nil, err
 		}
 		trips = append(trips, t)

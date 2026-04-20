@@ -193,7 +193,7 @@ func (s *Server) handleCreateTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/t/"+trip.Token+"/admin", http.StatusSeeOther)
+	http.Redirect(w, r, "/t/"+trip.ViewToken+"/admin", http.StatusSeeOther)
 }
 
 func (s *Server) verifyTripOwnership(w http.ResponseWriter, r *http.Request, trip *Trip) bool {
@@ -207,7 +207,7 @@ func (s *Server) verifyTripOwnership(w http.ResponseWriter, r *http.Request, tri
 
 func (s *Server) handleAdmin(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByToken(s.db, token)
+	trip, err := getTripByViewToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -232,7 +232,7 @@ func (s *Server) handleAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 	trackingURL := fmt.Sprintf(
 		"%s://%s/api/track?token=%s",
-		scheme, r.Host, trip.Token,
+		scheme, r.Host, trip.TrackingToken,
 	)
 
 	entries, err := getEntries(s.db, trip.ID, true)
@@ -247,7 +247,7 @@ func (s *Server) handleAdmin(w http.ResponseWriter, r *http.Request) {
 		"Trackpoints": trackpoints,
 		"Entries":     entries,
 		"TrackingURL": trackingURL,
-		"ShareURL":    fmt.Sprintf("%s://%s/t/%s", scheme, r.Host, trip.Token),
+		"ShareURL":    fmt.Sprintf("%s://%s/t/%s", scheme, r.Host, trip.ViewToken),
 	})
 }
 
@@ -258,7 +258,7 @@ func (s *Server) handleTrack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trip, err := getTripByToken(s.db, token)
+	trip, err := getTripByTrackingToken(s.db, token)
 	if err != nil {
 		http.Error(w, "invalid token", http.StatusUnauthorized)
 		return
@@ -335,7 +335,7 @@ func (s *Server) handleTrack(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByToken(s.db, token)
+	trip, err := getTripByViewToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -484,7 +484,7 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleUpdateEntry(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByToken(s.db, token)
+	trip, err := getTripByViewToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -526,7 +526,7 @@ func (s *Server) handleUpdateEntry(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleDeleteEntry(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByToken(s.db, token)
+	trip, err := getTripByViewToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -558,7 +558,7 @@ func (s *Server) handleDeleteEntry(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleDeletePhoto(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByToken(s.db, token)
+	trip, err := getTripByViewToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -594,7 +594,7 @@ func (s *Server) handleDeletePhoto(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleAddPhotos(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByToken(s.db, token)
+	trip, err := getTripByViewToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -661,7 +661,7 @@ func (s *Server) handleAddPhotos(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByToken(s.db, token)
+	trip, err := getTripByViewToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -705,7 +705,7 @@ func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handlePublicTrack(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByToken(s.db, token)
+	trip, err := getTripByViewToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -729,7 +729,7 @@ func (s *Server) handlePublicTrack(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handlePublicEntries(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByToken(s.db, token)
+	trip, err := getTripByViewToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -748,7 +748,7 @@ func (s *Server) handlePublicEntries(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleSSE(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByToken(s.db, token)
+	trip, err := getTripByViewToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return

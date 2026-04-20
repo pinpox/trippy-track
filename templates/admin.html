@@ -28,7 +28,7 @@
 
     <section class="new-entry">
         <h2>New Entry</h2>
-        <form method="POST" action="/t/{{.Trip.Token}}/admin/entries" enctype="multipart/form-data">
+        <form method="POST" action="/t/{{.Trip.ViewToken}}/admin/entries" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="photos">Photos</label>
                 <input type="file" id="photos" name="photos" multiple accept="image/*,video/*">
@@ -55,13 +55,13 @@
                     {{else}}
                     <img src="/uploads/{{.FilePath}}" alt="" class="entry-thumb">
                     {{end}}
-                    <form method="POST" action="/t/{{$.Trip.Token}}/admin/photos/{{.ID}}/delete" class="photo-delete-form">
+                    <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/photos/{{.ID}}/delete" class="photo-delete-form">
                         <button type="submit" class="photo-delete-btn" title="Delete">&times;</button>
                     </form>
                 </div>
                 {{end}}
                 <div class="entry-photo-add">
-                    <form method="POST" action="/t/{{$.Trip.Token}}/admin/entries/{{.ID}}/photos" enctype="multipart/form-data" class="photo-add-form">
+                    <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/entries/{{.ID}}/photos" enctype="multipart/form-data" class="photo-add-form">
                         <label class="photo-add-btn" title="Add photos">
                             +
                             <input type="file" name="photos" multiple accept="image/*,video/*" onchange="this.form.submit()" hidden>
@@ -73,7 +73,7 @@
                 <div class="entry-text-display">
                     {{if .Body}}<p>{{.Body}}</p>{{end}}
                 </div>
-                <form method="POST" action="/t/{{$.Trip.Token}}/admin/entries/{{.ID}}/update" class="entry-edit-form" style="display:none">
+                <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/entries/{{.ID}}/update" class="entry-edit-form" style="display:none">
                     <div class="entry-edit-datetime">
                         <label>Date &amp; Time</label>
                         <input type="datetime-local" name="timestamp" value="{{toDatetimeLocal .Timestamp}}">
@@ -88,7 +88,7 @@
             <div class="entry-footer">
                 <div class="entry-footer-actions">
                     <button type="button" class="entry-edit-btn" onclick="var w=document.getElementById('entry-wrap-{{.ID}}'); w.querySelector('.entry-edit-form').style.display='block'; w.querySelector('.entry-text-display').style.display='none';">Edit</button>
-                    <form method="POST" action="/t/{{$.Trip.Token}}/admin/entries/{{.ID}}/delete" class="entry-delete-form" onsubmit="return confirm('Delete this entry?')">
+                    <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/entries/{{.ID}}/delete" class="entry-delete-form" onsubmit="return confirm('Delete this entry?')">
                         <button type="submit" class="entry-delete-btn">Delete</button>
                     </form>
                 </div>
