@@ -66,8 +66,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     type: "line",
                     source: "track",
                     paint: {
-                        "line-color": "#2563eb",
-                        "line-width": 3,
+                        "line-color": "#b85c38",
+                        "line-width": 3.5,
                     },
                 });
 
@@ -136,44 +136,63 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
-    // Scroll timeline -> pan map
-    var observer = new IntersectionObserver(
-        function (observerEntries) {
-            observerEntries.forEach(function (oe) {
-                if (oe.isIntersecting) {
-                    var entryId = oe.target.dataset.entryId;
-                    var lat = parseFloat(oe.target.dataset.lat);
-                    var lon = parseFloat(oe.target.dataset.lon);
-                    if (!isNaN(lat) && !isNaN(lon)) {
-                        map.flyTo({
-                            center: [lon, lat],
-                            zoom: Math.max(map.getZoom(), 10),
-                            duration: 500,
-                        });
-                    }
-                    highlightEntry(oe.target);
+    // Scroll timeline -> pan map (center-based tracking)
+    var timelineEl = document.getElementById("timeline");
+    var allEntries = Array.from(document.querySelectorAll(".timeline-entry[data-lat]"));
+    var activeEntryId = null;
 
-                    // Highlight active map marker
-                    markers.forEach(function (m) {
-                        var el = m.marker.getElement();
-                        if (String(m.entryId) === String(entryId)) {
-                            el.classList.add("map-marker-active");
-                        } else {
-                            el.classList.remove("map-marker-active");
-                        }
-                    });
-                }
+    function updateActiveEntry() {
+        var timelineRect = timelineEl.getBoundingClientRect();
+        var centerY = timelineRect.top + timelineRect.height * 0.2;
+
+        var closest = null;
+        var closestDist = Infinity;
+
+        allEntries.forEach(function (el) {
+            var dot = el.querySelector(".timeline-dot");
+            if (!dot) return;
+            var dotRect = dot.getBoundingClientRect();
+            var dotCenter = dotRect.top + dotRect.height / 2;
+            var dist = Math.abs(dotCenter - centerY);
+            if (dist < closestDist) {
+                closestDist = dist;
+                closest = el;
+            }
+        });
+
+        if (!closest) return;
+        var entryId = closest.dataset.entryId;
+        if (entryId === activeEntryId) return;
+        activeEntryId = entryId;
+
+        var lat = parseFloat(closest.dataset.lat);
+        var lon = parseFloat(closest.dataset.lon);
+        if (!isNaN(lat) && !isNaN(lon)) {
+            map.flyTo({
+                center: [lon, lat],
+                zoom: Math.max(map.getZoom(), 10),
+                duration: 500,
             });
-        },
-        {
-            root: document.getElementById("timeline"),
-            threshold: 0.5,
         }
-    );
 
-    document.querySelectorAll(".timeline-entry[data-lat]").forEach(function (el) {
-        observer.observe(el);
+        highlightEntry(closest);
+
+        markers.forEach(function (m) {
+            var el = m.marker.getElement();
+            if (String(m.entryId) === String(entryId)) {
+                el.classList.add("map-marker-active");
+            } else {
+                el.classList.remove("map-marker-active");
+            }
+        });
+    }
+
+    var scrollTimeout;
+    timelineEl.addEventListener("scroll", function () {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(updateActiveEntry, 80);
     });
+    updateActiveEntry();
 
     // Stop timeline line at the current entry's dot
     var currentEntry = document.querySelector(".timeline-current");
