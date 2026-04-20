@@ -632,9 +632,18 @@ func buildGeoJSON(points []Trackpoint, entries []Entry) string {
 		if e.Body != nil {
 			body = strings.ReplaceAll(*e.Body, `"`, `\"`)
 		}
+		photo := ""
+		for _, p := range e.Photos {
+			if !strings.HasSuffix(strings.ToLower(p.FilePath), ".mp4") &&
+				!strings.HasSuffix(strings.ToLower(p.FilePath), ".webm") &&
+				!strings.HasSuffix(strings.ToLower(p.FilePath), ".mov") {
+				photo = p.FilePath
+				break
+			}
+		}
 		features = append(features, fmt.Sprintf(
-			`{"type":"Feature","geometry":{"type":"Point","coordinates":[%.6f,%.6f]},"properties":{"type":"entry","id":%d,"body":"%s","timestamp":"%s"}}`,
-			*e.Lon, *e.Lat, e.ID, body, e.Timestamp,
+			`{"type":"Feature","geometry":{"type":"Point","coordinates":[%.6f,%.6f]},"properties":{"type":"entry","id":%d,"body":"%s","timestamp":"%s","photo":"%s"}}`,
+			*e.Lon, *e.Lat, e.ID, body, e.Timestamp, photo,
 		))
 	}
 

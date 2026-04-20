@@ -78,7 +78,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 entryFeatures.forEach(function (f) {
                     var el = document.createElement("div");
-                    el.className = "map-marker";
+                    if (f.properties.photo) {
+                        el.className = "map-marker-photo";
+                        var img = document.createElement("img");
+                        img.src = "/uploads/" + f.properties.photo;
+                        el.appendChild(img);
+                    } else {
+                        el.className = "map-marker";
+                    }
 
                     var marker = new maplibregl.Marker({ element: el })
                         .setLngLat(f.geometry.coordinates)
