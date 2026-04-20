@@ -46,19 +46,30 @@
         <h2>Entries</h2>
         {{range .Entries}}
         <div class="entry-card">
-            {{if .Photos}}
             <div class="entry-photos">
                 {{range .Photos}}
-                {{if isVideo .FilePath}}
-                <video src="/uploads/{{.FilePath}}" controls preload="metadata" class="entry-thumb"></video>
-                {{else}}
-                <img src="/uploads/{{.FilePath}}" alt="" class="entry-thumb">
+                <div class="entry-photo-wrap">
+                    {{if isVideo .FilePath}}
+                    <video src="/uploads/{{.FilePath}}" controls preload="metadata" class="entry-thumb"></video>
+                    {{else}}
+                    <img src="/uploads/{{.FilePath}}" alt="" class="entry-thumb">
+                    {{end}}
+                    <form method="POST" action="/admin/{{$.Trip.AdminToken}}/photos/{{.ID}}/delete" class="photo-delete-form">
+                        <button type="submit" class="photo-delete-btn" title="Delete">&times;</button>
+                    </form>
+                </div>
                 {{end}}
-                {{end}}
+                <div class="entry-photo-add">
+                    <form method="POST" action="/admin/{{$.Trip.AdminToken}}/entries/{{.ID}}/photos" enctype="multipart/form-data" class="photo-add-form">
+                        <label class="photo-add-btn" title="Add photos">
+                            +
+                            <input type="file" name="photos" multiple accept="image/*,video/*" onchange="this.form.submit()" hidden>
+                        </label>
+                    </form>
+                </div>
             </div>
-            {{end}}
             {{if .Body}}<p>{{.Body}}</p>{{end}}
-            <span class="date">{{.Timestamp}}</span>
+            <span class="date">{{formatTime .Timestamp}}</span>
         </div>
         {{end}}
     </section>

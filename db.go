@@ -237,9 +237,13 @@ func addPhoto(db *sql.DB, entryID int64, filePath string, sortOrder int) error {
 	return err
 }
 
-func getEntries(db *sql.DB, tripID string) ([]Entry, error) {
+func getEntries(db *sql.DB, tripID string, descending bool) ([]Entry, error) {
+	order := "ASC"
+	if descending {
+		order = "DESC"
+	}
 	rows, err := db.Query(
-		"SELECT id, trip_id, body, lat, lon, location_name, timestamp, created_at FROM entries WHERE trip_id = ? ORDER BY timestamp ASC",
+		"SELECT id, trip_id, body, lat, lon, location_name, timestamp, created_at FROM entries WHERE trip_id = ? ORDER BY timestamp "+order,
 		tripID,
 	)
 	if err != nil {
@@ -290,4 +294,35 @@ func getPhotos(db *sql.DB, entryID int64) ([]Photo, error) {
 		photos = append(photos, p)
 	}
 	return photos, rows.Err()
+}
+
+func photobelongsToTrip(db *sql.DB, photoID int64, tripID string) bool {
+	var count int
+	db.QueryRow(
+		"SELECT COUNT(*) FROM photos p JOIN entries e ON p.entry_id = e.id WHERE p.id = ? AND e.trip_id = ?",
+		photoID, tripID,
+	).Scan(&count)
+	return count > 0
+}
+
+func deletePhoto(db *sql.DB, photoID int64) (string, error) {
+	var filePath string
+	err := db.QueryRow("SELECT file_path FROM photos WHERE id = ?", photoID).Scan(&filePath)
+	if err != nil {
+		return "", err
+	}
+	_, err = db.Exec("DELETE FROM photos WHERE id = ?", photoID)
+	return filePath, err
+}
+
+func getEntryTripID(db *sql.DB, entryID int64) (string, error) {
+	var tripID string
+	err := db.QueryRow("SELECT trip_id FROM entries WHERE id = ?", entryID).Scan(&tripID)
+	return tripID, err
+}
+
+func maxPhotoOrder(db *sql.DB, entryID int64) int {
+	var maxOrder int
+	db.QueryRow("SELECT COALESCE(MAX(sort_order), -1) FROM photos WHERE entry_id = ?", entryID).Scan(&maxOrder)
+	return maxOrder
 }

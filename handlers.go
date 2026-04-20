@@ -94,6 +94,8 @@ func (s *Server) routes() http.Handler {
 	// Admin (secret admin token)
 	mux.HandleFunc("GET /admin/{token}", s.handleAdmin)
 	mux.HandleFunc("POST /admin/{token}/entries", s.handleCreateEntry)
+	mux.HandleFunc("POST /admin/{token}/entries/{entryID}/photos", s.handleAddPhotos)
+	mux.HandleFunc("POST /admin/{token}/photos/{photoID}/delete", s.handleDeletePhoto)
 
 	// OsmAnd tracking
 	mux.HandleFunc("GET /api/track", s.handleTrack)
@@ -169,7 +171,7 @@ func (s *Server) handleAdmin(w http.ResponseWriter, r *http.Request) {
 		scheme, r.Host, trip.AdminToken,
 	)
 
-	entries, err := getEntries(s.db, trip.ID)
+	entries, err := getEntries(s.db, trip.ID, true)
 	if err != nil {
 		http.Error(w, "failed to get entries", http.StatusInternalServerError)
 		log.Printf("get entries: %v", err)
@@ -392,6 +394,103 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/"+token, http.StatusSeeOther)
 }
 
+func (s *Server) handleDeletePhoto(w http.ResponseWriter, r *http.Request) {
+	token := r.PathValue("token")
+	trip, err := getTripByAdminToken(s.db, token)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	photoID, err := strconv.ParseInt(r.PathValue("photoID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid photo ID", http.StatusBadRequest)
+		return
+	}
+
+	// Verify photo belongs to this trip
+	if !photobelongsToTrip(s.db, photoID, trip.ID) {
+		http.Error(w, "photo not found", http.StatusNotFound)
+		return
+	}
+
+	filePath, err := deletePhoto(s.db, photoID)
+	if err != nil {
+		http.Error(w, "failed to delete photo", http.StatusInternalServerError)
+		log.Printf("delete photo: %v", err)
+		return
+	}
+
+	// Remove file from disk
+	os.Remove(filepath.Join("uploads", filePath))
+
+	http.Redirect(w, r, "/admin/"+token, http.StatusSeeOther)
+}
+
+func (s *Server) handleAddPhotos(w http.ResponseWriter, r *http.Request) {
+	token := r.PathValue("token")
+	trip, err := getTripByAdminToken(s.db, token)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	entryID, err := strconv.ParseInt(r.PathValue("entryID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid entry ID", http.StatusBadRequest)
+		return
+	}
+
+	// Verify entry belongs to this trip
+	tripID, err := getEntryTripID(s.db, entryID)
+	if err != nil || tripID != trip.ID {
+		http.Error(w, "entry not found", http.StatusNotFound)
+		return
+	}
+
+	if err := r.ParseMultipartForm(32 << 20); err != nil {
+		http.Error(w, "failed to parse form", http.StatusBadRequest)
+		return
+	}
+
+	order := maxPhotoOrder(s.db, entryID) + 1
+
+	files := r.MultipartForm.File["photos"]
+	for _, fh := range files {
+		f, err := fh.Open()
+		if err != nil {
+			log.Printf("open upload: %v", err)
+			continue
+		}
+		data, err := io.ReadAll(f)
+		f.Close()
+		if err != nil {
+			log.Printf("read upload: %v", err)
+			continue
+		}
+
+		ext := filepath.Ext(fh.Filename)
+		if ext == "" {
+			ext = ".jpg"
+		}
+		b := make([]byte, 16)
+		rand.Read(b)
+		filename := hex.EncodeToString(b) + ext
+
+		if err := os.WriteFile(filepath.Join("uploads", filename), data, 0o644); err != nil {
+			log.Printf("save upload: %v", err)
+			continue
+		}
+
+		if err := addPhoto(s.db, entryID, filename, order); err != nil {
+			log.Printf("add photo: %v", err)
+		}
+		order++
+	}
+
+	http.Redirect(w, r, "/admin/"+token, http.StatusSeeOther)
+}
+
 func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("shareToken")
 	trip, err := getTripByShareToken(s.db, token)
@@ -400,7 +499,7 @@ func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entries, err := getEntries(s.db, trip.ID)
+	entries, err := getEntries(s.db, trip.ID, false)
 	if err != nil {
 		http.Error(w, "failed to get entries", http.StatusInternalServerError)
 		return
@@ -440,7 +539,7 @@ func (s *Server) handlePublicTrack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entries, err := getEntries(s.db, trip.ID)
+	entries, err := getEntries(s.db, trip.ID, false)
 	if err != nil {
 		http.Error(w, "failed to get entries", http.StatusInternalServerError)
 		return
@@ -458,7 +557,7 @@ func (s *Server) handlePublicEntries(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entries, err := getEntries(s.db, trip.ID)
+	entries, err := getEntries(s.db, trip.ID, false)
 	if err != nil {
 		http.Error(w, "failed to get entries", http.StatusInternalServerError)
 		return
