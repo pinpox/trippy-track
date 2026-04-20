@@ -35,7 +35,7 @@
             </div>
             <div class="form-group">
                 <label for="body">Notes</label>
-                <textarea id="body" name="body" rows="3" placeholder="What's happening?"></textarea>
+                <textarea id="body" name="body" rows="6" placeholder="What's happening?"></textarea>
             </div>
             <button type="submit">Post Entry</button>
         </form>
@@ -46,6 +46,7 @@
         <h2>Entries</h2>
         {{range .Entries}}
         <div class="entry-card">
+            <span class="entry-card-date">{{formatTime .Timestamp}}</span>
             <div class="entry-photos">
                 {{range .Photos}}
                 <div class="entry-photo-wrap">
@@ -68,8 +69,30 @@
                     </form>
                 </div>
             </div>
-            {{if .Body}}<p>{{.Body}}</p>{{end}}
-            <span class="date">{{formatTime .Timestamp}}</span>
+            <div class="entry-text-wrap" id="entry-wrap-{{.ID}}">
+                <div class="entry-text-display">
+                    {{if .Body}}<p>{{.Body}}</p>{{end}}
+                </div>
+                <form method="POST" action="/t/{{$.Trip.Token}}/admin/entries/{{.ID}}/update" class="entry-edit-form" style="display:none">
+                    <div class="entry-edit-datetime">
+                        <label>Date &amp; Time</label>
+                        <input type="datetime-local" name="timestamp" value="{{toDatetimeLocal .Timestamp}}">
+                    </div>
+                    <textarea name="body" rows="3">{{if .Body}}{{.Body}}{{end}}</textarea>
+                    <div class="entry-edit-actions">
+                        <button type="submit">Save</button>
+                        <button type="button" onclick="var w=this.closest('.entry-text-wrap'); w.querySelector('.entry-edit-form').style.display='none'; w.querySelector('.entry-text-display').style.display='block';">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            <div class="entry-footer">
+                <div class="entry-footer-actions">
+                    <button type="button" class="entry-edit-btn" onclick="var w=document.getElementById('entry-wrap-{{.ID}}'); w.querySelector('.entry-edit-form').style.display='block'; w.querySelector('.entry-text-display').style.display='none';">Edit</button>
+                    <form method="POST" action="/t/{{$.Trip.Token}}/admin/entries/{{.ID}}/delete" class="entry-delete-form" onsubmit="return confirm('Delete this entry?')">
+                        <button type="submit" class="entry-delete-btn">Delete</button>
+                    </form>
+                </div>
+            </div>
         </div>
         {{end}}
     </section>

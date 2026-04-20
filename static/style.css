@@ -181,6 +181,14 @@ code.copyable {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
+.entry-card-date {
+    display: block;
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
 .entry-card p {
     margin: 0.5rem 0;
 }
@@ -261,6 +269,84 @@ code.copyable {
 
 .photo-add-btn:hover {
     color: #555;
+}
+
+.entry-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.entry-footer-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.entry-edit-btn {
+    padding: 0.4rem 0.8rem;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.entry-edit-btn:hover {
+    background: #1d4ed8;
+}
+
+.entry-delete-btn {
+    padding: 0.4rem 0.8rem;
+    background: #e53e3e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.entry-delete-btn:hover {
+    background: #c53030;
+}
+
+.entry-text-wrap {
+}
+
+.entry-edit-datetime {
+    margin-bottom: 0.5rem;
+}
+
+.entry-edit-datetime label {
+    font-size: 0.8rem;
+    color: #666;
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+.entry-edit-datetime input {
+    padding: 0.4rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.entry-edit-form textarea {
+    width: 100%;
+    min-height: 150px;
+}
+
+.entry-edit-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.entry-edit-actions button[type="button"] {
+    background: #eee;
+    color: #333;
 }
 
 .photo-add-form {

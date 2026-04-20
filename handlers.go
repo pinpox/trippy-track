@@ -89,6 +89,13 @@ func newServer(db *sql.DB, addr string, auth *AuthService) (*Server, error) {
 			}
 			return CountryName(*code)
 		},
+		"toDatetimeLocal": func(ts string) string {
+			t, err := time.Parse(time.RFC3339, ts)
+			if err != nil {
+				return ts
+			}
+			return t.Format("2006-01-02T15:04")
+		},
 		"sub": func(a, b int) int {
 			return a - b
 		},
@@ -134,6 +141,8 @@ func (s *Server) routes() http.Handler {
 	mux.HandleFunc("GET /t/{token}/admin", s.handleAdmin)
 	mux.HandleFunc("POST /t/{token}/admin/entries", s.handleCreateEntry)
 	mux.HandleFunc("POST /t/{token}/admin/entries/{entryID}/photos", s.handleAddPhotos)
+	mux.HandleFunc("POST /t/{token}/admin/entries/{entryID}/update", s.handleUpdateEntry)
+	mux.HandleFunc("POST /t/{token}/admin/entries/{entryID}/delete", s.handleDeleteEntry)
 	mux.HandleFunc("POST /t/{token}/admin/photos/{photoID}/delete", s.handleDeletePhoto)
 
 	return s.auth.AuthMiddleware(mux)
@@ -469,6 +478,80 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 		Type: EventEntry,
 		Data: "reload",
 	})
+
+	http.Redirect(w, r, "/t/"+token+"/admin", http.StatusSeeOther)
+}
+
+func (s *Server) handleUpdateEntry(w http.ResponseWriter, r *http.Request) {
+	token := r.PathValue("token")
+	trip, err := getTripByToken(s.db, token)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if !s.verifyTripOwnership(w, r, trip) {
+		return
+	}
+
+	entryID, err := strconv.ParseInt(r.PathValue("entryID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid entry ID", http.StatusBadRequest)
+		return
+	}
+
+	tripID, err := getEntryTripID(s.db, entryID)
+	if err != nil || tripID != trip.ID {
+		http.Error(w, "entry not found", http.StatusNotFound)
+		return
+	}
+
+	body := r.FormValue("body")
+	timestamp := r.FormValue("timestamp")
+	if timestamp != "" {
+		// Convert datetime-local format to RFC3339
+		if t, err := time.Parse("2006-01-02T15:04", timestamp); err == nil {
+			timestamp = t.UTC().Format(time.RFC3339)
+		}
+	} else {
+		timestamp = time.Now().UTC().Format(time.RFC3339)
+	}
+	if err := updateEntry(s.db, entryID, body, timestamp); err != nil {
+		http.Error(w, "failed to update entry", http.StatusInternalServerError)
+		log.Printf("update entry: %v", err)
+		return
+	}
+
+	http.Redirect(w, r, "/t/"+token+"/admin", http.StatusSeeOther)
+}
+
+func (s *Server) handleDeleteEntry(w http.ResponseWriter, r *http.Request) {
+	token := r.PathValue("token")
+	trip, err := getTripByToken(s.db, token)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if !s.verifyTripOwnership(w, r, trip) {
+		return
+	}
+
+	entryID, err := strconv.ParseInt(r.PathValue("entryID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid entry ID", http.StatusBadRequest)
+		return
+	}
+
+	tripID, err := getEntryTripID(s.db, entryID)
+	if err != nil || tripID != trip.ID {
+		http.Error(w, "entry not found", http.StatusNotFound)
+		return
+	}
+
+	if err := deleteEntry(s.db, entryID); err != nil {
+		http.Error(w, "failed to delete entry", http.StatusInternalServerError)
+		log.Printf("delete entry: %v", err)
+		return
+	}
 
 	http.Redirect(w, r, "/t/"+token+"/admin", http.StatusSeeOther)
 }

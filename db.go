@@ -331,6 +331,20 @@ func photobelongsToTrip(db *sql.DB, photoID int64, tripID string) bool {
 	return count > 0
 }
 
+func deleteEntry(db *sql.DB, entryID int64) error {
+	_, err := db.Exec("DELETE FROM photos WHERE entry_id = ?", entryID)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("DELETE FROM entries WHERE id = ?", entryID)
+	return err
+}
+
+func updateEntry(db *sql.DB, entryID int64, body string, timestamp string) error {
+	_, err := db.Exec("UPDATE entries SET body = ?, timestamp = ? WHERE id = ?", body, timestamp, entryID)
+	return err
+}
+
 func deletePhoto(db *sql.DB, photoID int64) (string, error) {
 	var filePath string
 	err := db.QueryRow("SELECT file_path FROM photos WHERE id = ?", photoID).Scan(&filePath)
