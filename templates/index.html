@@ -11,7 +11,12 @@
 </head>
 <body>
 <div class="container">
-    <h1>Trippy Track</h1>
+    <div class="index-header">
+        <h1>Trippy Track</h1>
+        {{if .User}}
+        <span class="user-info">{{.User.Name}} &middot; <a href="/logout">Logout</a></span>
+        {{end}}
+    </div>
 
     <section class="create-trip">
         <h2>New Trip</h2>
@@ -26,7 +31,7 @@
         <h2>Your Trips</h2>
         {{range .Trips}}
         <div class="trip-card">
-            <a href="/admin/{{.AdminToken}}">
+            <a href="/admin/{{.Token}}">
                 <h3>{{.Name}}</h3>
                 <span class="date">{{.CreatedAt}}</span>
             </a>

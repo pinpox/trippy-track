@@ -9,13 +9,29 @@ import (
 )
 
 const schema = `
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    oidc_subject TEXT UNIQUE NOT NULL,
+    email TEXT NOT NULL,
+    name TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    last_login_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+    id TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+);
+
 CREATE TABLE IF NOT EXISTS trips (
     id          TEXT PRIMARY KEY,
     name        TEXT NOT NULL,
     created_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
-    share_token TEXT NOT NULL UNIQUE,
-    admin_token TEXT NOT NULL UNIQUE,
-    is_active   INTEGER NOT NULL DEFAULT 1
+    token TEXT NOT NULL UNIQUE,
+    is_active   INTEGER NOT NULL DEFAULT 1,
+    user_id     INTEGER REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS trackpoints (
@@ -86,9 +102,9 @@ type Trip struct {
 	ID         string
 	Name       string
 	CreatedAt  string
-	ShareToken string
-	AdminToken string
+	Token string
 	IsActive   bool
+	UserID     *int
 }
 
 type Trackpoint struct {
@@ -121,14 +137,13 @@ type Photo struct {
 	SortOrder int
 }
 
-func createTrip(db *sql.DB, name string) (*Trip, error) {
+func createTrip(db *sql.DB, name string, userID int) (*Trip, error) {
 	id := randomToken(8)
-	shareToken := randomToken(16)
-	adminToken := randomToken(16)
+	token := randomToken(16)
 
 	_, err := db.Exec(
-		"INSERT INTO trips (id, name, share_token, admin_token) VALUES (?, ?, ?, ?)",
-		id, name, shareToken, adminToken,
+		"INSERT INTO trips (id, name, token, user_id) VALUES (?, ?, ?, ?)",
+		id, name, token, userID,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("insert trip: %w", err)
@@ -137,38 +152,29 @@ func createTrip(db *sql.DB, name string) (*Trip, error) {
 	return &Trip{
 		ID:         id,
 		Name:       name,
-		ShareToken: shareToken,
-		AdminToken: adminToken,
+		Token: token,
 		IsActive:   true,
+		UserID:     &userID,
 	}, nil
 }
 
-func getTripByAdminToken(db *sql.DB, token string) (*Trip, error) {
+func getTripByToken(db *sql.DB, token string) (*Trip, error) {
 	t := &Trip{}
 	err := db.QueryRow(
-		"SELECT id, name, created_at, share_token, admin_token, is_active FROM trips WHERE admin_token = ?",
+		"SELECT id, name, created_at, token, is_active, user_id FROM trips WHERE token = ?",
 		token,
-	).Scan(&t.ID, &t.Name, &t.CreatedAt, &t.ShareToken, &t.AdminToken, &t.IsActive)
+	).Scan(&t.ID, &t.Name, &t.CreatedAt, &t.Token, &t.IsActive, &t.UserID)
 	if err != nil {
 		return nil, err
 	}
 	return t, nil
 }
 
-func getTripByShareToken(db *sql.DB, token string) (*Trip, error) {
-	t := &Trip{}
-	err := db.QueryRow(
-		"SELECT id, name, created_at, share_token, admin_token, is_active FROM trips WHERE share_token = ?",
-		token,
-	).Scan(&t.ID, &t.Name, &t.CreatedAt, &t.ShareToken, &t.AdminToken, &t.IsActive)
-	if err != nil {
-		return nil, err
-	}
-	return t, nil
-}
-
-func listTrips(db *sql.DB) ([]Trip, error) {
-	rows, err := db.Query("SELECT id, name, created_at, share_token, admin_token, is_active FROM trips ORDER BY created_at DESC")
+func listTripsByUser(db *sql.DB, userID int) ([]Trip, error) {
+	rows, err := db.Query(
+		"SELECT id, name, created_at, token, is_active, user_id FROM trips WHERE user_id = ? ORDER BY created_at DESC",
+		userID,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +183,7 @@ func listTrips(db *sql.DB) ([]Trip, error) {
 	var trips []Trip
 	for rows.Next() {
 		var t Trip
-		if err := rows.Scan(&t.ID, &t.Name, &t.CreatedAt, &t.ShareToken, &t.AdminToken, &t.IsActive); err != nil {
+		if err := rows.Scan(&t.ID, &t.Name, &t.CreatedAt, &t.Token, &t.IsActive, &t.UserID); err != nil {
 			return nil, err
 		}
 		trips = append(trips, t)

@@ -4,4 +4,5 @@
 trippy-track
 uploads/
 result
+.env
 .claude/

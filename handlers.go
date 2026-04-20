@@ -23,9 +23,10 @@ type Server struct {
 	tmpl *template.Template
 	addr string
 	sse  *SSEBroker
+	auth *AuthService
 }
 
-func newServer(db *sql.DB, addr string) (*Server, error) {
+func newServer(db *sql.DB, addr string, auth *AuthService) (*Server, error) {
 	funcMap := template.FuncMap{
 		"deref": func(f *float64) float64 {
 			if f == nil {
@@ -78,36 +79,40 @@ func newServer(db *sql.DB, addr string) (*Server, error) {
 	tmpl := template.Must(template.New("").Funcs(funcMap).ParseGlob("templates/*.html"))
 	template.Must(tmpl.ParseGlob("templates/partials/*.html"))
 
-	return &Server{db: db, tmpl: tmpl, addr: addr, sse: newSSEBroker()}, nil
+	return &Server{db: db, tmpl: tmpl, addr: addr, sse: newSSEBroker(), auth: auth}, nil
 }
 
 func (s *Server) routes() http.Handler {
 	mux := http.NewServeMux()
 
-	// Static files
+	// Static files (no auth)
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	mux.Handle("GET /uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 
-	// Landing page
+	// Auth routes (no auth)
+	mux.HandleFunc("GET /login", s.handleLoginPage)
+	mux.HandleFunc("GET /login/start", s.handleLoginStart)
+	mux.HandleFunc("GET /callback", s.handleCallback)
+	mux.HandleFunc("GET /logout", s.handleLogout)
+
+	// Public view (no auth)
+	mux.HandleFunc("GET /t/{token}", s.handlePublicView)
+	mux.HandleFunc("GET /t/{token}/track", s.handlePublicTrack)
+	mux.HandleFunc("GET /t/{token}/entries", s.handlePublicEntries)
+	mux.HandleFunc("GET /t/{token}/sse", s.handleSSE)
+
+	// OwnTracks tracking (no auth, token in query param)
+	mux.HandleFunc("POST /api/track", s.handleTrack)
+
+	// Protected routes (require login)
 	mux.HandleFunc("GET /", s.handleIndex)
 	mux.HandleFunc("POST /trips", s.handleCreateTrip)
-
-	// Admin (secret admin token)
 	mux.HandleFunc("GET /admin/{token}", s.handleAdmin)
 	mux.HandleFunc("POST /admin/{token}/entries", s.handleCreateEntry)
 	mux.HandleFunc("POST /admin/{token}/entries/{entryID}/photos", s.handleAddPhotos)
 	mux.HandleFunc("POST /admin/{token}/photos/{photoID}/delete", s.handleDeletePhoto)
 
-	// OwnTracks tracking
-	mux.HandleFunc("POST /api/track", s.handleTrack)
-
-	// Public view
-	mux.HandleFunc("GET /t/{shareToken}", s.handlePublicView)
-	mux.HandleFunc("GET /t/{shareToken}/track", s.handlePublicTrack)
-	mux.HandleFunc("GET /t/{shareToken}/entries", s.handlePublicEntries)
-	mux.HandleFunc("GET /t/{shareToken}/sse", s.handleSSE)
-
-	return mux
+	return s.auth.AuthMiddleware(mux)
 }
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -116,7 +121,13 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trips, err := listTrips(s.db)
+	user := GetUserFromContext(r)
+	if user == nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+
+	trips, err := listTripsByUser(s.db, user.ID)
 	if err != nil {
 		http.Error(w, "failed to list trips", http.StatusInternalServerError)
 		log.Printf("list trips: %v", err)
@@ -125,31 +136,50 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 
 	s.tmpl.ExecuteTemplate(w, "index.html", map[string]any{
 		"Trips": trips,
+		"User":  user,
 	})
 }
 
 func (s *Server) handleCreateTrip(w http.ResponseWriter, r *http.Request) {
+	user := GetUserFromContext(r)
+	if user == nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+
 	name := r.FormValue("name")
 	if name == "" {
 		http.Error(w, "name is required", http.StatusBadRequest)
 		return
 	}
 
-	trip, err := createTrip(s.db, name)
+	trip, err := createTrip(s.db, name, user.ID)
 	if err != nil {
 		http.Error(w, "failed to create trip", http.StatusInternalServerError)
 		log.Printf("create trip: %v", err)
 		return
 	}
 
-	http.Redirect(w, r, "/admin/"+trip.AdminToken, http.StatusSeeOther)
+	http.Redirect(w, r, "/admin/"+trip.Token, http.StatusSeeOther)
+}
+
+func (s *Server) verifyTripOwnership(w http.ResponseWriter, r *http.Request, trip *Trip) bool {
+	user := GetUserFromContext(r)
+	if user == nil || trip.UserID == nil || *trip.UserID != user.ID {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return false
+	}
+	return true
 }
 
 func (s *Server) handleAdmin(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByAdminToken(s.db, token)
+	trip, err := getTripByToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
+		return
+	}
+	if !s.verifyTripOwnership(w, r, trip) {
 		return
 	}
 
@@ -169,7 +199,7 @@ func (s *Server) handleAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 	trackingURL := fmt.Sprintf(
 		"%s://%s/api/track?token=%s",
-		scheme, r.Host, trip.AdminToken,
+		scheme, r.Host, trip.Token,
 	)
 
 	entries, err := getEntries(s.db, trip.ID, true)
@@ -184,7 +214,7 @@ func (s *Server) handleAdmin(w http.ResponseWriter, r *http.Request) {
 		"Trackpoints": trackpoints,
 		"Entries":     entries,
 		"TrackingURL": trackingURL,
-		"ShareURL":    fmt.Sprintf("%s://%s/t/%s", scheme, r.Host, trip.ShareToken),
+		"ShareURL":    fmt.Sprintf("%s://%s/t/%s", scheme, r.Host, trip.Token),
 	})
 }
 
@@ -195,7 +225,7 @@ func (s *Server) handleTrack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trip, err := getTripByAdminToken(s.db, token)
+	trip, err := getTripByToken(s.db, token)
 	if err != nil {
 		http.Error(w, "invalid token", http.StatusUnauthorized)
 		return
@@ -272,9 +302,12 @@ func (s *Server) handleTrack(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByAdminToken(s.db, token)
+	trip, err := getTripByToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
+		return
+	}
+	if !s.verifyTripOwnership(w, r, trip) {
 		return
 	}
 
@@ -393,9 +426,12 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleDeletePhoto(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByAdminToken(s.db, token)
+	trip, err := getTripByToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
+		return
+	}
+	if !s.verifyTripOwnership(w, r, trip) {
 		return
 	}
 
@@ -426,9 +462,12 @@ func (s *Server) handleDeletePhoto(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleAddPhotos(w http.ResponseWriter, r *http.Request) {
 	token := r.PathValue("token")
-	trip, err := getTripByAdminToken(s.db, token)
+	trip, err := getTripByToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
+		return
+	}
+	if !s.verifyTripOwnership(w, r, trip) {
 		return
 	}
 
@@ -489,8 +528,8 @@ func (s *Server) handleAddPhotos(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
-	token := r.PathValue("shareToken")
-	trip, err := getTripByShareToken(s.db, token)
+	token := r.PathValue("token")
+	trip, err := getTripByToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -533,8 +572,8 @@ func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlePublicTrack(w http.ResponseWriter, r *http.Request) {
-	token := r.PathValue("shareToken")
-	trip, err := getTripByShareToken(s.db, token)
+	token := r.PathValue("token")
+	trip, err := getTripByToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -557,8 +596,8 @@ func (s *Server) handlePublicTrack(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlePublicEntries(w http.ResponseWriter, r *http.Request) {
-	token := r.PathValue("shareToken")
-	trip, err := getTripByShareToken(s.db, token)
+	token := r.PathValue("token")
+	trip, err := getTripByToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -576,8 +615,8 @@ func (s *Server) handlePublicEntries(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleSSE(w http.ResponseWriter, r *http.Request) {
-	token := r.PathValue("shareToken")
-	trip, err := getTripByShareToken(s.db, token)
+	token := r.PathValue("token")
+	trip, err := getTripByToken(s.db, token)
 	if err != nil {
 		http.NotFound(w, r)
 		return
