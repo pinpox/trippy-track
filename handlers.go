@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -97,8 +98,8 @@ func (s *Server) routes() http.Handler {
 	mux.HandleFunc("POST /admin/{token}/entries/{entryID}/photos", s.handleAddPhotos)
 	mux.HandleFunc("POST /admin/{token}/photos/{photoID}/delete", s.handleDeletePhoto)
 
-	// OsmAnd tracking
-	mux.HandleFunc("GET /api/track", s.handleTrack)
+	// OwnTracks tracking
+	mux.HandleFunc("POST /api/track", s.handleTrack)
 
 	// Public view
 	mux.HandleFunc("GET /t/{shareToken}", s.handlePublicView)
@@ -166,8 +167,8 @@ func (s *Server) handleAdmin(w http.ResponseWriter, r *http.Request) {
 	if fwd := r.Header.Get("X-Forwarded-Proto"); fwd != "" {
 		scheme = fwd
 	}
-	osmandURL := fmt.Sprintf(
-		"%s://%s/api/track?token=%s&lat={0}&lon={1}&timestamp={2}&speed={3}&bearing={4}&altitude={5}&hdop={6}",
+	trackingURL := fmt.Sprintf(
+		"%s://%s/api/track?token=%s",
 		scheme, r.Host, trip.AdminToken,
 	)
 
@@ -182,7 +183,7 @@ func (s *Server) handleAdmin(w http.ResponseWriter, r *http.Request) {
 		"Trip":        trip,
 		"Trackpoints": trackpoints,
 		"Entries":     entries,
-		"OsmandURL":   osmandURL,
+		"TrackingURL": trackingURL,
 		"ShareURL":    fmt.Sprintf("%s://%s/t/%s", scheme, r.Host, trip.ShareToken),
 	})
 }
@@ -200,61 +201,55 @@ func (s *Server) handleTrack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	latStr := r.URL.Query().Get("lat")
-	lonStr := r.URL.Query().Get("lon")
-	tsStr := r.URL.Query().Get("timestamp")
-
-	if latStr == "" || lonStr == "" || tsStr == "" {
-		http.Error(w, "lat, lon, timestamp required", http.StatusBadRequest)
-		return
+	// OwnTracks sends JSON POST
+	var payload struct {
+		Type string  `json:"_type"`
+		Lat  float64 `json:"lat"`
+		Lon  float64 `json:"lon"`
+		Tst  int64   `json:"tst"` // Unix epoch seconds
+		Alt  float64 `json:"alt"`
+		Vel  int     `json:"vel"` // velocity km/h
+		Batt int     `json:"batt"`
+		Acc  int     `json:"acc"` // accuracy meters
+		Cog  int     `json:"cog"` // course over ground (bearing)
 	}
 
-	lat, err := strconv.ParseFloat(latStr, 64)
-	if err != nil {
-		http.Error(w, "invalid lat", http.StatusBadRequest)
-		return
-	}
-	lon, err := strconv.ParseFloat(lonStr, 64)
-	if err != nil {
-		http.Error(w, "invalid lon", http.StatusBadRequest)
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	// OsmAnd sends timestamp as Unix epoch in milliseconds
-	tsMs, err := strconv.ParseInt(tsStr, 10, 64)
-	if err != nil {
-		http.Error(w, "invalid timestamp", http.StatusBadRequest)
+	// Only process location messages
+	if payload.Type != "location" {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte("[]"))
 		return
 	}
-	ts := time.UnixMilli(tsMs)
+
+	ts := time.Unix(payload.Tst, 0)
 
 	tp := Trackpoint{
 		TripID:    trip.ID,
-		Lat:       lat,
-		Lon:       lon,
+		Lat:       payload.Lat,
+		Lon:       payload.Lon,
 		Timestamp: ts,
 	}
 
-	// Optional fields
-	if v := r.URL.Query().Get("altitude"); v != "" {
-		if f, err := strconv.ParseFloat(v, 64); err == nil {
-			tp.Altitude = &f
-		}
+	if payload.Alt != 0 {
+		alt := payload.Alt
+		tp.Altitude = &alt
 	}
-	if v := r.URL.Query().Get("speed"); v != "" {
-		if f, err := strconv.ParseFloat(v, 64); err == nil {
-			tp.Speed = &f
-		}
+	if payload.Vel != 0 {
+		speed := float64(payload.Vel)
+		tp.Speed = &speed
 	}
-	if v := r.URL.Query().Get("bearing"); v != "" {
-		if f, err := strconv.ParseFloat(v, 64); err == nil {
-			tp.Bearing = &f
-		}
+	if payload.Cog != 0 {
+		bearing := float64(payload.Cog)
+		tp.Bearing = &bearing
 	}
-	if v := r.URL.Query().Get("hdop"); v != "" {
-		if f, err := strconv.ParseFloat(v, 64); err == nil {
-			tp.HDOP = &f
-		}
+	if payload.Acc != 0 {
+		hdop := float64(payload.Acc)
+		tp.HDOP = &hdop
 	}
 
 	if err := insertTrackpoint(s.db, tp); err != nil {
@@ -263,14 +258,16 @@ func (s *Server) handleTrack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("trackpoint: trip=%s lat=%.6f lon=%.6f ts=%s", trip.ID, lat, lon, ts.Format(time.RFC3339))
+	log.Printf("trackpoint: trip=%s lat=%.6f lon=%.6f ts=%s", trip.ID, payload.Lat, payload.Lon, ts.Format(time.RFC3339))
 
 	s.sse.Publish(trip.ID, SSEEvent{
 		Type: EventTrackpoint,
-		Data: fmt.Sprintf(`{"lat":%.6f,"lon":%.6f}`, lat, lon),
+		Data: fmt.Sprintf(`{"lat":%.6f,"lon":%.6f}`, payload.Lat, payload.Lon),
 	})
 
-	w.WriteHeader(http.StatusOK)
+	// OwnTracks expects a JSON array response
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("[]"))
 }
 
 func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
@@ -519,9 +516,12 @@ func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+	lastPoint, _ := getLatestTrackpoint(s.db, trip.ID)
+
 	s.tmpl.ExecuteTemplate(w, "public.html", map[string]any{
-		"Trip":     trip,
-		"Timeline": timeline,
+		"Trip":      trip,
+		"Timeline":  timeline,
+		"LastPoint": lastPoint,
 	})
 }
 

@@ -175,6 +175,15 @@ document.addEventListener("DOMContentLoaded", function () {
         observer.observe(el);
     });
 
+    // Stop timeline line before current entry
+    var currentEntry = document.querySelector(".timeline-current");
+    if (currentEntry) {
+        var line = currentEntry.closest(".timeline-line");
+        if (line) {
+            line.style.setProperty("--current-height", currentEntry.offsetHeight + "px");
+        }
+    }
+
     // Position distance labels at the midpoint between consecutive dots
     positionDistanceLabels();
 

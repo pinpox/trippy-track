@@ -260,6 +260,10 @@ code.copyable {
     background: #d0d0d0;
 }
 
+.timeline-line:has(.timeline-current)::before {
+    bottom: var(--current-height, 0px);
+}
+
 /* Timeline entries */
 .timeline-entry {
     position: relative;
@@ -268,6 +272,10 @@ code.copyable {
 
 .timeline-entry:last-child {
     padding-bottom: 0;
+}
+
+.timeline-current {
+    padding-top: 2rem;
 }
 
 /* Distance label - centered vertically in the gap above the entry */
@@ -286,6 +294,38 @@ code.copyable {
     letter-spacing: 0.05em;
     z-index: 2;
     /* top is set by JS to center between dots */
+}
+
+/* Current location entry */
+.timeline-dot-current {
+    background: #e53e3e;
+    box-shadow: 0 0 0 2px #e53e3e, 0 0 0 6px rgba(229, 62, 62, 0.2);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 2px #e53e3e, 0 0 0 6px rgba(229, 62, 62, 0.2); }
+    50% { box-shadow: 0 0 0 2px #e53e3e, 0 0 0 10px rgba(229, 62, 62, 0); }
+}
+
+.timeline-current-content {
+    padding-top: 0.1rem;
+}
+
+.timeline-current-label {
+    display: block;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: #888;
+}
+
+.timeline-current-coords {
+    display: block;
+    padding: 0.15rem 0 0;
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #aaa;
 }
 
 /* Date label left of the dot */

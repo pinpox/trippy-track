@@ -55,6 +55,19 @@
                 </div>
             </div>
             {{end}}
+            {{if $.LastPoint}}
+            <div class="timeline-entry timeline-current" data-lat="{{printf "%.6f" $.LastPoint.Lat}}" data-lon="{{printf "%.6f" $.LastPoint.Lon}}">
+                <div class="timeline-date">
+                    <span class="timeline-date-day">{{formatDate ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}}</span>
+                    <span class="timeline-date-time">{{formatClock ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}}</span>
+                </div>
+                <div class="timeline-dot timeline-dot-current"></div>
+                <div class="timeline-content timeline-current-content">
+                    <span class="timeline-current-label">Last known position</span>
+                    <span class="timeline-current-coords">{{printf "%.4f" $.LastPoint.Lat}}, {{printf "%.4f" $.LastPoint.Lon}}</span>
+                </div>
+            </div>
+            {{end}}
         </div>
         {{else}}
         <p class="muted">No entries yet. Check back soon!</p>

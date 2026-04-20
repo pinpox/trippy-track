@@ -296,6 +296,20 @@ func getPhotos(db *sql.DB, entryID int64) ([]Photo, error) {
 	return photos, rows.Err()
 }
 
+func getLatestTrackpoint(db *sql.DB, tripID string) (*Trackpoint, error) {
+	var tp Trackpoint
+	var ts string
+	err := db.QueryRow(
+		"SELECT trip_id, lat, lon, altitude, speed, bearing, hdop, timestamp FROM trackpoints WHERE trip_id = ? ORDER BY timestamp DESC LIMIT 1",
+		tripID,
+	).Scan(&tp.TripID, &tp.Lat, &tp.Lon, &tp.Altitude, &tp.Speed, &tp.Bearing, &tp.HDOP, &ts)
+	if err != nil {
+		return nil, err
+	}
+	tp.Timestamp, _ = time.Parse(time.RFC3339, ts)
+	return &tp, nil
+}
+
 func photobelongsToTrip(db *sql.DB, photoID int64, tripID string) bool {
 	var count int
 	db.QueryRow(
