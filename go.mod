@@ -1,4 +1,4 @@
-module github.com/pinpox/trip-track
+module github.com/pinpox/trippy-track
 
 go 1.26.1
 

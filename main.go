@@ -11,7 +11,7 @@ import (
 
 func main() {
 	addr := flag.String("addr", ":8080", "listen address")
-	dbPath := flag.String("db", "trip-track.db", "SQLite database path")
+	dbPath := flag.String("db", "trippy-track.db", "SQLite database path")
 	flag.Parse()
 
 	// Ensure uploads directory exists

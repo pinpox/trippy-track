@@ -1,5 +1,5 @@
 {
-  description = "trip-track - self-hosted travel journal";
+  description = "trippy-track - self-hosted travel journal";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -13,15 +13,15 @@
       in
       {
         packages.default = pkgs.buildGoModule {
-          pname = "trip-track";
+          pname = "trippy-track";
           version = "0.1.0";
           src = ./.;
           vendorHash = "sha256-BcbLHcTmaFQQIARZq8E7EMwf19GPZiYuRRmAHi1mrvc=";
 
           # Copy static assets and templates into the output
           postInstall = ''
-            mkdir -p $out/share/trip-track
-            cp -r static templates $out/share/trip-track/
+            mkdir -p $out/share/trippy-track
+            cp -r static templates $out/share/trippy-track/
           '';
         };
 
