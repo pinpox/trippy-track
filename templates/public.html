@@ -62,8 +62,8 @@
                     <span class="timeline-date-time">{{formatClock ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}}</span>
                 </div>
                 <div class="timeline-dot timeline-dot-current"></div>
-                <div class="timeline-content timeline-current-content">
-                    <span class="timeline-current-label">Last known position</span>
+                <div class="timeline-content">
+                    <p class="timeline-body" style="padding:0;margin:0">Last known position</p>
                     <span class="timeline-current-coords">{{printf "%.4f" $.LastPoint.Lat}}, {{printf "%.4f" $.LastPoint.Lon}}</span>
                 </div>
             </div>

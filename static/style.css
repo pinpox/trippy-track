@@ -348,24 +348,22 @@ code.copyable {
     50% { box-shadow: 0 0 0 2px #e53e3e, 0 0 0 10px rgba(229, 62, 62, 0); }
 }
 
-.timeline-current-content {
-    padding-top: 0.1rem;
-}
 
 .timeline-current-label {
     display: block;
     font-family: 'Libre Baskerville', Georgia, serif;
-    font-style: italic;
-    font-size: 0.95rem;
-    color: #888;
+    font-size: 1.15rem;
+    color: #1a1a1a;
+    line-height: 1;
+    padding-top: 0.15rem;
 }
 
 .timeline-current-coords {
     display: block;
-    padding: 0.15rem 0 0;
+    padding: 0.25rem 0 0;
     font-family: monospace;
-    font-size: 0.75rem;
-    color: #aaa;
+    font-size: 0.8rem;
+    color: #999;
 }
 
 /* Date label left of the dot */
@@ -541,7 +539,7 @@ code.copyable {
 
 /* Text content inside card */
 .timeline-body {
-    padding: 0.75rem 0 0;
+    padding: 0;
     font-family: 'Libre Baskerville', Georgia, serif;
     line-height: 1.7;
     font-size: 1.15rem;
