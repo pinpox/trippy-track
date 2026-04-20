@@ -65,6 +65,30 @@ func newServer(db *sql.DB, addr string, auth *AuthService) (*Server, error) {
 			ext := strings.ToLower(filepath.Ext(path))
 			return ext == ".mp4" || ext == ".webm" || ext == ".mov" || ext == ".avi"
 		},
+		"weatherIcon": func(code *int) string {
+			if code == nil {
+				return ""
+			}
+			return WeatherIcon(*code)
+		},
+		"weatherLabel": func(code *int) string {
+			if code == nil {
+				return ""
+			}
+			return WeatherLabel(*code)
+		},
+		"countryFlag": func(code *string) string {
+			if code == nil {
+				return ""
+			}
+			return CountryFlag(*code)
+		},
+		"countryName": func(code *string) string {
+			if code == nil {
+				return ""
+			}
+			return CountryName(*code)
+		},
 		"sub": func(a, b int) int {
 			return a - b
 		},
@@ -400,7 +424,32 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	entryID, err := createEntry(s.db, trip.ID, body, lat, lon, nil, entryTS)
+	// Fetch weather and country data
+	var weatherCode *int
+	var temperature *float64
+	var countryCode *string
+	if lat != nil && lon != nil {
+		ts, err := time.Parse(time.RFC3339, entryTS)
+		if err == nil {
+			w, err := fetchWeather(*lat, *lon, ts)
+			if err != nil {
+				log.Printf("fetch weather: %v", err)
+			} else {
+				weatherCode = &w.Code
+				temperature = &w.Temperature
+				log.Printf("weather: code=%d temp=%.1f", w.Code, w.Temperature)
+			}
+		}
+		cc, err := fetchCountryCode(*lat, *lon)
+		if err != nil {
+			log.Printf("fetch country: %v", err)
+		} else {
+			countryCode = &cc
+			log.Printf("country: %s", cc)
+		}
+	}
+
+	entryID, err := createEntry(s.db, trip.ID, body, lat, lon, nil, entryTS, weatherCode, temperature, countryCode)
 	if err != nil {
 		http.Error(w, "failed to create entry", http.StatusInternalServerError)
 		log.Printf("create entry: %v", err)

@@ -461,6 +461,31 @@ code.copyable {
     line-height: 1.3;
 }
 
+/* Entry header (country + weather) */
+.timeline-entry-header {
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.entry-country {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.entry-weather {
+    font-family: 'Libre Baskerville', Georgia, serif;
+}
+
+.entry-header-sep {
+    margin: 0 0.4rem;
+    color: var(--warm-grey);
+}
+
 /* Dot on the line */
 .timeline-dot {
     position: absolute;
@@ -503,7 +528,7 @@ code.copyable {
 /* Photos */
 .timeline-photos-wrap {
     position: relative;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.8rem;
 }
 
 .timeline-photos-wrap .scroll-arrow {

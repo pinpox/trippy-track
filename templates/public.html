@@ -33,6 +33,13 @@
                 </div>
                 <div class="timeline-dot"></div>
                 <div class="timeline-content">
+                    {{if or .Entry.CountryCode .Entry.WeatherCode}}
+                    <div class="timeline-entry-header">
+                        {{if .Entry.CountryCode}}<span class="entry-country">{{countryFlag .Entry.CountryCode}} {{countryName .Entry.CountryCode}}</span>{{end}}
+                        {{if and .Entry.CountryCode .Entry.WeatherCode}}<span class="entry-header-sep">&middot;</span>{{end}}
+                        {{if .Entry.WeatherCode}}<span class="entry-weather">{{weatherIcon .Entry.WeatherCode}} {{printf "%.0f" (deref .Entry.Temperature)}}&deg; {{weatherLabel .Entry.WeatherCode}}</span>{{end}}
+                    </div>
+                    {{end}}
                     {{if .Entry.Photos}}
                     <div class="timeline-photos-wrap">
                         <div class="scroll-arrow scroll-arrow-left">&lsaquo;</div>

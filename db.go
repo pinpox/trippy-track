@@ -57,7 +57,10 @@ CREATE TABLE IF NOT EXISTS entries (
     lon           REAL,
     location_name TEXT,
     timestamp     TEXT NOT NULL,
-    created_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+    created_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    weather_code  INTEGER,
+    temperature   REAL,
+    country_code  TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_entries_trip_ts ON entries(trip_id, timestamp);
@@ -127,6 +130,9 @@ type Entry struct {
 	LocationName *string
 	Timestamp    string
 	CreatedAt    string
+	WeatherCode  *int
+	Temperature  *float64
+	CountryCode  *string
 	Photos       []Photo
 }
 
@@ -224,10 +230,10 @@ func getTrackpoints(db *sql.DB, tripID string) ([]Trackpoint, error) {
 	return points, rows.Err()
 }
 
-func createEntry(db *sql.DB, tripID, body string, lat, lon *float64, locationName *string, timestamp string) (int64, error) {
+func createEntry(db *sql.DB, tripID, body string, lat, lon *float64, locationName *string, timestamp string, weatherCode *int, temperature *float64, countryCode *string) (int64, error) {
 	res, err := db.Exec(
-		"INSERT INTO entries (trip_id, body, lat, lon, location_name, timestamp) VALUES (?, ?, ?, ?, ?, ?)",
-		tripID, body, lat, lon, locationName, timestamp,
+		"INSERT INTO entries (trip_id, body, lat, lon, location_name, timestamp, weather_code, temperature, country_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		tripID, body, lat, lon, locationName, timestamp, weatherCode, temperature, countryCode,
 	)
 	if err != nil {
 		return 0, fmt.Errorf("insert entry: %w", err)
@@ -249,7 +255,7 @@ func getEntries(db *sql.DB, tripID string, descending bool) ([]Entry, error) {
 		order = "DESC"
 	}
 	rows, err := db.Query(
-		"SELECT id, trip_id, body, lat, lon, location_name, timestamp, created_at FROM entries WHERE trip_id = ? ORDER BY timestamp "+order,
+		"SELECT id, trip_id, body, lat, lon, location_name, timestamp, created_at, weather_code, temperature, country_code FROM entries WHERE trip_id = ? ORDER BY timestamp "+order,
 		tripID,
 	)
 	if err != nil {
@@ -260,7 +266,7 @@ func getEntries(db *sql.DB, tripID string, descending bool) ([]Entry, error) {
 	var entries []Entry
 	for rows.Next() {
 		var e Entry
-		if err := rows.Scan(&e.ID, &e.TripID, &e.Body, &e.Lat, &e.Lon, &e.LocationName, &e.Timestamp, &e.CreatedAt); err != nil {
+		if err := rows.Scan(&e.ID, &e.TripID, &e.Body, &e.Lat, &e.Lon, &e.LocationName, &e.Timestamp, &e.CreatedAt, &e.WeatherCode, &e.Temperature, &e.CountryCode); err != nil {
 			return nil, err
 		}
 		entries = append(entries, e)
