@@ -106,6 +106,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Fit bounds to track + markers
                 fitMapBounds(geojson);
+
+                // SSE live updates
+                var evtSource = new EventSource("/t/" + shareToken + "/sse");
+
+                evtSource.addEventListener("trackpoint", function (e) {
+                    var point = JSON.parse(e.data);
+                    var trackSource = map.getSource("track");
+                    if (trackSource) {
+                        var data = trackSource._data || trackSource.serialize().data;
+                        if (data && data.features && data.features.length > 0) {
+                            data.features[0].geometry.coordinates.push([point.lon, point.lat]);
+                            trackSource.setData(data);
+                        }
+                    }
+                });
+
+                evtSource.addEventListener("entry", function () {
+                    // Reload the page to show the new entry
+                    window.location.reload();
+                });
             });
     });
 

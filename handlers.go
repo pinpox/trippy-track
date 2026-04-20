@@ -21,6 +21,7 @@ type Server struct {
 	db   *sql.DB
 	tmpl *template.Template
 	addr string
+	sse  *SSEBroker
 }
 
 func newServer(db *sql.DB, addr string) (*Server, error) {
@@ -76,7 +77,7 @@ func newServer(db *sql.DB, addr string) (*Server, error) {
 	tmpl := template.Must(template.New("").Funcs(funcMap).ParseGlob("templates/*.html"))
 	template.Must(tmpl.ParseGlob("templates/partials/*.html"))
 
-	return &Server{db: db, tmpl: tmpl, addr: addr}, nil
+	return &Server{db: db, tmpl: tmpl, addr: addr, sse: newSSEBroker()}, nil
 }
 
 func (s *Server) routes() http.Handler {
@@ -101,6 +102,7 @@ func (s *Server) routes() http.Handler {
 	mux.HandleFunc("GET /t/{shareToken}", s.handlePublicView)
 	mux.HandleFunc("GET /t/{shareToken}/track", s.handlePublicTrack)
 	mux.HandleFunc("GET /t/{shareToken}/entries", s.handlePublicEntries)
+	mux.HandleFunc("GET /t/{shareToken}/sse", s.handleSSE)
 
 	return mux
 }
@@ -260,6 +262,12 @@ func (s *Server) handleTrack(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("trackpoint: trip=%s lat=%.6f lon=%.6f ts=%s", trip.ID, lat, lon, ts.Format(time.RFC3339))
+
+	s.sse.Publish(trip.ID, SSEEvent{
+		Type: EventTrackpoint,
+		Data: fmt.Sprintf(`{"lat":%.6f,"lon":%.6f}`, lat, lon),
+	})
+
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -374,6 +382,13 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("entry: trip=%s id=%d photos=%d", trip.ID, entryID, len(photoFiles))
+
+	// Publish SSE event with entry data
+	s.sse.Publish(trip.ID, SSEEvent{
+		Type: EventEntry,
+		Data: "reload",
+	})
+
 	http.Redirect(w, r, "/admin/"+token, http.StatusSeeOther)
 }
 
@@ -451,6 +466,43 @@ func (s *Server) handlePublicEntries(w http.ResponseWriter, r *http.Request) {
 
 	for _, e := range entries {
 		s.tmpl.ExecuteTemplate(w, "entry", e)
+	}
+}
+
+func (s *Server) handleSSE(w http.ResponseWriter, r *http.Request) {
+	token := r.PathValue("shareToken")
+	trip, err := getTripByShareToken(s.db, token)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "streaming not supported", http.StatusInternalServerError)
+		return
+	}
+
+	ch := s.sse.Subscribe(trip.ID)
+	defer s.sse.Unsubscribe(trip.ID, ch)
+
+	// Send initial keepalive
+	fmt.Fprint(w, ": connected\n\n")
+	flusher.Flush()
+
+	ctx := r.Context()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case event := <-ch:
+			fmt.Fprint(w, formatSSE(event.Type, event.Data))
+			flusher.Flush()
+		}
 	}
 }
 
