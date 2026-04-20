@@ -696,11 +696,17 @@ func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
 	}
 	stats := ComputeStats(trackpoints, len(entries), trip.IsActive)
 
+	isOwner := false
+	if user := GetUserFromContext(r); user != nil && trip.UserID != nil && *trip.UserID == user.ID {
+		isOwner = true
+	}
+
 	s.tmpl.ExecuteTemplate(w, "public.html", map[string]any{
 		"Trip":      trip,
 		"Timeline":  timeline,
 		"LastPoint": lastPoint,
 		"Stats":     stats,
+		"IsOwner":   isOwner,
 	})
 }
 

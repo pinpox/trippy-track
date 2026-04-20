@@ -22,7 +22,7 @@
         <div class="admin-info-row">
             <div class="admin-info-block">
                 <span class="admin-info-label">Share link</span>
-                <code class="admin-code" onclick="navigator.clipboard.writeText('{{.ShareURL}}'); this.classList.add('copied'); setTimeout(function(){this.classList.remove('copied')}.bind(this), 1500)"><span class="admin-code-text">{{.ShareURL}}</span><span class="copy-icon">&#x2398;</span></code>
+                <code class="admin-code"><a href="{{.ShareURL}}" class="admin-code-text">{{.ShareURL}}</a><span class="copy-icon" onclick="event.preventDefault(); event.stopPropagation(); navigator.clipboard.writeText('{{.ShareURL}}'); this.classList.add('copied'); setTimeout(function(){this.classList.remove('copied')}.bind(this), 1500)">&#x2398;</span></code>
             </div>
             <div class="admin-info-block">
                 <span class="admin-info-label">OwnTracks URL</span>

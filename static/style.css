@@ -283,6 +283,12 @@ h2 {
 .admin-code .admin-code-text {
     flex: 1;
     word-break: break-all;
+    color: var(--cream, #f5f0e8);
+    text-decoration: none;
+}
+
+.admin-code a.admin-code-text:hover {
+    text-decoration: underline;
 }
 
 .copy-icon {
@@ -720,6 +726,20 @@ code.copyable {
 .timeline-header {
     padding: 6rem 2rem 0 20rem;
     position: relative;
+}
+
+.admin-link {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    text-decoration: none;
+}
+
+.admin-link:hover {
+    color: var(--sienna);
 }
 
 .rss-link {
