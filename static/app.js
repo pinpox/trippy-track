@@ -114,6 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
         function (observerEntries) {
             observerEntries.forEach(function (oe) {
                 if (oe.isIntersecting) {
+                    var entryId = oe.target.dataset.entryId;
                     var lat = parseFloat(oe.target.dataset.lat);
                     var lon = parseFloat(oe.target.dataset.lon);
                     if (!isNaN(lat) && !isNaN(lon)) {
@@ -123,6 +124,17 @@ document.addEventListener("DOMContentLoaded", function () {
                             duration: 500,
                         });
                     }
+                    highlightEntry(oe.target);
+
+                    // Highlight active map marker
+                    markers.forEach(function (m) {
+                        var el = m.marker.getElement();
+                        if (String(m.entryId) === String(entryId)) {
+                            el.classList.add("map-marker-active");
+                        } else {
+                            el.classList.remove("map-marker-active");
+                        }
+                    });
                 }
             });
         },
@@ -172,36 +184,42 @@ document.addEventListener("DOMContentLoaded", function () {
     lightbox.id = "lightbox";
     lightbox.innerHTML =
         '<div class="lightbox-backdrop"></div>' +
-        '<img class="lightbox-img" src="">' +
+        '<div class="lightbox-media"></div>' +
         '<button class="lightbox-prev">&lsaquo;</button>' +
         '<button class="lightbox-next">&rsaquo;</button>' +
         '<button class="lightbox-close">&times;</button>' +
         '<span class="lightbox-counter"></span>';
     document.body.appendChild(lightbox);
 
-    var lightboxImg = lightbox.querySelector(".lightbox-img");
+    var lightboxMedia = lightbox.querySelector(".lightbox-media");
     var lightboxCounter = lightbox.querySelector(".lightbox-counter");
-    var currentPhotos = [];
+    var currentMedia = [];
     var currentIndex = 0;
 
-    function openLightbox(img) {
-        var container = img.closest(".timeline-photos");
+    function openLightbox(el) {
+        var container = el.closest(".timeline-photos");
         if (!container) return;
-        // Include all photos, even hidden ones
-        currentPhotos = Array.from(container.querySelectorAll("img"));
-        currentIndex = currentPhotos.indexOf(img);
+        currentMedia = Array.from(container.querySelectorAll("img, video"));
+        currentIndex = currentMedia.indexOf(el);
         if (currentIndex === -1) currentIndex = 0;
-        showPhoto();
+        showMedia();
         lightbox.classList.add("active");
     }
 
-    function showPhoto() {
-        lightboxImg.src = currentPhotos[currentIndex].src;
-        lightboxCounter.textContent = (currentIndex + 1) + " / " + currentPhotos.length;
+    function showMedia() {
+        var src = currentMedia[currentIndex].src;
+        var isVideo = currentMedia[currentIndex].tagName === "VIDEO";
+        if (isVideo) {
+            lightboxMedia.innerHTML = '<video class="lightbox-img" src="' + src + '" controls autoplay></video>';
+        } else {
+            lightboxMedia.innerHTML = '<img class="lightbox-img" src="' + src + '">';
+        }
+        lightboxCounter.textContent = (currentIndex + 1) + " / " + currentMedia.length;
     }
 
     function closeLightbox() {
         lightbox.classList.remove("active");
+        lightboxMedia.innerHTML = "";
     }
 
     lightbox.querySelector(".lightbox-backdrop").addEventListener("click", closeLightbox);
@@ -209,44 +227,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
     lightbox.querySelector(".lightbox-prev").addEventListener("click", function (e) {
         e.stopPropagation();
-        currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
-        showPhoto();
+        currentIndex = (currentIndex - 1 + currentMedia.length) % currentMedia.length;
+        showMedia();
     });
 
     lightbox.querySelector(".lightbox-next").addEventListener("click", function (e) {
         e.stopPropagation();
-        currentIndex = (currentIndex + 1) % currentPhotos.length;
-        showPhoto();
+        currentIndex = (currentIndex + 1) % currentMedia.length;
+        showMedia();
     });
 
     document.addEventListener("keydown", function (e) {
         if (!lightbox.classList.contains("active")) return;
         if (e.key === "Escape") closeLightbox();
         if (e.key === "ArrowLeft") {
-            currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
-            showPhoto();
+            currentIndex = (currentIndex - 1 + currentMedia.length) % currentMedia.length;
+            showMedia();
         }
         if (e.key === "ArrowRight") {
-            currentIndex = (currentIndex + 1) % currentPhotos.length;
-            showPhoto();
+            currentIndex = (currentIndex + 1) % currentMedia.length;
+            showMedia();
         }
     });
 
-    document.querySelectorAll(".timeline-photos img").forEach(function (img) {
-        img.style.cursor = "pointer";
-        img.addEventListener("click", function () {
-            openLightbox(img);
+    document.querySelectorAll(".timeline-photos img").forEach(function (el) {
+        el.style.cursor = "pointer";
+        el.addEventListener("click", function () {
+            openLightbox(el);
         });
     });
 
-    document.querySelectorAll(".photos-more").forEach(function (el) {
-        el.addEventListener("click", function () {
-            // Open lightbox at the 4th photo (first hidden one)
-            var container = el.closest(".timeline-photos");
-            var imgs = Array.from(container.querySelectorAll("img"));
-            if (imgs.length > 3) {
-                openLightbox(imgs[3]);
-            }
+    document.querySelectorAll(".timeline-photos .video-wrap").forEach(function (wrap) {
+        var video = wrap.querySelector("video");
+        wrap.style.cursor = "pointer";
+        wrap.addEventListener("click", function () {
+            openLightbox(video);
         });
     });
 

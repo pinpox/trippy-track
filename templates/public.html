@@ -37,7 +37,14 @@
                         <div class="scroll-arrow scroll-arrow-right">&rsaquo;</div>
                         <div class="timeline-photos">
                             {{range .Entry.Photos}}
+                            {{if isVideo .FilePath}}
+                            <div class="video-wrap">
+                                <div class="video-play-btn"></div>
+                                <video src="/uploads/{{.FilePath}}" preload="metadata" loop></video>
+                            </div>
+                            {{else}}
                             <img src="/uploads/{{.FilePath}}" alt="">
+                            {{end}}
                             {{end}}
                         </div>
                     </div>

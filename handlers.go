@@ -58,6 +58,10 @@ func newServer(db *sql.DB, addr string) (*Server, error) {
 			}
 			return fmt.Sprintf("%.1f km", km)
 		},
+		"isVideo": func(path string) bool {
+			ext := strings.ToLower(filepath.Ext(path))
+			return ext == ".mp4" || ext == ".webm" || ext == ".mov" || ext == ".avi"
+		},
 		"sub": func(a, b int) int {
 			return a - b
 		},

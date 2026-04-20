@@ -29,7 +29,7 @@
         <form method="POST" action="/admin/{{.Trip.AdminToken}}/entries" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="photos">Photos</label>
-                <input type="file" id="photos" name="photos" multiple accept="image/*">
+                <input type="file" id="photos" name="photos" multiple accept="image/*,video/*">
             </div>
             <div class="form-group">
                 <label for="body">Notes</label>
@@ -47,7 +47,11 @@
             {{if .Photos}}
             <div class="entry-photos">
                 {{range .Photos}}
+                {{if isVideo .FilePath}}
+                <video src="/uploads/{{.FilePath}}" controls preload="metadata" class="entry-thumb"></video>
+                {{else}}
                 <img src="/uploads/{{.FilePath}}" alt="" class="entry-thumb">
+                {{end}}
                 {{end}}
             </div>
             {{end}}
