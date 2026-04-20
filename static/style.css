@@ -630,8 +630,8 @@ code.copyable {
 
 /* Map markers */
 .map-marker {
-    width: 10px;
-    height: 10px;
+    width: 16px;
+    height: 16px;
     background: var(--ink-light);
     border: 2px solid white;
     border-radius: 50%;
