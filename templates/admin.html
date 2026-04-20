@@ -36,12 +36,12 @@
 
     <section class="admin-new-entry">
         <form method="POST" action="/t/{{.Trip.ViewToken}}/admin/entries" enctype="multipart/form-data" class="admin-entry-form">
-            <div class="entry-photos">
+            <div class="entry-photos" id="new-entry-photos">
                 <div class="entry-photo-add">
                     <div class="photo-add-form">
                         <label class="photo-add-btn" title="Add photos &amp; videos">
                             +
-                            <input type="file" name="photos" multiple accept="image/*,video/*" hidden>
+                            <input type="file" id="new-entry-file-input" name="photos" multiple accept="image/*,video/*" hidden>
                         </label>
                     </div>
                 </div>
@@ -110,5 +110,66 @@
     </section>
     {{end}}
 </div>
+<script>
+(function() {
+    var input = document.getElementById('new-entry-file-input');
+    var container = document.getElementById('new-entry-photos');
+    var addBox = container.querySelector('.entry-photo-add');
+    var dt = new DataTransfer();
+
+    function rebuildPreviews() {
+        container.querySelectorAll('.entry-photo-wrap').forEach(function(el) { el.remove(); });
+
+        Array.from(dt.files).forEach(function(file, idx) {
+            var wrap = document.createElement('div');
+            wrap.className = 'entry-photo-wrap';
+
+            if (file.type.startsWith('video/')) {
+                var vid = document.createElement('video');
+                vid.src = URL.createObjectURL(file);
+                vid.className = 'entry-thumb';
+                vid.preload = 'metadata';
+                wrap.appendChild(vid);
+            } else {
+                var img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'entry-thumb';
+                wrap.appendChild(img);
+            }
+
+            var removeWrap = document.createElement('div');
+            removeWrap.className = 'photo-delete-form';
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'photo-delete-btn';
+            removeBtn.textContent = '\u00d7';
+            removeBtn.style.opacity = '1';
+            removeBtn.onclick = function(e) {
+                e.preventDefault();
+                var newDt = new DataTransfer();
+                Array.from(dt.files).forEach(function(f, i) {
+                    if (i !== idx) newDt.items.add(f);
+                });
+                dt = newDt;
+                input.files = dt.files;
+                rebuildPreviews();
+            };
+            removeWrap.appendChild(removeBtn);
+            wrap.appendChild(removeWrap);
+
+            container.insertBefore(wrap, addBox);
+        });
+
+        input.files = dt.files;
+    }
+
+    input.addEventListener('change', function() {
+        Array.from(input.files).forEach(function(file) {
+            dt.items.add(file);
+        });
+        rebuildPreviews();
+    });
+})();
+</script>
 </body>
 </html>
