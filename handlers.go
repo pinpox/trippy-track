@@ -131,6 +131,7 @@ func (s *Server) routes() http.Handler {
 	mux.HandleFunc("GET /t/{token}/track", s.handlePublicTrack)
 	mux.HandleFunc("GET /t/{token}/entries", s.handlePublicEntries)
 	mux.HandleFunc("GET /t/{token}/sse", s.handleSSE)
+	mux.HandleFunc("GET /t/{token}/rss", s.handleRSS)
 
 	// OwnTracks tracking (no auth, token in query param)
 	mux.HandleFunc("POST /api/track", s.handleTrack)
@@ -781,6 +782,80 @@ func (s *Server) handleSSE(w http.ResponseWriter, r *http.Request) {
 			flusher.Flush()
 		}
 	}
+}
+
+func (s *Server) handleRSS(w http.ResponseWriter, r *http.Request) {
+	token := r.PathValue("token")
+	trip, err := getTripByViewToken(s.db, token)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	entries, err := getEntries(s.db, trip.ID, true)
+	if err != nil {
+		http.Error(w, "failed to get entries", http.StatusInternalServerError)
+		return
+	}
+
+	scheme := "http"
+	if r.TLS != nil {
+		scheme = "https"
+	}
+	if fwd := r.Header.Get("X-Forwarded-Proto"); fwd != "" {
+		scheme = fwd
+	}
+	baseURL := fmt.Sprintf("%s://%s", scheme, r.Host)
+	tripURL := fmt.Sprintf("%s/t/%s", baseURL, trip.ViewToken)
+
+	w.Header().Set("Content-Type", "application/rss+xml; charset=utf-8")
+
+	fmt.Fprintf(w, `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+<title>%s</title>
+<link>%s</link>
+<description>Travel journal: %s</description>
+`, template.HTMLEscapeString(trip.Name), tripURL, template.HTMLEscapeString(trip.Name))
+
+	for _, e := range entries {
+		ts, _ := time.Parse(time.RFC3339, e.Timestamp)
+		pubDate := ts.Format(time.RFC1123Z)
+
+		title := ts.Format("Jan 2, 2006 15:04")
+		if e.Body != nil && len(*e.Body) > 0 {
+			t := *e.Body
+			if len(t) > 80 {
+				t = t[:80] + "..."
+			}
+			title = t
+		}
+
+		description := ""
+		for _, p := range e.Photos {
+			if strings.HasSuffix(strings.ToLower(p.FilePath), ".mp4") ||
+				strings.HasSuffix(strings.ToLower(p.FilePath), ".webm") ||
+				strings.HasSuffix(strings.ToLower(p.FilePath), ".mov") {
+				description += fmt.Sprintf(`<p><video src="%s/uploads/%s" controls></video></p>`, baseURL, p.FilePath)
+			} else {
+				description += fmt.Sprintf(`<p><img src="%s/uploads/%s" /></p>`, baseURL, p.FilePath)
+			}
+		}
+		if e.Body != nil {
+			description += fmt.Sprintf("<p>%s</p>", template.HTMLEscapeString(*e.Body))
+		}
+
+		fmt.Fprintf(w, `<item>
+<title>%s</title>
+<link>%s</link>
+<pubDate>%s</pubDate>
+<description><![CDATA[%s]]></description>
+</item>
+`, template.HTMLEscapeString(title), tripURL, pubDate, description)
+	}
+
+	fmt.Fprint(w, `</channel>
+</rss>`)
 }
 
 func buildGeoJSON(points []Trackpoint, entries []Entry) string {

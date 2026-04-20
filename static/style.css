@@ -718,14 +718,32 @@ code.copyable {
 
 /* Timeline header */
 .timeline-header {
-    padding: 3.5rem 2rem 0 20rem;
+    padding: 6rem 2rem 0 20rem;
+    position: relative;
+}
+
+.rss-link {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    text-decoration: none;
+}
+
+.rss-link:hover {
+    color: var(--sienna);
 }
 
 .timeline-header h1 {
     font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 4rem;
+    margin-bottom: 6rem;
     text-align: center;
     color: var(--ink);
 }

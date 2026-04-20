@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="{{.Trip.Name}}" href="/t/{{.Trip.ViewToken}}/rss">
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
     <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
@@ -19,6 +20,10 @@
     <div id="timeline">
         <div class="timeline-header">
             <h1>{{.Trip.Name}}</h1>
+            <a href="/t/{{.Trip.ViewToken}}/rss" class="rss-link" title="RSS Feed">
+                <svg width="14" height="14" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><circle cx="68" cy="189" r="36" fill="currentColor"/><path d="M32 32v32c88.4 0 160 71.6 160 160h32C224 118 138 32 32 32z" fill="currentColor"/><path d="M32 96v32c52.9 0 96 43.1 96 96h32c0-70.7-57.3-128-128-128z" fill="currentColor"/></svg>
+                RSS
+            </a>
         </div>
         {{if .Timeline}}
         <div class="timeline-line">
