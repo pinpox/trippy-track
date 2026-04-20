@@ -1,38 +1,125 @@
 {
   description = "trippy-track - self-hosted travel journal";
 
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-  };
+  inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
 
   outputs =
-    { nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in
-      {
-        packages.default = pkgs.buildGoModule {
-          pname = "trippy-track";
-          version = "0.1.0";
-          src = ./.;
-          vendorHash = "sha256-BcbLHcTmaFQQIARZq8E7EMwf19GPZiYuRRmAHi1mrvc=";
+    { self, nixpkgs }:
+    let
+      lastModifiedDate = self.lastModifiedDate or self.lastModified or "19700101";
+      version = builtins.substring 0 8 lastModifiedDate;
+      supportedSystems = [
+        "x86_64-linux"
+        "x86_64-darwin"
+        "aarch64-linux"
+        "aarch64-darwin"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+      nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; });
+    in
+    {
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgsFor.${system};
+        in
+        rec {
+          trippy-track = pkgs.buildGoModule {
+            pname = "trippy-track";
+            inherit version;
+            src = ./.;
 
-          # Copy static assets and templates into the output
-          postInstall = ''
-            mkdir -p $out/share/trippy-track
-            cp -r static templates $out/share/trippy-track/
-          '';
-        };
+            vendorHash = "sha256-BcbLHcTmaFQQIARZq8E7EMwf19GPZiYuRRmAHi1mrvc=";
 
-        devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            go
-            sqlite
-          ];
+            postInstall = ''
+              mkdir -p $out/share/trippy-track
+              cp -r static templates $out/share/trippy-track/
+            '';
+          };
+          default = trippy-track;
+        }
+      );
+
+      devShells = forAllSystems (
+        system:
+        with nixpkgsFor.${system};
+        {
+          default = mkShell {
+            buildInputs = [
+              go
+              gopls
+              gotools
+              sqlite
+            ];
+          };
+        }
+      );
+
+      nixosModules.default = { config, lib, pkgs, ... }:
+        let
+          cfg = config.services.trippy-track;
+        in
+        {
+          options.services.trippy-track = {
+            enable = lib.mkEnableOption "trippy-track travel journal";
+
+            port = lib.mkOption {
+              type = lib.types.port;
+              default = 8080;
+              description = "Port to listen on";
+            };
+
+            dataDir = lib.mkOption {
+              type = lib.types.path;
+              default = "/var/lib/trippy-track";
+              description = "Directory for database and uploads";
+            };
+
+            environmentFile = lib.mkOption {
+              type = lib.types.nullOr lib.types.path;
+              default = null;
+              description = "Environment file with OIDC secrets (OIDC_ISSUER_URL, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET, OIDC_REDIRECT_URL)";
+            };
+
+            package = lib.mkOption {
+              type = lib.types.package;
+              default = self.packages.${pkgs.system}.trippy-track;
+              description = "trippy-track package to use";
+            };
+          };
+
+          config = lib.mkIf cfg.enable {
+            systemd.services.trippy-track = {
+              description = "Trippy Track - self-hosted travel journal";
+              wantedBy = [ "multi-user.target" ];
+              after = [ "network-online.target" ];
+              wants = [ "network-online.target" ];
+
+              environment = {
+                PORT = toString cfg.port;
+                DATABASE_URL = "${cfg.dataDir}/trippy-track.db";
+              };
+
+              serviceConfig = {
+                Type = "simple";
+                DynamicUser = true;
+                StateDirectory = "trippy-track";
+                WorkingDirectory = "${cfg.package}/share/trippy-track";
+                ExecStart = "${cfg.package}/bin/trippy-track";
+                Restart = "on-failure";
+                RestartSec = 5;
+
+                # Hardening
+                NoNewPrivileges = true;
+                ProtectSystem = "strict";
+                ProtectHome = true;
+                PrivateTmp = true;
+                ReadWritePaths = [ cfg.dataDir ];
+              } // lib.optionalAttrs (cfg.environmentFile != null) {
+                EnvironmentFile = cfg.environmentFile;
+              };
+            };
+          };
         };
-      }
-    );
+    };
 }
