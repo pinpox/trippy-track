@@ -6,38 +6,39 @@
     <title>Trippy Track</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
     <link rel="icon" type="image/svg+xml" href="/static/favicon-dark.svg" media="(prefers-color-scheme: dark)">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
-<body>
-<div class="container">
+<body class="index-page">
+<div class="index-container">
     <div class="index-header">
-        <h1>Trippy Track</h1>
+        <h1 class="index-title">Trippy Track</h1>
         {{if .User}}
         <span class="user-info">{{.User.Name}} &middot; <a href="/logout">Logout</a></span>
         {{end}}
     </div>
 
     <section class="create-trip">
-        <h2>New Trip</h2>
-        <form method="POST" action="/trips">
-            <input type="text" name="name" placeholder="Trip name, e.g. Balkans 2026" required>
+        <form method="POST" action="/trips" class="create-trip-form">
+            <input type="text" name="name" placeholder="New trip name..." required>
             <button type="submit">Create Trip</button>
         </form>
     </section>
 
     {{if .Trips}}
     <section class="trip-list">
-        <h2>Your Trips</h2>
         {{range .Trips}}
-        <div class="trip-card">
-            <a href="/t/{{.ViewToken}}/admin">
-                <h3>{{.Name}}</h3>
-                <span class="date">{{.CreatedAt}}</span>
-            </a>
-        </div>
+        <a href="/t/{{.ViewToken}}/admin" class="trip-card">
+            <span class="trip-card-name">{{.Name}}</span>
+            <span class="trip-card-date">{{formatTime .CreatedAt}}</span>
+            <span class="trip-card-arrow">&rsaquo;</span>
+        </a>
         {{end}}
     </section>
+    {{else}}
+    <p class="index-empty">No trips yet. Create your first one above.</p>
     {{end}}
 </div>
 </body>

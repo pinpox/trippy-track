@@ -6,35 +6,47 @@
     <title>{{.Trip.Name}} - Admin</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
     <link rel="icon" type="image/svg+xml" href="/static/favicon-dark.svg" media="(prefers-color-scheme: dark)">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
-<body>
-<div class="container">
-    <h1>{{.Trip.Name}}</h1>
+<body class="admin-page">
+<div class="admin-container">
+    <div class="admin-header">
+        <a href="/" class="admin-back">&lsaquo; Trips</a>
+        <h1 class="admin-title">{{.Trip.Name}}</h1>
+    </div>
 
-    <section class="trip-info">
-        <h2>Share Link</h2>
-        <p>Send this to friends so they can follow your trip:</p>
-        <code class="copyable">{{.ShareURL}}</code>
-
-        <h2>OwnTracks Setup</h2>
-        <p>In OwnTracks, set mode to <strong>HTTP</strong> and use this URL:</p>
-        <code class="copyable">{{.TrackingURL}}</code>
-
-        <h2>Stats</h2>
-        <p>Trackpoints: <strong>{{len .Trackpoints}}</strong> | Entries: <strong>{{len .Entries}}</strong></p>
+    <section class="admin-info">
+        <div class="admin-info-row">
+            <div class="admin-info-block">
+                <span class="admin-info-label">Share link</span>
+                <code class="admin-code" onclick="navigator.clipboard.writeText('{{.ShareURL}}'); this.classList.add('copied'); setTimeout(function(){this.classList.remove('copied')}.bind(this), 1500)"><span class="admin-code-text">{{.ShareURL}}</span><span class="copy-icon">&#x2398;</span></code>
+            </div>
+            <div class="admin-info-block">
+                <span class="admin-info-label">OwnTracks URL</span>
+                <code class="admin-code" onclick="navigator.clipboard.writeText('{{.TrackingURL}}'); this.classList.add('copied'); setTimeout(function(){this.classList.remove('copied')}.bind(this), 1500)"><span class="admin-code-text">{{.TrackingURL}}</span><span class="copy-icon">&#x2398;</span></code>
+            </div>
+        </div>
+        <div class="admin-stats">
+            {{len .Trackpoints}} trackpoints &middot; {{len .Entries}} entries
+        </div>
     </section>
 
-    <section class="new-entry">
-        <h2>New Entry</h2>
-        <form method="POST" action="/t/{{.Trip.ViewToken}}/admin/entries" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="photos">Photos</label>
-                <input type="file" id="photos" name="photos" multiple accept="image/*,video/*">
+    <section class="admin-new-entry">
+        <form method="POST" action="/t/{{.Trip.ViewToken}}/admin/entries" enctype="multipart/form-data" class="admin-entry-form">
+            <div class="entry-photos">
+                <div class="entry-photo-add">
+                    <div class="photo-add-form">
+                        <label class="photo-add-btn" title="Add photos &amp; videos">
+                            +
+                            <input type="file" name="photos" multiple accept="image/*,video/*" hidden>
+                        </label>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
-                <label for="body">Notes</label>
                 <textarea id="body" name="body" rows="6" placeholder="What's happening?"></textarea>
             </div>
             <button type="submit">Post Entry</button>
@@ -42,8 +54,8 @@
     </section>
 
     {{if .Entries}}
-    <section class="entries">
-        <h2>Entries</h2>
+    <section class="admin-entries">
+        <h2 class="admin-section-title">Entries</h2>
         {{range .Entries}}
         <div class="entry-card">
             <span class="entry-card-date">{{formatTime .Timestamp}}</span>
