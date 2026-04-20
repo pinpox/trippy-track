@@ -518,10 +518,17 @@ func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
 
 	lastPoint, _ := getLatestTrackpoint(s.db, trip.ID)
 
+	trackpoints, err := getTrackpoints(s.db, trip.ID)
+	if err != nil {
+		trackpoints = nil
+	}
+	stats := ComputeStats(trackpoints, len(entries), trip.IsActive)
+
 	s.tmpl.ExecuteTemplate(w, "public.html", map[string]any{
 		"Trip":      trip,
 		"Timeline":  timeline,
 		"LastPoint": lastPoint,
+		"Stats":     stats,
 	})
 }
 

@@ -89,6 +89,51 @@ func DistanceBetweenEntries(entries []Entry) []float64 {
 	return dists
 }
 
+// TotalTrackDistance returns the total distance in km along the trackpoints.
+func TotalTrackDistance(points []Trackpoint) float64 {
+	var total float64
+	for i := 1; i < len(points); i++ {
+		total += Haversine(points[i-1].Lat, points[i-1].Lon, points[i].Lat, points[i].Lon)
+	}
+	return total
+}
+
+type TripStats struct {
+	TotalDistanceKm float64
+	DurationDays    int
+	DurationHours   int
+	EntryCount      int
+	IsActive        bool
+	LastSpeed       *float64 // km/h
+}
+
+func ComputeStats(points []Trackpoint, entryCount int, isActive bool) TripStats {
+	stats := TripStats{
+		EntryCount: entryCount,
+		IsActive:   isActive,
+	}
+
+	if len(points) == 0 {
+		return stats
+	}
+
+	stats.TotalDistanceKm = TotalTrackDistance(points)
+
+	first := points[0].Timestamp
+	last := points[len(points)-1].Timestamp
+	dur := last.Sub(first)
+	stats.DurationDays = int(dur.Hours()) / 24
+	stats.DurationHours = int(dur.Hours()) % 24
+
+	// Last known speed
+	lastPoint := points[len(points)-1]
+	if lastPoint.Speed != nil {
+		stats.LastSpeed = lastPoint.Speed
+	}
+
+	return stats
+}
+
 // FormatCoord returns a human-readable coordinate string.
 func FormatCoord(lat, lon float64) string {
 	ns := "N"

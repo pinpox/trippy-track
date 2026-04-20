@@ -229,6 +229,45 @@ code.copyable {
 #map {
     width: 40%;
     min-width: 0;
+    position: relative;
+}
+
+.map-stats {
+    position: absolute;
+    top: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    display: flex;
+    align-items: center;
+    border-radius: 20px;
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+}
+
+.stats-sep {
+    margin: 0 0.5rem;
+    color: #888;
+}
+
+.stats-live-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #e53e3e;
+    border-radius: 50%;
+    margin-right: 0.4rem;
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
 }
 
 /* Timeline header */

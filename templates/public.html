@@ -73,7 +73,18 @@
         <p class="muted">No entries yet. Check back soon!</p>
         {{end}}
     </div>
-    <div id="map"></div>
+    <div id="map">
+        <div class="map-stats">
+            {{if .Stats.IsActive}}<span class="stats-live-dot"></span> Traveling{{end}}
+            <span class="stats-sep">&middot;</span>
+            {{if gt .Stats.DurationDays 0}}{{.Stats.DurationDays}}d {{.Stats.DurationHours}}h{{else}}{{.Stats.DurationHours}}h{{end}}
+            <span class="stats-sep">&middot;</span>
+            {{.Stats.EntryCount}} entries
+            <span class="stats-sep">&middot;</span>
+            {{printf "%.0f" .Stats.TotalDistanceKm}} km
+            {{if .Stats.LastSpeed}}<span class="stats-sep">&middot;</span> {{printf "%.0f" (deref .Stats.LastSpeed)}} km/h{{end}}
+        </div>
+    </div>
 </div>
 <script>
     const shareToken = "{{.Trip.ShareToken}}";

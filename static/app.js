@@ -184,6 +184,34 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // Click timeline dots or dates -> fly to location on map
+    document.querySelectorAll(".timeline-dot, .timeline-date").forEach(function (el) {
+        el.style.cursor = "pointer";
+        el.addEventListener("click", function () {
+            var entry = el.closest(".timeline-entry");
+            if (!entry) return;
+            var lat = parseFloat(entry.dataset.lat);
+            var lon = parseFloat(entry.dataset.lon);
+            if (!isNaN(lat) && !isNaN(lon)) {
+                map.flyTo({
+                    center: [lon, lat],
+                    zoom: Math.max(map.getZoom(), 12),
+                    duration: 800,
+                });
+                highlightEntry(entry);
+                var entryId = entry.dataset.entryId;
+                markers.forEach(function (m) {
+                    var mel = m.marker.getElement();
+                    if (String(m.entryId) === String(entryId)) {
+                        mel.classList.add("map-marker-active");
+                    } else {
+                        mel.classList.remove("map-marker-active");
+                    }
+                });
+            }
+        });
+    });
+
     // Position distance labels at the midpoint between consecutive dots
     positionDistanceLabels();
 
