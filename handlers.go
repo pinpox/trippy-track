@@ -359,7 +359,7 @@ func (s *Server) handleOwnTracksConfig(w http.ResponseWriter, r *http.Request) {
 	config := fmt.Sprintf(`{
   "_type": "configuration",
   "mode": 3,
-  "monitoring": -1,
+  "monitoring": 2,
   "url": "%s",
   "autostartOnBoot": true,
   "cmd": true,
