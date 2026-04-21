@@ -98,6 +98,7 @@
               environment = {
                 PORT = toString cfg.port;
                 DATABASE_URL = "${cfg.dataDir}/trippy-track.db";
+                UPLOADS_DIR = "${cfg.dataDir}/uploads";
               };
 
               serviceConfig = {

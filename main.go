@@ -15,7 +15,7 @@ func main() {
 		log.Fatalf("OIDC config: %v", err)
 	}
 
-	if err := os.MkdirAll("uploads", 0o755); err != nil {
+	if err := os.MkdirAll(config.UploadsDir, 0o755); err != nil {
 		log.Fatalf("create uploads dir: %v", err)
 	}
 
@@ -30,7 +30,7 @@ func main() {
 		log.Fatalf("init auth: %v", err)
 	}
 
-	srv, err := newServer(db, config.Addr, auth)
+	srv, err := newServer(db, config.Addr, config.UploadsDir, auth)
 	if err != nil {
 		log.Fatalf("init server: %v", err)
 	}

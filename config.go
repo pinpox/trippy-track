@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Addr        string
 	DatabaseURL string
+	UploadsDir  string
 	OIDC        OIDCConfig
 }
 
@@ -29,6 +30,7 @@ func LoadConfig() Config {
 	return Config{
 		Addr:        ":" + getEnv("PORT", "8080"),
 		DatabaseURL: getEnv("DATABASE_URL", "trippy-track.db"),
+		UploadsDir:  getEnv("UPLOADS_DIR", "uploads"),
 		OIDC: OIDCConfig{
 			IssuerURL:    getEnv("OIDC_ISSUER_URL", ""),
 			ClientID:     getEnv("OIDC_CLIENT_ID", ""),

@@ -19,14 +19,15 @@ import (
 )
 
 type Server struct {
-	db   *sql.DB
-	tmpl *template.Template
-	addr string
-	sse  *SSEBroker
-	auth *AuthService
+	db         *sql.DB
+	tmpl       *template.Template
+	addr       string
+	uploadsDir string
+	sse        *SSEBroker
+	auth       *AuthService
 }
 
-func newServer(db *sql.DB, addr string, auth *AuthService) (*Server, error) {
+func newServer(db *sql.DB, addr string, uploadsDir string, auth *AuthService) (*Server, error) {
 	funcMap := template.FuncMap{
 		"deref": func(f *float64) float64 {
 			if f == nil {
@@ -110,7 +111,7 @@ func newServer(db *sql.DB, addr string, auth *AuthService) (*Server, error) {
 	tmpl := template.Must(template.New("").Funcs(funcMap).ParseGlob("templates/*.html"))
 	template.Must(tmpl.ParseGlob("templates/partials/*.html"))
 
-	return &Server{db: db, tmpl: tmpl, addr: addr, sse: newSSEBroker(), auth: auth}, nil
+	return &Server{db: db, tmpl: tmpl, addr: addr, uploadsDir: uploadsDir, sse: newSSEBroker(), auth: auth}, nil
 }
 
 func (s *Server) routes() http.Handler {
@@ -118,7 +119,7 @@ func (s *Server) routes() http.Handler {
 
 	// Static files (no auth)
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	mux.Handle("GET /uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
+	mux.Handle("GET /uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir(s.uploadsDir))))
 
 	// Auth routes (no auth)
 	mux.HandleFunc("GET /login", s.handleLoginPage)
@@ -388,7 +389,7 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 		rand.Read(b)
 		filename := hex.EncodeToString(b) + ext
 
-		if err := os.WriteFile(filepath.Join("uploads", filename), data, 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(s.uploadsDir, filename), data, 0o644); err != nil {
 			log.Printf("save upload: %v", err)
 			continue
 		}
@@ -588,7 +589,7 @@ func (s *Server) handleDeletePhoto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Remove file from disk
-	os.Remove(filepath.Join("uploads", filePath))
+	os.Remove(filepath.Join(s.uploadsDir, filePath))
 
 	http.Redirect(w, r, "/t/"+token+"/admin", http.StatusSeeOther)
 }
@@ -646,7 +647,7 @@ func (s *Server) handleAddPhotos(w http.ResponseWriter, r *http.Request) {
 		rand.Read(b)
 		filename := hex.EncodeToString(b) + ext
 
-		if err := os.WriteFile(filepath.Join("uploads", filename), data, 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(s.uploadsDir, filename), data, 0o644); err != nil {
 			log.Printf("save upload: %v", err)
 			continue
 		}
