@@ -141,6 +141,7 @@ func (s *Server) routes() http.Handler {
 	mux.HandleFunc("GET /", s.handleIndex)
 	mux.HandleFunc("POST /trips", s.handleCreateTrip)
 	mux.HandleFunc("GET /t/{token}/admin", s.handleAdmin)
+	mux.HandleFunc("GET /t/{token}/admin/owntracks-config", s.handleOwnTracksConfig)
 	mux.HandleFunc("POST /t/{token}/admin/entries", s.handleCreateEntry)
 	mux.HandleFunc("POST /t/{token}/admin/entries/{entryID}/photos", s.handleAddPhotos)
 	mux.HandleFunc("POST /t/{token}/admin/entries/{entryID}/update", s.handleUpdateEntry)
@@ -333,6 +334,51 @@ func (s *Server) handleTrack(w http.ResponseWriter, r *http.Request) {
 	// OwnTracks expects a JSON array response
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte("[]"))
+}
+
+func (s *Server) handleOwnTracksConfig(w http.ResponseWriter, r *http.Request) {
+	token := r.PathValue("token")
+	trip, err := getTripByViewToken(s.db, token)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if !s.verifyTripOwnership(w, r, trip) {
+		return
+	}
+
+	scheme := "http"
+	if r.TLS != nil {
+		scheme = "https"
+	}
+	if fwd := r.Header.Get("X-Forwarded-Proto"); fwd != "" {
+		scheme = fwd
+	}
+	trackingURL := fmt.Sprintf("%s://%s/api/track?token=%s", scheme, r.Host, trip.TrackingToken)
+
+	config := fmt.Sprintf(`{
+  "_type": "configuration",
+  "mode": 3,
+  "monitoring": -1,
+  "url": "%s",
+  "autostartOnBoot": true,
+  "cmd": true,
+  "locatorDisplacement": 20,
+  "locatorInterval": 60,
+  "moveModeLocatorInterval": 15,
+  "ignoreInaccurateLocations": 30,
+  "ignoreStaleLocations": 1.0,
+  "pegLocatorFastestIntervalToInterval": false,
+  "extendedData": true,
+  "notificationLocation": true,
+  "notificationEvents": false,
+  "notificationHigherPriority": true,
+  "connectionTimeoutSeconds": 60
+}`, trackingURL)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.otrc"`, trip.Name))
+	fmt.Fprint(w, config)
 }
 
 func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {

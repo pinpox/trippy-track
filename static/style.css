@@ -263,6 +263,20 @@ h2 {
     margin-bottom: 0.3rem;
 }
 
+.config-download-link {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 0.7rem;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--sienna, #b85c38);
+    text-decoration: none;
+    margin-left: 0.5rem;
+}
+
+.config-download-link:hover {
+    text-decoration: underline;
+}
+
 .admin-code {
     display: flex;
     align-items: flex-start;
