@@ -430,7 +430,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (bounds) {
-            map.fitBounds(bounds, { padding: 50 });
+            map.fitBounds(bounds, { padding: 50, maxZoom: 14 });
         }
     }
 });
