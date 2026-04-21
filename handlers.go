@@ -377,7 +377,15 @@ func (s *Server) handleOwnTracksConfig(w http.ResponseWriter, r *http.Request) {
 }`, trackingURL)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.otrc"`, trip.Name))
+	slug := strings.ToLower(strings.TrimSpace(trip.Name))
+	slug = strings.ReplaceAll(slug, " ", "-")
+	slug = strings.Map(func(r rune) rune {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') || r == '-' {
+			return r
+		}
+		return -1
+	}, slug)
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="trippy-track-%s.otrc"`, slug))
 	fmt.Fprint(w, config)
 }
 
