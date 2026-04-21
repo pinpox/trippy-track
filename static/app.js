@@ -433,4 +433,191 @@ document.addEventListener("DOMContentLoaded", function () {
             map.fitBounds(bounds, { padding: 50, maxZoom: 14 });
         }
     }
+
+    // ========================================
+    // Mobile: horizontal timeline + entry viewer
+    // ========================================
+    if (typeof isMobile !== "undefined" && isMobile) {
+        var mobileCards = document.querySelectorAll(".mobile-entry-card");
+        var viewer = document.getElementById("mobile-viewer");
+        var viewerProgress = viewer.querySelector(".viewer-progress");
+        var viewerContent = viewer.querySelector(".viewer-content");
+        var viewerMeta = viewer.querySelector(".viewer-meta");
+        var viewerMapStrip = viewer.querySelector(".viewer-map-strip");
+
+        var currentEntryIdx = 0;
+        var currentPageIdx = 0;
+        var entryPages = []; // array of arrays: each entry's pages (photos + text)
+
+        // Build entry pages from the DOM
+        mobileCards.forEach(function (card, idx) {
+            var pages = [];
+            var entryEl = document.querySelectorAll(".timeline-entry")[idx];
+            if (!entryEl) return;
+
+            // Get photos from the desktop timeline entry
+            var photos = entryEl.querySelectorAll(".timeline-photos img, .timeline-photos video");
+            photos.forEach(function (el) {
+                pages.push({
+                    type: el.tagName === "VIDEO" ? "video" : "photo",
+                    src: el.src
+                });
+            });
+
+            // Get text
+            var bodyEl = entryEl.querySelector(".timeline-body");
+            if (bodyEl && bodyEl.textContent.trim()) {
+                pages.push({
+                    type: "text",
+                    content: bodyEl.textContent.trim()
+                });
+            }
+
+            // If no pages at all, add a text placeholder
+            if (pages.length === 0) {
+                pages.push({ type: "text", content: "" });
+            }
+
+            // Get metadata
+            var lat = card.dataset.lat;
+            var lon = card.dataset.lon;
+            var headerEl = entryEl.querySelector(".timeline-entry-header");
+            var meta = {
+                lat: lat,
+                lon: lon,
+                header: headerEl ? headerEl.textContent.trim() : ""
+            };
+
+            entryPages.push({ pages: pages, meta: meta });
+        });
+
+        // Open viewer for an entry
+        function openViewer(entryIdx) {
+            currentEntryIdx = entryIdx;
+            currentPageIdx = 0;
+            renderViewer();
+            viewer.classList.add("active");
+
+            // Fly map to entry
+            var card = mobileCards[entryIdx];
+            if (card && card.dataset.lat) {
+                map.flyTo({
+                    center: [parseFloat(card.dataset.lon), parseFloat(card.dataset.lat)],
+                    zoom: 12,
+                    duration: 500
+                });
+            }
+        }
+
+        function closeViewer() {
+            viewer.classList.remove("active");
+        }
+
+        function renderViewer() {
+            var entry = entryPages[currentEntryIdx];
+            if (!entry) return;
+
+            var page = entry.pages[currentPageIdx];
+
+            // Progress bars
+            viewerProgress.innerHTML = "";
+            entry.pages.forEach(function (_, i) {
+                var bar = document.createElement("div");
+                bar.className = "viewer-progress-bar" + (i <= currentPageIdx ? " active" : "");
+                viewerProgress.appendChild(bar);
+            });
+
+            // Content
+            viewerContent.innerHTML = "";
+            if (page.type === "photo") {
+                var img = document.createElement("img");
+                img.src = page.src;
+                viewerContent.appendChild(img);
+            } else if (page.type === "video") {
+                var vid = document.createElement("video");
+                vid.src = page.src;
+                vid.controls = true;
+                vid.autoplay = true;
+                viewerContent.appendChild(vid);
+            } else {
+                var txt = document.createElement("div");
+                txt.className = "viewer-text";
+                txt.textContent = page.content || "No text";
+                viewerContent.appendChild(txt);
+            }
+
+            // Meta
+            viewerMeta.innerHTML = "";
+            if (entry.meta.header) {
+                var info = document.createElement("div");
+                info.className = "viewer-meta-info";
+                info.textContent = entry.meta.header;
+                viewerMeta.appendChild(info);
+            }
+        }
+
+        // Tap left/right on viewer content
+        viewerContent.addEventListener("click", function (e) {
+            var rect = viewerContent.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var entry = entryPages[currentEntryIdx];
+
+            if (x < rect.width * 0.3) {
+                // Tap left — previous page or previous entry
+                if (currentPageIdx > 0) {
+                    currentPageIdx--;
+                    renderViewer();
+                } else if (currentEntryIdx > 0) {
+                    currentEntryIdx--;
+                    currentPageIdx = entryPages[currentEntryIdx].pages.length - 1;
+                    renderViewer();
+                    scrollToCard(currentEntryIdx);
+                }
+            } else if (x > rect.width * 0.7) {
+                // Tap right — next page or next entry
+                if (currentPageIdx < entry.pages.length - 1) {
+                    currentPageIdx++;
+                    renderViewer();
+                } else if (currentEntryIdx < entryPages.length - 1) {
+                    currentEntryIdx++;
+                    currentPageIdx = 0;
+                    renderViewer();
+                    scrollToCard(currentEntryIdx);
+                }
+            }
+        });
+
+        // Map strip closes viewer
+        viewerMapStrip.addEventListener("click", closeViewer);
+
+        // Tap on mobile entry cards to open viewer
+        mobileCards.forEach(function (card, idx) {
+            card.addEventListener("click", function () {
+                openViewer(idx);
+            });
+        });
+
+        // Scroll horizontal timeline to active card
+        function scrollToCard(idx) {
+            var card = mobileCards[idx];
+            if (card) {
+                card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+
+                // Fly map
+                if (card.dataset.lat) {
+                    map.flyTo({
+                        center: [parseFloat(card.dataset.lon), parseFloat(card.dataset.lat)],
+                        zoom: 12,
+                        duration: 500
+                    });
+                }
+            }
+        }
+
+        // Highlight active card in timeline
+        function highlightCard(idx) {
+            mobileCards.forEach(function (c) { c.classList.remove("mobile-card-active"); });
+            if (mobileCards[idx]) mobileCards[idx].classList.add("mobile-card-active");
+        }
+    }
 });

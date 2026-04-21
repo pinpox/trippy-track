@@ -97,6 +97,10 @@ func newServer(db *sql.DB, addr string, uploadsDir string, auth *AuthService) (*
 			}
 			return t.Format("2006-01-02T15:04")
 		},
+		"toJSON": func(v any) template.JS {
+			b, _ := json.Marshal(v)
+			return template.JS(b)
+		},
 		"sub": func(a, b int) int {
 			return a - b
 		},

@@ -86,6 +86,40 @@
         <p class="muted">No entries yet. Check back soon!</p>
         {{end}}
     </div>
+    <!-- Mobile horizontal timeline -->
+    <div id="mobile-timeline">
+        <div class="mobile-timeline-track">
+            {{range .Timeline}}
+            <div class="mobile-entry-card" data-entry-id="{{.Entry.ID}}" {{if .Entry.Lat}}data-lat="{{printf "%.6f" (deref .Entry.Lat)}}" data-lon="{{printf "%.6f" (deref .Entry.Lon)}}"{{end}}>
+                {{if .Entry.Photos}}
+                <div class="mobile-entry-thumb">
+                    {{range $i, $p := .Entry.Photos}}{{if eq $i 0}}
+                    {{if isVideo $p.FilePath}}
+                    <video src="/uploads/{{$p.FilePath}}" preload="metadata"></video>
+                    {{else}}
+                    <img src="/uploads/{{$p.FilePath}}" alt="">
+                    {{end}}
+                    {{end}}{{end}}
+                </div>
+                {{else}}
+                <div class="mobile-entry-thumb mobile-entry-text-thumb">
+                    <p>{{if .Entry.Body}}{{.Entry.Body}}{{end}}</p>
+                </div>
+                {{end}}
+                <div class="mobile-entry-info">
+                    <span class="mobile-entry-date">{{formatDate .Entry.Timestamp}}</span>
+                </div>
+            </div>
+            {{end}}
+        </div>
+    </div>
+    <!-- Mobile entry viewer -->
+    <div id="mobile-viewer">
+        <div class="viewer-map-strip" id="viewer-map-strip"></div>
+        <div class="viewer-progress"></div>
+        <div class="viewer-content"></div>
+        <div class="viewer-meta"></div>
+    </div>
     <div id="map">
         <div class="map-stats">
             {{if .Stats.IsActive}}<span class="stats-live-dot"></span> Traveling{{end}}
@@ -101,6 +135,8 @@
 </div>
 <script>
     const shareToken = "{{.Trip.ViewToken}}";
+    const tripName = "{{.Trip.Name}}";
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
 </script>
 <script src="/static/app.js"></script>
 </body>

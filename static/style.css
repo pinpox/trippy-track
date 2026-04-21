@@ -1246,20 +1246,262 @@ code.copyable {
 /* ========================================
    Mobile: stack vertically
    ======================================== */
+/* Hide mobile elements on desktop */
+#mobile-timeline,
+#mobile-viewer {
+    display: none;
+}
+
+/* ========================================
+   Mobile layout
+   ======================================== */
 @media (max-width: 768px) {
     .trip-view {
         flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
     }
 
+    /* Hide desktop timeline on mobile */
     #timeline {
-        width: 100%;
-        height: 50vh;
-        border-right: none;
-        border-bottom: 1px solid #e0e0e0;
+        display: none;
     }
 
+    /* Map takes top 2/3 */
     #map {
         width: 100%;
-        height: 50vh;
+        height: 66vh;
+        order: -1;
+    }
+
+    /* Mobile horizontal timeline */
+    #mobile-timeline {
+        display: block;
+        order: 10;
+        width: 100%;
+        height: 34vh;
+        background: var(--cream);
+        border-top: 1px solid var(--warm-line);
+        overflow: hidden;
+        padding: 1rem 0;
+    }
+
+    .mobile-timeline-track {
+        display: flex;
+        gap: 0.75rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        height: 100%;
+        padding: 0 1rem;
+        align-items: center;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .mobile-timeline-track::-webkit-scrollbar {
+        display: none;
+    }
+
+    .mobile-entry-card {
+        flex-shrink: 0;
+        width: 160px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+        scroll-snap-align: center;
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        transition: transform 0.15s;
+    }
+
+    .mobile-entry-card:active {
+        transform: scale(0.96);
+    }
+
+    .mobile-entry-thumb {
+        flex: 1;
+        overflow: hidden;
+        min-height: 0;
+    }
+
+    .mobile-entry-thumb img,
+    .mobile-entry-thumb video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .mobile-entry-text-thumb {
+        background: var(--cream);
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+    }
+
+    .mobile-entry-text-thumb p {
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 0.7rem;
+        color: var(--ink);
+        line-height: 1.4;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+    }
+
+    .mobile-entry-info {
+        padding: 0.4rem 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .mobile-entry-flag {
+        font-size: 0.75rem;
+    }
+
+    .mobile-entry-date {
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 0.65rem;
+        color: var(--ink-faint);
+    }
+
+    /* Stats pill adjustments */
+    .map-stats {
+        top: 0.5rem;
+        font-size: 0.7rem;
+        padding: 0.35rem 0.8rem;
+    }
+
+    /* Hide desktop-only elements */
+    .rss-link,
+    .admin-link {
+        display: none;
+    }
+
+    /* Mobile entry viewer (State 2) */
+    #mobile-viewer {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: #000;
+        flex-direction: column;
+    }
+
+    #mobile-viewer.active {
+        display: flex;
+    }
+
+    .viewer-map-strip {
+        height: 5vh;
+        background: var(--cream);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .viewer-map-strip::after {
+        content: "";
+        width: 40px;
+        height: 4px;
+        background: var(--warm-grey);
+        border-radius: 2px;
+    }
+
+    .viewer-progress {
+        display: flex;
+        gap: 3px;
+        padding: 0.5rem 0.75rem;
+        background: rgba(0,0,0,0.3);
+    }
+
+    .viewer-progress-bar {
+        flex: 1;
+        height: 3px;
+        background: rgba(255,255,255,0.3);
+        border-radius: 2px;
+    }
+
+    .viewer-progress-bar.active {
+        background: rgba(255,255,255,0.9);
+    }
+
+    .viewer-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .viewer-content img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .viewer-content video {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .viewer-content .viewer-text {
+        padding: 2rem;
+        color: white;
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        text-align: center;
+        max-width: 90%;
+    }
+
+    /* Tap zones */
+    .viewer-content::before,
+    .viewer-content::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 30%;
+        z-index: 2;
+    }
+
+    .viewer-content::before {
+        left: 0;
+    }
+
+    .viewer-content::after {
+        right: 0;
+    }
+
+    .viewer-meta {
+        padding: 0.75rem 1rem;
+        background: linear-gradient(transparent, rgba(0,0,0,0.7));
+        color: white;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+
+    .viewer-meta-location {
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.2rem;
+    }
+
+    .viewer-meta-info {
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.7);
     }
 }
