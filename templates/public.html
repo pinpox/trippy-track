@@ -101,7 +101,7 @@
                 <div class="mobile-card-connector-line"></div>
             </div>
             {{end}}
-            <div class="mobile-entry-card" data-entry-id="{{.Entry.ID}}" {{if .Entry.Lat}}data-lat="{{printf "%.6f" (deref .Entry.Lat)}}" data-lon="{{printf "%.6f" (deref .Entry.Lon)}}"{{end}}>
+            <div class="mobile-entry-card" data-entry-id="{{.Entry.ID}}" data-dist="{{printf "%.4f" .DistFromPrev}}" {{if .Entry.Lat}}data-lat="{{printf "%.6f" (deref .Entry.Lat)}}" data-lon="{{printf "%.6f" (deref .Entry.Lon)}}"{{end}}>
                 {{if .Entry.Photos}}
                 <div class="mobile-card-bg">
                     {{range $i, $p := .Entry.Photos}}{{if eq $i 0}}
