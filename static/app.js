@@ -443,7 +443,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var viewerProgress = viewer.querySelector(".viewer-progress");
         var viewerContent = viewer.querySelector(".viewer-content");
         var viewerMeta = viewer.querySelector(".viewer-meta");
-        var viewerMapStrip = viewer.querySelector(".viewer-map-strip");
+        var viewerCloseBtn = document.getElementById("viewer-close-btn");
 
         var currentEntryIdx = 0;
         var currentPageIdx = 0;
@@ -587,8 +587,32 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // Map strip closes viewer
-        viewerMapStrip.addEventListener("click", closeViewer);
+        // Close button closes viewer
+        viewerCloseBtn.addEventListener("click", closeViewer);
+
+        // Swipe down closes viewer
+        var touchStartY = 0;
+        var touchDeltaY = 0;
+        viewer.addEventListener("touchstart", function (e) {
+            touchStartY = e.touches[0].clientY;
+            touchDeltaY = 0;
+        }, { passive: true });
+
+        viewer.addEventListener("touchmove", function (e) {
+            touchDeltaY = e.touches[0].clientY - touchStartY;
+            if (touchDeltaY > 0) {
+                viewer.style.transform = "translateY(" + touchDeltaY + "px)";
+                viewer.style.opacity = Math.max(0.3, 1 - touchDeltaY / 300);
+            }
+        }, { passive: true });
+
+        viewer.addEventListener("touchend", function () {
+            if (touchDeltaY > 100) {
+                closeViewer();
+            }
+            viewer.style.transform = "";
+            viewer.style.opacity = "";
+        });
 
         // Tap on mobile entry cards to open viewer
         mobileCards.forEach(function (card, idx) {
