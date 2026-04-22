@@ -1098,6 +1098,7 @@ code.copyable {
     border-radius: 50%;
     border: 2.5px solid white;
     box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    background: var(--warm-grey);
     overflow: hidden;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1108,6 +1109,10 @@ code.copyable {
     height: 100%;
     object-fit: cover;
     display: block;
+}
+
+.maplibregl-marker {
+    opacity: 1 !important;
 }
 
 .map-marker-photo:hover {
