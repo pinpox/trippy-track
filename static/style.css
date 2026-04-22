@@ -1334,6 +1334,12 @@ code.copyable {
         transform: scale(1.4);
     }
 
+    .mobile-progress-dot-current {
+        background: var(--sienna);
+        box-shadow: 0 0 0 1.5px var(--sienna);
+        animation: pulse-dot 2s ease-in-out infinite;
+    }
+
     .mobile-timeline-track {
         display: flex;
         gap: 0.75rem;
@@ -1456,6 +1462,25 @@ code.copyable {
         -webkit-box-orient: vertical;
     }
 
+    .mobile-card-current-bg {
+        background: var(--ink);
+    }
+
+    .mobile-card-current-label {
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 0.85rem;
+        color: white;
+        font-weight: 700;
+    }
+
+    .mobile-current-card .mobile-card-overlay {
+        background: none;
+    }
+
+    .mobile-current-card .mobile-card-date {
+        color: rgba(255,255,255,0.5);
+    }
+
     /* Stats pill adjustments */
     .map-stats {
         top: 0.5rem;
@@ -1466,6 +1491,11 @@ code.copyable {
     /* Hide desktop-only elements */
     .rss-link,
     .admin-link {
+        display: none;
+    }
+
+    .maplibregl-ctrl-bottom-left,
+    .maplibregl-ctrl-bottom-right {
         display: none;
     }
 
