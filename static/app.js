@@ -687,7 +687,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         closest = idx;
                     }
                 });
-                updateProgressDot(closest);
+                highlightCard(closest);
 
                 // Fly map to this entry
                 var card = mobileCards[closest];
@@ -738,6 +738,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         trackEl.addEventListener("scroll", updateProgressBar);
         updateProgressBar();
+        highlightCard(0);
 
         // Initialize first dot as active
         updateProgressDot(0);
