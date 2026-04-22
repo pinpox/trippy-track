@@ -72,6 +72,35 @@ func newServer(db *sql.DB, addr string, uploadsDir string, auth *AuthService) (*
 			}
 			return WeatherIcon(*code)
 		},
+		"weatherLucide": func(code *int) string {
+			if code == nil {
+				return "icon-cloud"
+			}
+			switch {
+			case *code == 0:
+				return "icon-sun"
+			case *code <= 2:
+				return "icon-cloud-sun"
+			case *code == 3:
+				return "icon-cloud"
+			case *code == 45 || *code == 48:
+				return "icon-cloud-fog"
+			case *code >= 51 && *code <= 57:
+				return "icon-cloud-drizzle"
+			case *code >= 61 && *code <= 67:
+				return "icon-cloud-rain"
+			case *code >= 71 && *code <= 77:
+				return "icon-snowflake"
+			case *code >= 80 && *code <= 82:
+				return "icon-cloud-rain-wind"
+			case *code >= 85 && *code <= 86:
+				return "icon-cloud-snow"
+			case *code >= 95:
+				return "icon-cloud-lightning"
+			default:
+				return "icon-cloud"
+			}
+		},
 		"weatherLabel": func(code *int) string {
 			if code == nil {
 				return ""

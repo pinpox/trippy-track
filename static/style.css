@@ -1374,15 +1374,15 @@ code.copyable {
     .mobile-entry-card {
         flex-shrink: 0;
         width: 200px;
-        height: 100%;
-        position: relative;
         cursor: pointer;
         scroll-snap-align: center;
         border-radius: 10px;
         overflow: hidden;
-        background: #1a1a1a;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         transition: transform 0.15s;
+        display: flex;
+        flex-direction: column;
     }
 
     .mobile-entry-card:active {
@@ -1390,8 +1390,9 @@ code.copyable {
     }
 
     .mobile-card-bg {
-        position: absolute;
-        inset: 0;
+        position: relative;
+        aspect-ratio: 4/3;
+        overflow: hidden;
     }
 
     .mobile-card-bg img,
@@ -1402,77 +1403,128 @@ code.copyable {
         display: block;
     }
 
+    .mobile-card-bg::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(transparent 50%, rgba(0,0,0,0.25));
+    }
+
     .mobile-card-text-bg {
         background: var(--cream);
     }
 
     .mobile-card-overlay {
         position: absolute;
-        inset: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.4rem 0.5rem;
+        z-index: 1;
         display: flex;
         flex-direction: column;
-        justify-content: flex-end;
-        background: linear-gradient(transparent 40%, rgba(0,0,0,0.6));
-        padding: 0.6rem 0.7rem;
+        gap: 0.05rem;
     }
 
-    .mobile-card-count {
-        position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
-        background: rgba(0,0,0,0.5);
+    .mobile-card-overlay .mobile-card-date {
         color: white;
-        font-size: 0.65rem;
-        padding: 0.15rem 0.4rem;
-        border-radius: 3px;
-        backdrop-filter: blur(4px);
+        font-weight: 700;
+        font-size: 0.75rem;
     }
 
-    .mobile-card-count::before {
-        content: "\1F4F7 ";
+    .mobile-card-overlay .mobile-card-country {
+        color: rgba(255,255,255,0.85);
+        font-size: 0.6rem;
     }
 
     .mobile-card-bottom {
         display: flex;
         flex-direction: column;
+        gap: 0.1rem;
+    }
+
+    .mobile-card-info {
+        padding: 0.35rem 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid #f0ebe4;
+    }
+
+    .mobile-card-stat {
+        font-size: 0.55rem;
+        color: var(--ink-light);
+        font-weight: 600;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
         gap: 0.15rem;
+        flex: 1;
+    }
+
+    .mobile-card-stat:nth-child(2) {
+        justify-content: center;
+    }
+
+    .mobile-card-stat:last-child {
+        justify-content: flex-end;
+    }
+
+    .mobile-card-stat i {
+        font-size: 0.6rem;
+        opacity: 0.7;
     }
 
     .mobile-card-country {
         font-size: 0.7rem;
-        color: white;
+        color: var(--ink);
         font-weight: 600;
     }
 
     .mobile-card-date {
         font-family: 'Libre Baskerville', Georgia, serif;
-        font-size: 0.65rem;
-        color: rgba(255,255,255,0.7);
+        font-size: 0.6rem;
+        color: var(--ink-faint);
     }
 
-    .mobile-card-weather {
-        font-size: 0.65rem;
-        color: rgba(255,255,255,0.7);
-    }
-
-    .mobile-card-text-preview {
-        position: absolute;
-        inset: 0;
+    .mobile-card-text-area {
+        aspect-ratio: 4/3;
         display: flex;
-        align-items: center;
-        padding: 0.75rem;
-        padding-bottom: 3rem;
+        flex-direction: column;
+        padding: 0.5rem;
+        background: var(--cream);
     }
 
-    .mobile-card-text-preview p {
+    .mobile-card-text-header {
+        display: flex;
+        flex-direction: column;
+        gap: 0.05rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .mobile-card-text-header .mobile-card-date {
         font-family: 'Libre Baskerville', Georgia, serif;
         font-size: 0.7rem;
+        font-weight: 700;
         color: var(--ink);
+    }
+
+    .mobile-card-text-header .mobile-card-country {
+        font-size: 0.6rem;
+        color: var(--ink-faint);
+    }
+
+    .mobile-card-text-body {
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 0.6rem;
+        color: var(--ink-light);
         line-height: 1.5;
         overflow: hidden;
         display: -webkit-box;
-        -webkit-line-clamp: 5;
+        -webkit-line-clamp: 4;
         -webkit-box-orient: vertical;
+        margin: 0;
+        flex: 1;
     }
 
     .mobile-current-position {
