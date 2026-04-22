@@ -88,6 +88,11 @@
     </div>
     <!-- Mobile horizontal timeline -->
     <div id="mobile-timeline">
+        <div class="mobile-progress-line">
+            {{range .Timeline}}
+            <div class="mobile-progress-dot {{if .Entry.Photos}}has-photo{{end}}" data-entry-id="{{.Entry.ID}}"></div>
+            {{end}}
+        </div>
         <div class="mobile-timeline-track">
             {{range .Timeline}}
             <div class="mobile-entry-card" data-entry-id="{{.Entry.ID}}" {{if .Entry.Lat}}data-lat="{{printf "%.6f" (deref .Entry.Lat)}}" data-lon="{{printf "%.6f" (deref .Entry.Lon)}}"{{end}}>

@@ -1286,6 +1286,46 @@ code.copyable {
         padding: 1rem 0;
     }
 
+    .mobile-progress-line {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.5rem;
+        height: 1.5rem;
+        position: relative;
+    }
+
+    .mobile-progress-line::before {
+        content: "";
+        position: absolute;
+        left: 1.5rem;
+        right: 1.5rem;
+        top: 50%;
+        height: 2px;
+        background: var(--warm-grey);
+        transform: translateY(-50%);
+    }
+
+    .mobile-progress-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--ink-light);
+        border: 2px solid var(--cream);
+        border-radius: 50%;
+        box-shadow: 0 0 0 1px var(--ink-light);
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .mobile-progress-dot.active {
+        background: var(--sienna);
+        box-shadow: 0 0 0 1.5px var(--sienna);
+        transform: scale(1.4);
+    }
+
     .mobile-timeline-track {
         display: flex;
         gap: 0.75rem;

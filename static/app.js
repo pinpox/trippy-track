@@ -619,5 +619,57 @@ document.addEventListener("DOMContentLoaded", function () {
             mobileCards.forEach(function (c) { c.classList.remove("mobile-card-active"); });
             if (mobileCards[idx]) mobileCards[idx].classList.add("mobile-card-active");
         }
+
+        // Progress dots
+        var progressDots = document.querySelectorAll(".mobile-progress-dot");
+
+        function updateProgressDot(idx) {
+            progressDots.forEach(function (d) { d.classList.remove("active"); });
+            if (progressDots[idx]) progressDots[idx].classList.add("active");
+        }
+
+        // Tap progress dot → scroll to that card
+        progressDots.forEach(function (dot, idx) {
+            dot.addEventListener("click", function () {
+                scrollToCard(idx);
+                updateProgressDot(idx);
+            });
+        });
+
+        // Detect which card is centered during scroll
+        var trackEl = document.querySelector(".mobile-timeline-track");
+        var scrollDebounce;
+        trackEl.addEventListener("scroll", function () {
+            clearTimeout(scrollDebounce);
+            scrollDebounce = setTimeout(function () {
+                var trackRect = trackEl.getBoundingClientRect();
+                var centerX = trackRect.left + trackRect.width / 2;
+                var closest = 0;
+                var closestDist = Infinity;
+                mobileCards.forEach(function (card, idx) {
+                    var cardRect = card.getBoundingClientRect();
+                    var cardCenter = cardRect.left + cardRect.width / 2;
+                    var dist = Math.abs(cardCenter - centerX);
+                    if (dist < closestDist) {
+                        closestDist = dist;
+                        closest = idx;
+                    }
+                });
+                updateProgressDot(closest);
+
+                // Fly map to this entry
+                var card = mobileCards[closest];
+                if (card && card.dataset.lat) {
+                    map.flyTo({
+                        center: [parseFloat(card.dataset.lon), parseFloat(card.dataset.lat)],
+                        zoom: Math.max(map.getZoom(), 10),
+                        duration: 500
+                    });
+                }
+            }, 100);
+        });
+
+        // Initialize first dot as active
+        updateProgressDot(0);
     }
 });
