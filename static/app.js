@@ -320,12 +320,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function showMedia() {
-        var src = currentMedia[currentIndex].src;
-        var isVideo = currentMedia[currentIndex].tagName === "VIDEO";
+        var el = currentMedia[currentIndex];
+        var isVideo = el.tagName === "VIDEO";
         if (isVideo) {
-            lightboxMedia.innerHTML = '<video class="lightbox-img" src="' + src + '" controls autoplay></video>';
+            lightboxMedia.innerHTML = '<video class="lightbox-img" src="' + el.src + '" controls autoplay></video>';
         } else {
-            lightboxMedia.innerHTML = '<img class="lightbox-img" src="' + src + '">';
+            var fullSrc = el.dataset.full || el.src;
+            lightboxMedia.innerHTML = '<img class="lightbox-img" src="' + fullSrc + '">';
         }
         lightboxCounter.textContent = (currentIndex + 1) + " / " + currentMedia.length;
     }
@@ -464,7 +465,7 @@ document.addEventListener("DOMContentLoaded", function () {
             photos.forEach(function (el) {
                 pages.push({
                     type: el.tagName === "VIDEO" ? "video" : "photo",
-                    src: el.src
+                    src: el.dataset.full || el.src
                 });
             });
 

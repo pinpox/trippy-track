@@ -65,7 +65,7 @@
                     {{if isVideo .FilePath}}
                     <video src="/uploads/{{.FilePath}}" controls preload="metadata" class="entry-thumb"></video>
                     {{else}}
-                    <img src="/uploads/{{.FilePath}}" alt="" class="entry-thumb">
+                    <img src="/uploads/{{thumbPath .FilePath}}" alt="" class="entry-thumb" loading="lazy">
                     {{end}}
                     <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/photos/{{.ID}}/delete" class="photo-delete-form">
                         <button type="submit" class="photo-delete-btn" title="Delete">&times;</button>

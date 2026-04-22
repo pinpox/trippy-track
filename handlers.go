@@ -126,6 +126,12 @@ func newServer(db *sql.DB, addr string, uploadsDir string, auth *AuthService) (*
 			}
 			return t.Format("2006-01-02T15:04")
 		},
+		"thumbPath": func(path string) string {
+			return ThumbPath(path)
+		},
+		"medPath": func(path string) string {
+			return MediumPath(path)
+		},
 		"toJSON": func(v any) template.JS {
 			b, _ := json.Marshal(v)
 			return template.JS(b)
@@ -485,6 +491,8 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
+		go GenerateThumbnails(s.uploadsDir, filename)
+
 		photoFiles = append(photoFiles, filename)
 	}
 
@@ -742,6 +750,8 @@ func (s *Server) handleAddPhotos(w http.ResponseWriter, r *http.Request) {
 			log.Printf("save upload: %v", err)
 			continue
 		}
+
+		go GenerateThumbnails(s.uploadsDir, filename)
 
 		if err := addPhoto(s.db, entryID, filename, order); err != nil {
 			log.Printf("add photo: %v", err)

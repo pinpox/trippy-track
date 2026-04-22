@@ -59,7 +59,7 @@
                                 <video src="/uploads/{{.FilePath}}" preload="metadata" loop></video>
                             </div>
                             {{else}}
-                            <img src="/uploads/{{.FilePath}}" alt="">
+                            <img src="/uploads/{{thumbPath .FilePath}}" data-full="/uploads/{{medPath .FilePath}}" alt="" loading="lazy">
                             {{end}}
                             {{end}}
                         </div>
@@ -108,7 +108,7 @@
                     {{if isVideo $p.FilePath}}
                     <video src="/uploads/{{$p.FilePath}}" preload="metadata"></video>
                     {{else}}
-                    <img src="/uploads/{{$p.FilePath}}" alt="">
+                    <img src="/uploads/{{thumbPath $p.FilePath}}" alt="" loading="lazy">
                     {{end}}
                     {{end}}{{end}}
                     <div class="mobile-card-overlay">
