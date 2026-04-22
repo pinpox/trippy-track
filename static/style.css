@@ -1341,21 +1341,58 @@ code.copyable {
         transition: left 0.3s ease;
     }
 
-    /* Connector line between cards */
-    .mobile-entry-card + .mobile-entry-card::before,
-    .mobile-entry-card + .mobile-current-position::before {
-        content: "";
-        position: absolute;
-        left: -0.75rem;
-        top: 50%;
-        width: 0.75rem;
+    /* Connector between cards */
+    .mobile-card-connector {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 3.5rem;
+        padding: 0 0.3rem;
+        margin: 0 -0.3rem;
+        position: relative;
+        z-index: 0;
+    }
+
+    .mobile-card-connector-line {
+        width: 100%;
         height: 2px;
         background: var(--warm-grey);
+        position: relative;
+    }
+
+    .mobile-card-connector-line::before,
+    .mobile-card-connector-line::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: 5px;
+        height: 5px;
+        background: var(--warm-grey);
+        border-radius: 50%;
+        transform: translateY(-50%);
+    }
+
+    .mobile-card-connector-line::before {
+        left: -2px;
+    }
+
+    .mobile-card-connector-line::after {
+        right: -2px;
+    }
+
+    .mobile-card-connector-km {
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 0.45rem;
+        color: var(--ink-faint);
+        white-space: nowrap;
+        margin-bottom: 0.2rem;
     }
 
     .mobile-timeline-track {
         display: flex;
-        gap: 0.75rem;
+        gap: 0;
         overflow-x: auto;
         overflow-y: hidden;
         flex: 1;
@@ -1383,6 +1420,8 @@ code.copyable {
         transition: transform 0.15s;
         display: flex;
         flex-direction: column;
+        position: relative;
+        z-index: 1;
     }
 
     .mobile-entry-card:active {

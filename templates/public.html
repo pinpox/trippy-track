@@ -95,6 +95,12 @@
     <div id="mobile-timeline">
         <div class="mobile-timeline-track">
             {{range .Timeline}}
+            {{if gt .DistFromPrev 0.0}}
+            <div class="mobile-card-connector">
+                <span class="mobile-card-connector-km">{{formatDist .DistFromPrev}}</span>
+                <div class="mobile-card-connector-line"></div>
+            </div>
+            {{end}}
             <div class="mobile-entry-card" data-entry-id="{{.Entry.ID}}" {{if .Entry.Lat}}data-lat="{{printf "%.6f" (deref .Entry.Lat)}}" data-lon="{{printf "%.6f" (deref .Entry.Lon)}}"{{end}}>
                 {{if .Entry.Photos}}
                 <div class="mobile-card-bg">
