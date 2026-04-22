@@ -1704,8 +1704,16 @@ code.copyable {
         border-radius: 2px;
     }
 
-    .viewer-progress-bar.active {
+    .viewer-progress-fill {
+        height: 100%;
+        width: 0%;
         background: rgba(255,255,255,0.9);
+        border-radius: 2px;
+    }
+
+    @keyframes progress-fill {
+        from { width: 0%; }
+        to { width: 100%; }
     }
 
     .viewer-content {

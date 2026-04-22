@@ -527,7 +527,50 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
+        var autoAdvanceTimer = null;
+        var autoAdvancePaused = false;
+        var PHOTO_DURATION = 5000; // 5 seconds per photo
+        var TEXT_DURATION = 8000;  // 8 seconds for text
+
+        function stopAutoAdvance() {
+            if (autoAdvanceTimer) {
+                clearTimeout(autoAdvanceTimer);
+                autoAdvanceTimer = null;
+            }
+            // Stop CSS animations
+            var bars = viewerProgress.querySelectorAll(".viewer-progress-fill");
+            bars.forEach(function (b) { b.style.animationPlayState = "paused"; });
+        }
+
+        function startAutoAdvance() {
+            stopAutoAdvance();
+            if (autoAdvancePaused) return;
+
+            var entry = entryPages[currentEntryIdx];
+            if (!entry) return;
+            var page = entry.pages[currentPageIdx];
+            var duration = page.type === "text" ? TEXT_DURATION : PHOTO_DURATION;
+
+            // Resume CSS animation on current bar
+            var currentBar = viewerProgress.querySelectorAll(".viewer-progress-bar")[currentPageIdx];
+            if (currentBar) {
+                var fill = currentBar.querySelector(".viewer-progress-fill");
+                if (fill) fill.style.animationPlayState = "running";
+            }
+
+            autoAdvanceTimer = setTimeout(function () {
+                if (currentPageIdx < entry.pages.length - 1) {
+                    currentPageIdx++;
+                    renderViewer();
+                } else {
+                    closeViewer();
+                    scrollToCard(currentEntryIdx);
+                }
+            }, duration);
+        }
+
         function closeViewer() {
+            stopAutoAdvance();
             viewer.classList.remove("active");
         }
 
@@ -536,6 +579,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!entry) return;
 
             var page = entry.pages[currentPageIdx];
+            var duration = page.type === "text" ? TEXT_DURATION : PHOTO_DURATION;
 
             // Top info
             var topDate = viewer.querySelector(".viewer-top-date");
@@ -543,13 +587,25 @@ document.addEventListener("DOMContentLoaded", function () {
             topDate.textContent = entry.meta.date + (entry.meta.time ? " · " + entry.meta.time : "");
             topKm.textContent = entry.meta.totalKm > 0 ? entry.meta.totalKm + " km" : "";
 
-            // Progress bars
+            // Progress bars with fill animation
             viewerProgress.innerHTML = "";
             entry.pages.forEach(function (_, i) {
                 var bar = document.createElement("div");
-                bar.className = "viewer-progress-bar" + (i <= currentPageIdx ? " active" : "");
+                bar.className = "viewer-progress-bar";
+                var fill = document.createElement("div");
+                fill.className = "viewer-progress-fill";
+                if (i < currentPageIdx) {
+                    fill.style.width = "100%";
+                    fill.style.animation = "none";
+                } else if (i === currentPageIdx) {
+                    fill.style.animation = "progress-fill " + (duration / 1000) + "s linear forwards";
+                }
+                bar.appendChild(fill);
                 viewerProgress.appendChild(bar);
             });
+
+            // Start auto-advance
+            startAutoAdvance();
 
             // Content
             viewerContent.innerHTML = "";
@@ -563,6 +619,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 vid.controls = true;
                 vid.autoplay = true;
                 viewerContent.appendChild(vid);
+                stopAutoAdvance(); // Let video play at its own pace
             } else {
                 var txt = document.createElement("div");
                 txt.className = "viewer-text";
@@ -609,8 +666,46 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
+        // Hold to pause auto-advance
+        var holdTimer = null;
+        var isHolding = false;
+
+        viewerContent.addEventListener("touchstart", function () {
+            holdTimer = setTimeout(function () {
+                isHolding = true;
+                autoAdvancePaused = true;
+                stopAutoAdvance();
+            }, 200);
+        }, { passive: true });
+
+        viewerContent.addEventListener("touchend", function () {
+            clearTimeout(holdTimer);
+            if (isHolding) {
+                isHolding = false;
+                autoAdvancePaused = false;
+                startAutoAdvance();
+            }
+        });
+
+        viewerContent.addEventListener("mousedown", function () {
+            holdTimer = setTimeout(function () {
+                isHolding = true;
+                autoAdvancePaused = true;
+                stopAutoAdvance();
+            }, 200);
+        });
+
+        document.addEventListener("mouseup", function () {
+            clearTimeout(holdTimer);
+            if (isHolding) {
+                isHolding = false;
+                autoAdvancePaused = false;
+                startAutoAdvance();
+            }
+        });
+
         // Close button closes viewer
-        viewerCloseBtn.addEventListener("click", closeViewer);
+        viewerCloseBtn.addEventListener("click", function () { closeViewer(); });
 
         // Swipe down closes viewer
         var touchStartY = 0;
