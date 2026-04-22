@@ -598,14 +598,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     scrollToCard(currentEntryIdx);
                 }
             } else if (x > rect.width * 0.7) {
-                // Tap right — next page or next entry
+                // Tap right — next page or close viewer
                 if (currentPageIdx < entry.pages.length - 1) {
                     currentPageIdx++;
                     renderViewer();
-                } else if (currentEntryIdx < entryPages.length - 1) {
-                    currentEntryIdx++;
-                    currentPageIdx = 0;
-                    renderViewer();
+                } else {
+                    closeViewer();
                     scrollToCard(currentEntryIdx);
                 }
             }
