@@ -1248,7 +1248,8 @@ code.copyable {
    ======================================== */
 /* Hide mobile elements on desktop */
 #mobile-timeline,
-#mobile-viewer {
+#mobile-viewer,
+.mobile-progress-bar-wrap {
     display: none;
 }
 
@@ -1289,68 +1290,67 @@ code.copyable {
         height: 35%;
         min-height: 0;
         background: var(--cream);
-        border-top: 1px solid var(--warm-line);
+        border-top: none;
         overflow: hidden;
-        padding: 1rem 0;
-    }
-
-    .mobile-progress-line {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        padding: 0 1.5rem;
-        height: 1.8rem;
+        padding: 0.5rem 0 0;
         position: relative;
-        padding-bottom: 0.25rem;
     }
 
-    .mobile-progress-line::before {
-        content: "";
-        position: absolute;
-        left: 1.5rem;
-        right: 1.5rem;
-        bottom: calc(0.25rem + 3px);
-        height: 2px;
-        background: var(--warm-grey);
-    }
-
-    .mobile-progress-dot {
-        width: 8px;
-        height: 8px;
-        background: var(--ink-light);
-        border: 2px solid var(--cream);
-        border-radius: 50%;
-        box-shadow: 0 0 0 1px var(--ink-light);
+    /* Progress bar — sits at the boundary between map and cards */
+    .mobile-progress-bar-wrap {
+        display: block;
+        position: relative;
+        width: 100%;
+        height: 4px;
+        order: 5;
+        z-index: 5;
         flex-shrink: 0;
-        position: relative;
-        z-index: 1;
-        cursor: pointer;
-        transition: all 0.2s;
     }
 
-    .mobile-progress-km {
+    .mobile-progress-bar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 100%;
+        background: transparent;
+        overflow: hidden;
+    }
+
+    .mobile-progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--sienna);
+        transition: width 0.3s ease;
+    }
+
+    .mobile-progress-badge {
         position: absolute;
         bottom: 100%;
+        left: 0;
+        transform: translateX(-100%);
+        background: var(--sienna);
+        color: white;
         font-family: 'Libre Baskerville', Georgia, serif;
-        font-size: 0.5rem;
-        color: var(--ink-faint);
+        font-size: 0.6rem;
+        font-weight: 700;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px 4px 0 0;
         white-space: nowrap;
-        margin-bottom: 0.15rem;
-        pointer-events: none;
-        transform: translateX(-50%);
-        /* left is set by JS */
+        z-index: 6;
+        transition: left 0.3s ease;
     }
 
-    .mobile-progress-dot.active {
-        background: var(--sienna);
-        box-shadow: 0 0 0 1.5px var(--sienna);
-        transform: scale(1.4);
-    }
-
-    .mobile-progress-dot-current {
-        background: var(--sienna);
-        box-shadow: 0 0 0 1.5px var(--sienna);
-        animation: pulse-dot 2s ease-in-out infinite;
+    /* Connector line between cards */
+    .mobile-entry-card + .mobile-entry-card::before,
+    .mobile-entry-card + .mobile-current-position::before {
+        content: "";
+        position: absolute;
+        left: -0.75rem;
+        top: 50%;
+        width: 0.75rem;
+        height: 2px;
+        background: var(--warm-grey);
     }
 
     .mobile-timeline-track {
@@ -1362,7 +1362,7 @@ code.copyable {
         min-height: 0;
         padding: 0 1rem 0.75rem;
         align-items: center;
-        scroll-snap-type: x mandatory;
+        scroll-snap-type: x proximity;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
     }

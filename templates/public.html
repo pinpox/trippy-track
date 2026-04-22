@@ -87,17 +87,11 @@
         {{end}}
     </div>
     <!-- Mobile horizontal timeline -->
+    <div class="mobile-progress-bar-wrap">
+        <div class="mobile-progress-bar"><div class="mobile-progress-bar-fill"></div></div>
+        <div class="mobile-progress-badge">0 km</div>
+    </div>
     <div id="mobile-timeline">
-        <div class="mobile-progress-line">
-            {{range .Timeline}}
-            <div class="mobile-progress-dot" data-entry-id="{{.Entry.ID}}">
-                {{if gt .DistFromPrev 0.0}}<span class="mobile-progress-km">{{formatDist .DistFromPrev}}</span>{{end}}
-            </div>
-            {{end}}
-            {{if .LastPoint}}
-            <div class="mobile-progress-dot mobile-progress-dot-current"></div>
-            {{end}}
-        </div>
         <div class="mobile-timeline-track">
             {{range .Timeline}}
             <div class="mobile-entry-card" data-entry-id="{{.Entry.ID}}" {{if .Entry.Lat}}data-lat="{{printf "%.6f" (deref .Entry.Lat)}}" data-lon="{{printf "%.6f" (deref .Entry.Lon)}}"{{end}}>

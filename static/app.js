@@ -663,21 +663,10 @@ document.addEventListener("DOMContentLoaded", function () {
             if (mobileCards[idx]) mobileCards[idx].classList.add("mobile-card-active");
         }
 
-        // Progress dots
-        var progressDots = document.querySelectorAll(".mobile-progress-dot");
-
-        function updateProgressDot(idx) {
-            progressDots.forEach(function (d) { d.classList.remove("active"); });
-            if (progressDots[idx]) progressDots[idx].classList.add("active");
-        }
-
-        // Tap progress dot → scroll to that card
-        progressDots.forEach(function (dot, idx) {
-            dot.addEventListener("click", function () {
-                scrollToCard(idx);
-                updateProgressDot(idx);
-            });
-        });
+        // Progress bar + badge
+        var progressBarFill = document.querySelector(".mobile-progress-bar-fill");
+        var progressBadge = document.querySelector(".mobile-progress-badge");
+        var progressBarWrap = document.querySelector(".mobile-progress-bar-wrap");
 
         // Detect which card is centered during scroll
         var trackEl = document.querySelector(".mobile-timeline-track");
@@ -712,21 +701,43 @@ document.addEventListener("DOMContentLoaded", function () {
             }, 100);
         });
 
-        // Position km labels between dots
-        function positionKmLabels() {
-            var dots = Array.from(progressDots);
-            dots.forEach(function (dot, idx) {
-                var km = dot.querySelector(".mobile-progress-km");
-                if (!km || idx === 0) return;
-                var prevDot = dots[idx - 1];
-                var prevRect = prevDot.getBoundingClientRect();
-                var curRect = dot.getBoundingClientRect();
-                var midX = (prevRect.left + prevRect.right + curRect.left + curRect.right) / 4;
-                var dotRect = dot.getBoundingClientRect();
-                km.style.left = (midX - dotRect.left) + "px";
+        // Position dots to match card centers and sync scroll
+        var progressLine = document.querySelector(".mobile-progress-line");
+
+        function updateProgressBar() {
+            if (!trackEl || !progressBarFill || !progressBadge) return;
+            var maxScroll = trackEl.scrollWidth - trackEl.clientWidth;
+            var scrollRatio = maxScroll > 0 ? trackEl.scrollLeft / maxScroll : 0;
+            var pct = Math.min(100, scrollRatio * 100);
+            progressBarFill.style.width = pct + "%";
+
+            // Position badge — ensure it stays visible
+            if (progressBarWrap) {
+                var barWidth = progressBarWrap.clientWidth;
+                var badgeWidth = progressBadge.offsetWidth;
+                var pos = Math.max(badgeWidth, pct / 100 * barWidth);
+                progressBadge.style.left = pos + "px";
+            }
+
+            // Update badge text with cumulative km
+            var closest = 0;
+            var trackRect = trackEl.getBoundingClientRect();
+            var centerX = trackRect.left + trackRect.width * 0.3;
+            var closestDist = Infinity;
+            mobileCards.forEach(function (card, idx) {
+                var cardRect = card.getBoundingClientRect();
+                var cardCenter = cardRect.left + cardRect.width / 2;
+                var dist = Math.abs(cardCenter - centerX);
+                if (dist < closestDist) { closestDist = dist; closest = idx; }
             });
+
+            if (entryPages[closest] && entryPages[closest].meta.totalKm !== undefined) {
+                progressBadge.textContent = entryPages[closest].meta.totalKm + " km";
+            }
         }
-        positionKmLabels();
+
+        trackEl.addEventListener("scroll", updateProgressBar);
+        updateProgressBar();
 
         // Initialize first dot as active
         updateProgressDot(0);
