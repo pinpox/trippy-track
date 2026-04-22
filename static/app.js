@@ -93,15 +93,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     // Click marker -> scroll to entry
                     el.addEventListener("click", function () {
-                        var entryEl = document.querySelector(
-                            '[data-entry-id="' + f.properties.id + '"]'
-                        );
-                        if (entryEl) {
-                            entryEl.scrollIntoView({
-                                behavior: "smooth",
-                                block: "center",
-                            });
-                            highlightEntry(entryEl);
+                        if (typeof isMobile !== "undefined" && isMobile) {
+                            // Mobile: scroll card strip to this entry
+                            var card = document.querySelector('.mobile-entry-card[data-entry-id="' + f.properties.id + '"]');
+                            if (card) {
+                                card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+                            }
+                        } else {
+                            // Desktop: scroll timeline
+                            var entryEl = document.querySelector('.timeline-entry[data-entry-id="' + f.properties.id + '"]');
+                            if (entryEl) {
+                                entryEl.scrollIntoView({ behavior: "smooth", block: "center" });
+                                highlightEntry(entryEl);
+                            }
                         }
                     });
 
