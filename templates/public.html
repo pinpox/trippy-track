@@ -92,7 +92,7 @@
             {{range .Timeline}}
             <div class="mobile-entry-card" data-entry-id="{{.Entry.ID}}" {{if .Entry.Lat}}data-lat="{{printf "%.6f" (deref .Entry.Lat)}}" data-lon="{{printf "%.6f" (deref .Entry.Lon)}}"{{end}}>
                 {{if .Entry.Photos}}
-                <div class="mobile-entry-thumb">
+                <div class="mobile-card-bg">
                     {{range $i, $p := .Entry.Photos}}{{if eq $i 0}}
                     {{if isVideo $p.FilePath}}
                     <video src="/uploads/{{$p.FilePath}}" preload="metadata"></video>
@@ -102,13 +102,23 @@
                     {{end}}{{end}}
                 </div>
                 {{else}}
-                <div class="mobile-entry-thumb mobile-entry-text-thumb">
+                <div class="mobile-card-bg mobile-card-text-bg"></div>
+                {{end}}
+                <div class="mobile-card-overlay">
+                    {{if gt (len .Entry.Photos) 1}}
+                    <span class="mobile-card-count">{{len .Entry.Photos}}</span>
+                    {{end}}
+                    <div class="mobile-card-bottom">
+                        {{if .Entry.CountryCode}}<span class="mobile-card-country">{{countryFlag .Entry.CountryCode}} {{countryName .Entry.CountryCode}}</span>{{end}}
+                        <span class="mobile-card-date">{{formatDate .Entry.Timestamp}}</span>
+                        {{if .Entry.WeatherCode}}<span class="mobile-card-weather">{{weatherIcon .Entry.WeatherCode}} {{printf "%.0f" (deref .Entry.Temperature)}}&deg;</span>{{end}}
+                    </div>
+                </div>
+                {{if not .Entry.Photos}}
+                <div class="mobile-card-text-preview">
                     <p>{{if .Entry.Body}}{{.Entry.Body}}{{end}}</p>
                 </div>
                 {{end}}
-                <div class="mobile-entry-info">
-                    <span class="mobile-entry-date">{{formatDate .Entry.Timestamp}}</span>
-                </div>
             </div>
             {{end}}
         </div>

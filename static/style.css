@@ -1305,16 +1305,15 @@ code.copyable {
 
     .mobile-entry-card {
         flex-shrink: 0;
-        width: 160px;
+        width: 240px;
         height: 100%;
-        display: flex;
-        flex-direction: column;
+        position: relative;
         cursor: pointer;
         scroll-snap-align: center;
-        border-radius: 8px;
+        border-radius: 10px;
         overflow: hidden;
-        background: white;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        background: #1a1a1a;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         transition: transform 0.15s;
     }
 
@@ -1322,53 +1321,90 @@ code.copyable {
         transform: scale(0.96);
     }
 
-    .mobile-entry-thumb {
-        flex: 1;
-        overflow: hidden;
-        min-height: 0;
+    .mobile-card-bg {
+        position: absolute;
+        inset: 0;
     }
 
-    .mobile-entry-thumb img,
-    .mobile-entry-thumb video {
+    .mobile-card-bg img,
+    .mobile-card-bg video {
         width: 100%;
         height: 100%;
         object-fit: cover;
         display: block;
     }
 
-    .mobile-entry-text-thumb {
+    .mobile-card-text-bg {
         background: var(--cream);
+    }
+
+    .mobile-card-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        background: linear-gradient(transparent 40%, rgba(0,0,0,0.6));
+        padding: 0.6rem 0.7rem;
+    }
+
+    .mobile-card-count {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: rgba(0,0,0,0.5);
+        color: white;
+        font-size: 0.65rem;
+        padding: 0.15rem 0.4rem;
+        border-radius: 3px;
+        backdrop-filter: blur(4px);
+    }
+
+    .mobile-card-count::before {
+        content: "\1F4F7 ";
+    }
+
+    .mobile-card-bottom {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    .mobile-card-country {
+        font-size: 0.7rem;
+        color: white;
+        font-weight: 600;
+    }
+
+    .mobile-card-date {
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 0.65rem;
+        color: rgba(255,255,255,0.7);
+    }
+
+    .mobile-card-weather {
+        font-size: 0.65rem;
+        color: rgba(255,255,255,0.7);
+    }
+
+    .mobile-card-text-preview {
+        position: absolute;
+        inset: 0;
         display: flex;
         align-items: center;
         padding: 0.75rem;
+        padding-bottom: 3rem;
     }
 
-    .mobile-entry-text-thumb p {
+    .mobile-card-text-preview p {
         font-family: 'Libre Baskerville', Georgia, serif;
         font-size: 0.7rem;
         color: var(--ink);
-        line-height: 1.4;
+        line-height: 1.5;
         overflow: hidden;
         display: -webkit-box;
-        -webkit-line-clamp: 4;
+        -webkit-line-clamp: 5;
         -webkit-box-orient: vertical;
-    }
-
-    .mobile-entry-info {
-        padding: 0.4rem 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-    }
-
-    .mobile-entry-flag {
-        font-size: 0.75rem;
-    }
-
-    .mobile-entry-date {
-        font-family: 'Libre Baskerville', Georgia, serif;
-        font-size: 0.65rem;
-        color: var(--ink-faint);
     }
 
     /* Stats pill adjustments */
