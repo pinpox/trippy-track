@@ -1299,9 +1299,9 @@ code.copyable {
         align-items: flex-end;
         justify-content: space-between;
         padding: 0 1.5rem;
-        height: 2rem;
-        padding-top: 0.75rem;
+        height: 1.8rem;
         position: relative;
+        padding-bottom: 0.25rem;
     }
 
     .mobile-progress-line::before {
@@ -1309,10 +1309,9 @@ code.copyable {
         position: absolute;
         left: 1.5rem;
         right: 1.5rem;
-        top: 50%;
+        bottom: calc(0.25rem + 3px);
         height: 2px;
         background: var(--warm-grey);
-        transform: translateY(-50%);
     }
 
     .mobile-progress-dot {
@@ -1332,13 +1331,14 @@ code.copyable {
     .mobile-progress-km {
         position: absolute;
         bottom: 100%;
-        right: 100%;
-        transform: translateX(50%);
         font-family: 'Libre Baskerville', Georgia, serif;
         font-size: 0.5rem;
         color: var(--ink-faint);
         white-space: nowrap;
         margin-bottom: 0.15rem;
+        pointer-events: none;
+        transform: translateX(-50%);
+        /* left is set by JS */
     }
 
     .mobile-progress-dot.active {

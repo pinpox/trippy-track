@@ -693,6 +693,22 @@ document.addEventListener("DOMContentLoaded", function () {
             }, 100);
         });
 
+        // Position km labels between dots
+        function positionKmLabels() {
+            var dots = Array.from(progressDots);
+            dots.forEach(function (dot, idx) {
+                var km = dot.querySelector(".mobile-progress-km");
+                if (!km || idx === 0) return;
+                var prevDot = dots[idx - 1];
+                var prevRect = prevDot.getBoundingClientRect();
+                var curRect = dot.getBoundingClientRect();
+                var midX = (prevRect.left + prevRect.right + curRect.left + curRect.right) / 4;
+                var dotRect = dot.getBoundingClientRect();
+                km.style.left = (midX - dotRect.left) + "px";
+            });
+        }
+        positionKmLabels();
+
         // Initialize first dot as active
         updateProgressDot(0);
     }
