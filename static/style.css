@@ -1462,23 +1462,34 @@ code.copyable {
         -webkit-box-orient: vertical;
     }
 
-    .mobile-card-current-bg {
-        background: var(--ink);
+    .mobile-current-position {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 1.5rem;
+        min-width: 140px;
     }
 
-    .mobile-card-current-label {
+    .mobile-current-label {
         font-family: 'Libre Baskerville', Georgia, serif;
-        font-size: 0.85rem;
-        color: white;
-        font-weight: 700;
+        font-size: 1rem;
+        color: var(--ink);
+        margin: 0;
     }
 
-    .mobile-current-card .mobile-card-overlay {
-        background: none;
+    .mobile-current-coords {
+        font-family: monospace;
+        font-size: 0.75rem;
+        color: var(--ink-faint);
+        margin-top: 0.2rem;
     }
 
-    .mobile-current-card .mobile-card-date {
-        color: rgba(255,255,255,0.5);
+    .mobile-current-time {
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 0.7rem;
+        color: var(--ink-faint);
+        margin-top: 0.15rem;
     }
 
     /* Stats pill adjustments */

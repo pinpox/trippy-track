@@ -130,15 +130,10 @@
             </div>
             {{end}}
             {{if $.LastPoint}}
-            <div class="mobile-entry-card mobile-current-card" data-lat="{{printf "%.6f" $.LastPoint.Lat}}" data-lon="{{printf "%.6f" $.LastPoint.Lon}}">
-                <div class="mobile-card-bg mobile-card-current-bg"></div>
-                <div class="mobile-card-overlay">
-                    <div class="mobile-card-bottom">
-                        <span class="mobile-card-current-label">Last known position</span>
-                        <span class="mobile-card-date">{{formatDate ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}}</span>
-                        <span class="mobile-card-date">{{formatClock ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}}</span>
-                    </div>
-                </div>
+            <div class="mobile-current-position" data-lat="{{printf "%.6f" $.LastPoint.Lat}}" data-lon="{{printf "%.6f" $.LastPoint.Lon}}">
+                <p class="mobile-current-label">Last known position</p>
+                <span class="mobile-current-coords">{{printf "%.4f" $.LastPoint.Lat}}, {{printf "%.4f" $.LastPoint.Lon}}</span>
+                <span class="mobile-current-time">{{formatDate ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}} · {{formatClock ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}}</span>
             </div>
             {{end}}
         </div>
