@@ -498,7 +498,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 dist: distLabel ? distLabel.textContent.trim() : ""
             };
 
-            entryPages.push({ pages: pages, meta: meta, distFromPrev: distLabel ? parseFloat(distLabel.textContent) : 0 });
+            var distKm = 0;
+            if (distLabel) {
+                var distText = distLabel.textContent.trim();
+                if (distText.indexOf(" m") !== -1 && distText.indexOf(" km") === -1) {
+                    distKm = parseFloat(distText) / 1000;
+                } else {
+                    distKm = parseFloat(distText) || 0;
+                }
+            }
+            entryPages.push({ pages: pages, meta: meta, distFromPrev: distKm });
         });
 
         // Compute cumulative distances
