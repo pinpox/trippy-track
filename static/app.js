@@ -482,13 +482,26 @@ document.addEventListener("DOMContentLoaded", function () {
             var lat = card.dataset.lat;
             var lon = card.dataset.lon;
             var headerEl = entryEl.querySelector(".timeline-entry-header");
+            var dateEl = entryEl.querySelector(".timeline-date-day");
+            var timeEl = entryEl.querySelector(".timeline-date-time");
+            var distLabel = entryEl.querySelector(".timeline-distance-label");
             var meta = {
                 lat: lat,
                 lon: lon,
-                header: headerEl ? headerEl.textContent.trim() : ""
+                header: headerEl ? headerEl.textContent.trim() : "",
+                date: dateEl ? dateEl.textContent.trim() : "",
+                time: timeEl ? timeEl.textContent.trim() : "",
+                dist: distLabel ? distLabel.textContent.trim() : ""
             };
 
-            entryPages.push({ pages: pages, meta: meta });
+            entryPages.push({ pages: pages, meta: meta, distFromPrev: distLabel ? parseFloat(distLabel.textContent) : 0 });
+        });
+
+        // Compute cumulative distances
+        var cumulativeDist = 0;
+        entryPages.forEach(function (entry) {
+            cumulativeDist += entry.distFromPrev;
+            entry.meta.totalKm = Math.round(cumulativeDist * 10) / 10;
         });
 
         // Open viewer for an entry
@@ -518,6 +531,12 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!entry) return;
 
             var page = entry.pages[currentPageIdx];
+
+            // Top info
+            var topDate = viewer.querySelector(".viewer-top-date");
+            var topKm = viewer.querySelector(".viewer-top-km");
+            topDate.textContent = entry.meta.date + (entry.meta.time ? " · " + entry.meta.time : "");
+            topKm.textContent = entry.meta.totalKm > 0 ? entry.meta.totalKm + " km" : "";
 
             // Progress bars
             viewerProgress.innerHTML = "";

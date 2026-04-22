@@ -1570,10 +1570,29 @@ code.copyable {
         color: rgba(255,255,255,0.7);
     }
 
+    .viewer-top-info {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .viewer-top-date {
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 0.8rem;
+        color: white;
+    }
+
+    .viewer-top-km {
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.6);
+    }
+
     .viewer-progress {
         display: flex;
         gap: 3px;
-        flex: 1;
+        padding: 0 0.75rem 0.5rem;
     }
 
     .viewer-progress-bar {
