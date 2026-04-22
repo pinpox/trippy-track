@@ -772,6 +772,7 @@ document.addEventListener("DOMContentLoaded", function () {
         trackEl.addEventListener("scroll", function () {
             clearTimeout(scrollDebounce);
             scrollDebounce = setTimeout(function () {
+                if (badgeDragging) return;
                 var trackRect = trackEl.getBoundingClientRect();
                 var centerX = trackRect.left + trackRect.width / 2;
                 var closest = 0;
@@ -796,7 +797,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         duration: 500
                     });
                 }
-            }, 100);
+            }, 30);
         });
 
         // Position dots to match card centers and sync scroll

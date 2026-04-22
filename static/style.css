@@ -1422,7 +1422,7 @@ code.copyable {
         background: white;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         border: 1px solid var(--warm-line);
-        transition: transform 0.15s;
+        transition: transform 0.3s ease;
         display: flex;
         flex-direction: column;
         position: relative;
