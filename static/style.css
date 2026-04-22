@@ -1417,6 +1417,7 @@ code.copyable {
         overflow: hidden;
         background: white;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 1px solid var(--warm-line);
         transition: transform 0.15s;
         display: flex;
         flex-direction: column;
@@ -1531,7 +1532,8 @@ code.copyable {
         display: flex;
         flex-direction: column;
         padding: 0.5rem;
-        background: var(--cream);
+        background: var(--cream-light, #faf7f2);
+        border: none;
     }
 
     .mobile-card-text-header {
