@@ -1296,10 +1296,11 @@ code.copyable {
 
     .mobile-progress-line {
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         justify-content: space-between;
         padding: 0 1.5rem;
-        height: 1.5rem;
+        height: 2rem;
+        padding-top: 0.75rem;
         position: relative;
     }
 
@@ -1326,6 +1327,18 @@ code.copyable {
         z-index: 1;
         cursor: pointer;
         transition: all 0.2s;
+    }
+
+    .mobile-progress-km {
+        position: absolute;
+        bottom: 100%;
+        right: 100%;
+        transform: translateX(50%);
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 0.5rem;
+        color: var(--ink-faint);
+        white-space: nowrap;
+        margin-bottom: 0.15rem;
     }
 
     .mobile-progress-dot.active {

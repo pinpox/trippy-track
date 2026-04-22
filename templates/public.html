@@ -90,7 +90,9 @@
     <div id="mobile-timeline">
         <div class="mobile-progress-line">
             {{range .Timeline}}
-            <div class="mobile-progress-dot" data-entry-id="{{.Entry.ID}}"></div>
+            <div class="mobile-progress-dot" data-entry-id="{{.Entry.ID}}">
+                {{if gt .DistFromPrev 0.0}}<span class="mobile-progress-km">{{formatDist .DistFromPrev}}</span>{{end}}
+            </div>
             {{end}}
             {{if .LastPoint}}
             <div class="mobile-progress-dot mobile-progress-dot-current"></div>
