@@ -842,10 +842,16 @@ document.addEventListener("DOMContentLoaded", function () {
         var badgeDragging = false;
         progressBadge.addEventListener("touchstart", function (e) {
             badgeDragging = true;
+            trackEl.style.scrollSnapType = "none";
+            progressBadge.style.transition = "none";
+            progressBarFill.style.transition = "none";
             e.preventDefault();
         });
         progressBadge.addEventListener("mousedown", function (e) {
             badgeDragging = true;
+            trackEl.style.scrollSnapType = "none";
+            progressBadge.style.transition = "none";
+            progressBarFill.style.transition = "none";
             e.preventDefault();
         });
 
@@ -857,14 +863,22 @@ document.addEventListener("DOMContentLoaded", function () {
             trackEl.scrollLeft = pct * maxScroll;
         }
 
+        function stopBadgeDrag() {
+            if (!badgeDragging) return;
+            badgeDragging = false;
+            trackEl.style.scrollSnapType = "";
+            progressBadge.style.transition = "";
+            progressBarFill.style.transition = "";
+        }
+
         document.addEventListener("touchmove", function (e) {
             if (badgeDragging) handleBadgeDrag(e.touches[0].clientX);
         });
         document.addEventListener("mousemove", function (e) {
             if (badgeDragging) handleBadgeDrag(e.clientX);
         });
-        document.addEventListener("touchend", function () { badgeDragging = false; });
-        document.addEventListener("mouseup", function () { badgeDragging = false; });
+        document.addEventListener("touchend", stopBadgeDrag);
+        document.addEventListener("mouseup", stopBadgeDrag);
 
         // Initialize first dot as active
         updateProgressDot(0);
