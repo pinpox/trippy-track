@@ -1339,6 +1339,8 @@ code.copyable {
         white-space: nowrap;
         z-index: 6;
         transition: left 0.3s ease;
+        cursor: grab;
+        touch-action: none;
     }
 
     /* Connector between cards */

@@ -744,6 +744,34 @@ document.addEventListener("DOMContentLoaded", function () {
         updateProgressBar();
         highlightCard(0);
 
+        // Draggable progress badge
+        var badgeDragging = false;
+        progressBadge.addEventListener("touchstart", function (e) {
+            badgeDragging = true;
+            e.preventDefault();
+        });
+        progressBadge.addEventListener("mousedown", function (e) {
+            badgeDragging = true;
+            e.preventDefault();
+        });
+
+        function handleBadgeDrag(clientX) {
+            if (!badgeDragging || !progressBarWrap) return;
+            var barRect = progressBarWrap.getBoundingClientRect();
+            var pct = Math.max(0, Math.min(1, (clientX - barRect.left) / barRect.width));
+            var maxScroll = trackEl.scrollWidth - trackEl.clientWidth;
+            trackEl.scrollLeft = pct * maxScroll;
+        }
+
+        document.addEventListener("touchmove", function (e) {
+            if (badgeDragging) handleBadgeDrag(e.touches[0].clientX);
+        });
+        document.addEventListener("mousemove", function (e) {
+            if (badgeDragging) handleBadgeDrag(e.clientX);
+        });
+        document.addEventListener("touchend", function () { badgeDragging = false; });
+        document.addEventListener("mouseup", function () { badgeDragging = false; });
+
         // Initialize first dot as active
         updateProgressDot(0);
     }
