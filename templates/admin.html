@@ -33,7 +33,7 @@
                     <div class="photo-add-form">
                         <label class="photo-add-btn" title="Take photo or video">
                             <i class="icon-camera"></i>
-                            <input type="file" id="new-entry-camera-input" accept="image/*" capture="environment" hidden>
+                            <input type="file" id="new-entry-camera-input" accept="image/*,video/*,android/allowCamera" capture="environment" hidden>
                         </label>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
                     <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/entries/{{.ID}}/photos" enctype="multipart/form-data" class="photo-add-form">
                         <label class="photo-add-btn" title="Take photo or video">
                             <i class="icon-camera"></i>
-                            <input type="file" name="photos" accept="image/*" capture="environment" onchange="this.form.submit()" hidden>
+                            <input type="file" name="photos" accept="image/*,video/*,android/allowCamera" capture="environment" onchange="this.form.submit()" hidden>
                         </label>
                     </form>
                 </div>
