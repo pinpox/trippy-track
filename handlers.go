@@ -309,7 +309,8 @@ func (s *Server) handleAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	otrcConfig := fmt.Sprintf(`{"_type":"configuration","mode":3,"monitoring":2,"url":"%s","autostartOnBoot":true,"cmd":true,"locatorDisplacement":10,"locatorInterval":60,"moveModeLocatorInterval":15,"ignoreInaccurateLocations":20,"ignoreStaleLocations":1.0,"pegLocatorFastestIntervalToInterval":false,"extendedData":true}`, trackingURL)
-	otrcDeepLink := "owntracks:///config?inline=" + base64.StdEncoding.EncodeToString([]byte(otrcConfig))
+	otrcInline := base64.StdEncoding.EncodeToString([]byte(otrcConfig))
+	otrcDeepLink := "intent:///config?inline=" + otrcInline + "#Intent;scheme=owntracks;package=org.owntracks.android;end"
 
 	s.tmpl.ExecuteTemplate(w, "admin.html", map[string]any{
 		"Trip":         trip,
