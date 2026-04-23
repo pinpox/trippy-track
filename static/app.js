@@ -734,8 +734,9 @@ document.addEventListener("DOMContentLoaded", function () {
             viewer.style.opacity = "";
         });
 
-        // Tap on mobile entry cards to open viewer
+        // Tap on mobile entry cards to open viewer (skip the last-position card)
         mobileCards.forEach(function (card, idx) {
+            if (card.classList.contains("mobile-current-card")) return;
             card.addEventListener("click", function () {
                 openViewer(idx);
             });
