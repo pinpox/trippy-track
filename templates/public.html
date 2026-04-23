@@ -166,6 +166,9 @@
             </div>
             {{end}}
             {{else if $.IsOwner}}
+            <div class="mobile-card-connector">
+                <div class="mobile-card-connector-line"></div>
+            </div>
             <a href="/t/{{$.Trip.ViewToken}}/admin" class="mobile-entry-card mobile-current-card">
                 <div class="mobile-card-text-area mobile-current-card-area">
                     <div class="mobile-current-card-content">
