@@ -1262,7 +1262,8 @@ code.copyable {
    Mobile layout
    ======================================== */
 @media (max-width: 768px) {
-    html, body {
+    html:has(.trip-view),
+    html:has(.trip-view) body {
         height: 100dvh;
         overflow: hidden;
     }
