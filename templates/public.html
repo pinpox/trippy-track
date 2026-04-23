@@ -94,10 +94,10 @@
     </div>
     <div id="mobile-timeline">
         <div class="mobile-timeline-track">
-            {{range .Timeline}}
-            {{if gt .DistFromPrev 0.0}}
+            {{range $i, $te := .Timeline}}
+            {{if gt $i 0}}
             <div class="mobile-card-connector">
-                <span class="mobile-card-connector-km">{{formatDist .DistFromPrev}}</span>
+                {{if gt $te.DistFromPrev 0.0}}<span class="mobile-card-connector-km">{{formatDist $te.DistFromPrev}}</span>{{end}}
                 <div class="mobile-card-connector-line"></div>
             </div>
             {{end}}
