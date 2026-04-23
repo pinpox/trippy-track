@@ -213,6 +213,11 @@ func listTripsByUser(db *sql.DB, userID int) ([]Trip, error) {
 	return trips, rows.Err()
 }
 
+func toggleTripActive(db *sql.DB, tripID string) error {
+	_, err := db.Exec("UPDATE trips SET is_active = NOT is_active WHERE id = ?", tripID)
+	return err
+}
+
 func insertTrackpoint(db *sql.DB, tp Trackpoint) error {
 	_, err := db.Exec(
 		`INSERT OR IGNORE INTO trackpoints (trip_id, lat, lon, altitude, speed, bearing, hdop, timestamp)

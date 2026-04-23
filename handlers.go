@@ -208,6 +208,7 @@ func (s *Server) routes() http.Handler {
 	mux.HandleFunc("POST /t/{token}/admin/entries/{entryID}/update", s.handleUpdateEntry)
 	mux.HandleFunc("POST /t/{token}/admin/entries/{entryID}/delete", s.handleDeleteEntry)
 	mux.HandleFunc("POST /t/{token}/admin/photos/{photoID}/delete", s.handleDeletePhoto)
+	mux.HandleFunc("POST /t/{token}/admin/toggle-active", s.handleToggleActive)
 
 	return s.auth.AuthMiddleware(mux)
 }
@@ -675,6 +676,26 @@ func (s *Server) handleDeleteEntry(w http.ResponseWriter, r *http.Request) {
 	if err := deleteEntry(s.db, entryID); err != nil {
 		http.Error(w, "failed to delete entry", http.StatusInternalServerError)
 		log.Printf("delete entry: %v", err)
+		return
+	}
+
+	http.Redirect(w, r, "/t/"+token+"/admin", http.StatusSeeOther)
+}
+
+func (s *Server) handleToggleActive(w http.ResponseWriter, r *http.Request) {
+	token := r.PathValue("token")
+	trip, err := getTripByViewToken(s.db, token)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if !s.verifyTripOwnership(w, r, trip) {
+		return
+	}
+
+	if err := toggleTripActive(s.db, trip.ID); err != nil {
+		http.Error(w, "failed to toggle status", http.StatusInternalServerError)
+		log.Printf("toggle active: %v", err)
 		return
 	}
 
