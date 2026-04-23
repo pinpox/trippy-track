@@ -60,7 +60,7 @@
                 <code class="admin-code admin-code-desktop" onclick="navigator.clipboard.writeText('{{.TrackingURL}}'); this.classList.add('copied'); setTimeout(function(){this.classList.remove('copied')}.bind(this), 1500)"><span class="admin-code-text">{{.TrackingURL}}</span><span class="copy-icon">&#x2398;</span></code>
                 <div class="admin-share-actions">
                     <button type="button" class="admin-share-btn" onclick="navigator.clipboard.writeText('{{.TrackingURL}}'); this.textContent='Copied!'; setTimeout(function(){this.textContent='Copy URL'}.bind(this), 1500)">Copy URL</button>
-                    <a href="{{.OTRCDeepLink}}" class="admin-share-btn admin-share-btn-primary">Open in OwnTracks</a>
+                    <button type="button" class="admin-share-btn admin-share-btn-primary" data-otrc="{{.OTRCDeepLink}}" onclick="window.location=this.dataset.otrc">Open in OwnTracks</button>
                 </div>
             </div>
         </div>
