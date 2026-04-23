@@ -76,18 +76,6 @@
         <div class="entry-card">
             <span class="entry-card-date">{{formatTime .Timestamp}}</span>
             <div class="entry-photos">
-                {{range .Photos}}
-                <div class="entry-photo-wrap">
-                    {{if isVideo .FilePath}}
-                    <video src="/uploads/{{.FilePath}}" controls preload="metadata" class="entry-thumb"></video>
-                    {{else}}
-                    <img src="/uploads/{{thumbPath .FilePath}}" alt="" class="entry-thumb" loading="lazy">
-                    {{end}}
-                    <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/photos/{{.ID}}/delete" class="photo-delete-form">
-                        <button type="submit" class="photo-delete-btn" title="Delete">&times;</button>
-                    </form>
-                </div>
-                {{end}}
                 <div class="entry-photo-add">
                     <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/entries/{{.ID}}/photos" enctype="multipart/form-data" class="photo-add-form">
                         <label class="photo-add-btn" title="Add photos">
@@ -104,6 +92,18 @@
                         </label>
                     </form>
                 </div>
+                {{range .Photos}}
+                <div class="entry-photo-wrap">
+                    {{if isVideo .FilePath}}
+                    <video src="/uploads/{{.FilePath}}" controls preload="metadata" class="entry-thumb"></video>
+                    {{else}}
+                    <img src="/uploads/{{thumbPath .FilePath}}" alt="" class="entry-thumb" loading="lazy">
+                    {{end}}
+                    <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/photos/{{.ID}}/delete" class="photo-delete-form">
+                        <button type="submit" class="photo-delete-btn" title="Delete">&times;</button>
+                    </form>
+                </div>
+                {{end}}
             </div>
             <div class="entry-text-wrap" id="entry-wrap-{{.ID}}">
                 <div class="entry-text-display">
