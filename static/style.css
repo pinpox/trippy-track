@@ -5,7 +5,7 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-ui);
     color: #1a1a1a;
     background: #f5f5f5;
 }
@@ -40,13 +40,13 @@ h2 {
 }
 
 .login-title {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
 }
 
 .login-subtitle {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-style: italic;
     color: #888;
     margin-bottom: 2rem;
@@ -87,14 +87,13 @@ h2 {
 }
 
 .index-title {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 2rem;
     font-weight: 700;
     color: var(--ink, #2c2c2c);
 }
 
 .user-info {
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.8rem;
     color: var(--ink-faint, #9a9488);
 }
@@ -120,7 +119,6 @@ h2 {
     padding: 0.7rem 1rem;
     border: 1px solid var(--warm-line, #d8d2c8);
     border-radius: var(--radius-sm);
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.9rem;
     background: white;
     color: var(--ink, #2c2c2c);
@@ -136,7 +134,6 @@ h2 {
     color: white;
     border: none;
     border-radius: var(--radius-sm);
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.85rem;
     cursor: pointer;
 }
@@ -180,14 +177,13 @@ h2 {
 }
 
 .trip-card-name {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 1.05rem;
     color: var(--ink, #2c2c2c);
     flex: 1;
 }
 
 .trip-card-date {
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.8rem;
     color: var(--ink-faint, #9a9488);
     margin-right: 0.75rem;
@@ -199,7 +195,7 @@ h2 {
 }
 
 .index-empty {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-style: italic;
     color: var(--ink-faint, #9a9488);
     text-align: center;
@@ -224,7 +220,6 @@ h2 {
 }
 
 .admin-back {
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.85rem;
     color: var(--ink-faint, #9a9488);
     text-decoration: none;
@@ -235,7 +230,7 @@ h2 {
 }
 
 .admin-title {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 2rem;
     font-weight: 700;
     color: var(--ink, #2c2c2c);
@@ -255,7 +250,6 @@ h2 {
 
 .admin-info-label {
     display: block;
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -264,7 +258,6 @@ h2 {
 }
 
 .config-download-link {
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.7rem;
     text-transform: none;
     letter-spacing: 0;
@@ -320,12 +313,10 @@ h2 {
 
 .admin-code.copied .copy-icon::after {
     content: " Copied!";
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.7rem;
 }
 
 .admin-stats {
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.8rem;
     color: var(--ink-faint, #9a9488);
     text-align: center;
@@ -338,7 +329,6 @@ h2 {
     justify-content: center;
     gap: 0.4rem;
     margin-top: 0.3rem;
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.7rem;
 }
 
@@ -387,7 +377,6 @@ h2 {
 .admin-share-btn {
     padding: 0.5rem 1rem;
     border-radius: var(--radius-sm);
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.8rem;
     cursor: pointer;
     text-align: center;
@@ -412,7 +401,7 @@ h2 {
 }
 
 .admin-section-title {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--ink, #2c2c2c);
@@ -427,7 +416,6 @@ h2 {
 }
 
 .admin-entry-form .form-group label {
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -435,7 +423,6 @@ h2 {
 }
 
 .admin-entry-form textarea {
-    font-family: 'Libre Baskerville', Georgia, serif;
     border-color: var(--warm-line, #d8d2c8);
     background: white;
 }
@@ -443,7 +430,6 @@ h2 {
 .admin-entry-form button {
     align-self: flex-start;
     background: var(--ink, #2c2c2c);
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.85rem;
 }
 
@@ -461,13 +447,12 @@ h2 {
 }
 
 .admin-entries .entry-card p {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     color: var(--ink, #2c2c2c);
     line-height: 1.6;
 }
 
 .admin-entries .entry-card-date {
-    font-family: 'Libre Baskerville', Georgia, serif;
     color: var(--ink-faint, #9a9488);
 }
 
@@ -494,7 +479,6 @@ h2 {
     color: white;
     border: none;
     border-radius: var(--radius-sm);
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.8rem;
     cursor: pointer;
 }
@@ -509,7 +493,6 @@ h2 {
     color: var(--ink-faint, #9a9488);
     border: 1px solid var(--warm-line, #d8d2c8);
     border-radius: var(--radius-sm);
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.8rem;
     cursor: pointer;
 }
@@ -521,7 +504,6 @@ h2 {
 
 /* Edit form within entries */
 .admin-entries .entry-edit-form textarea {
-    font-family: 'Libre Baskerville', Georgia, serif;
     border-color: var(--warm-line, #d8d2c8);
     background: white;
     font-size: 0.9rem;
@@ -529,7 +511,6 @@ h2 {
 
 .admin-entries .entry-edit-form button[type="submit"] {
     background: var(--ink, #2c2c2c);
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.8rem;
 }
 
@@ -541,7 +522,6 @@ h2 {
     background: none;
     color: var(--ink-faint, #9a9488);
     border: 1px solid var(--warm-line, #d8d2c8);
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.8rem;
 }
 
@@ -551,12 +531,10 @@ h2 {
 }
 
 .admin-entries .entry-edit-datetime label {
-    font-family: 'Libre Baskerville', Georgia, serif;
     color: var(--ink-faint, #9a9488);
 }
 
 .admin-entries .entry-edit-datetime input {
-    font-family: 'Libre Baskerville', Georgia, serif;
     border-color: var(--warm-line, #d8d2c8);
 }
 
@@ -844,6 +822,8 @@ code.copyable {
     --ink-faint: #9a9488;
     --warm-grey: #c4bdb2;
     --warm-line: #d8d2c8;
+    --font-serif: 'Libre Baskerville', Georgia, serif;
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 16px;
@@ -884,7 +864,6 @@ code.copyable {
     color: var(--cream-light);
     padding: 0.45rem 1.2rem;
     font-size: 0.75rem;
-    font-family: 'Libre Baskerville', Georgia, serif;
     display: flex;
     align-items: center;
     border-radius: var(--radius-lg);
@@ -923,7 +902,7 @@ code.copyable {
     position: absolute;
     top: 1.5rem;
     left: 1.5rem;
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 0.75rem;
     color: var(--ink-faint);
     text-decoration: none;
@@ -945,7 +924,7 @@ code.copyable {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 0.75rem;
     color: var(--ink-faint);
     text-decoration: none;
@@ -956,7 +935,7 @@ code.copyable {
 }
 
 .timeline-header h1 {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 6rem;
@@ -1009,7 +988,6 @@ code.copyable {
     left: -4.5rem;
     transform: rotate(-90deg);
     color: var(--ink-light);
-    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.1em;
@@ -1032,7 +1010,7 @@ code.copyable {
 .timeline-current-coords {
     display: block;
     padding: 0.3rem 0 0;
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 0.85rem;
     color: var(--ink-faint);
     letter-spacing: 0.05em;
@@ -1048,7 +1026,7 @@ code.copyable {
 
 .timeline-date-day {
     display: block;
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 1.6rem;
     white-space: nowrap;
     font-weight: 400;
@@ -1058,7 +1036,7 @@ code.copyable {
 
 .timeline-date-time {
     display: block;
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 1.15rem;
     font-weight: 400;
     font-style: italic;
@@ -1077,13 +1055,11 @@ code.copyable {
 }
 
 .entry-country {
-    font-family: 'Libre Baskerville', Georgia, serif;
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
 
 .entry-weather {
-    font-family: 'Libre Baskerville', Georgia, serif;
 }
 
 .entry-header-sep {
@@ -1243,7 +1219,7 @@ code.copyable {
 /* Text content */
 .timeline-body {
     padding: 0;
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     line-height: 1.8;
     font-size: 1.05rem;
     font-weight: 400;
@@ -1333,7 +1309,7 @@ code.copyable {
 
 .muted {
     color: var(--ink-faint);
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: var(--font-serif);
     font-style: italic;
     font-size: 0.9rem;
     padding: 1rem 2rem;
@@ -1518,7 +1494,6 @@ code.copyable {
         transform: translateX(-100%);
         background: var(--sienna);
         color: white;
-        font-family: 'Libre Baskerville', Georgia, serif;
         font-size: 0.6rem;
         font-weight: 700;
         padding: 0.2rem 0.6rem;
@@ -1572,7 +1547,6 @@ code.copyable {
     }
 
     .mobile-card-connector-km {
-        font-family: 'Libre Baskerville', Georgia, serif;
         font-size: 0.45rem;
         color: var(--ink-faint);
         white-space: nowrap;
@@ -1720,7 +1694,6 @@ code.copyable {
     }
 
     .mobile-card-date {
-        font-family: 'Libre Baskerville', Georgia, serif;
         font-size: 0.6rem;
         color: var(--ink-faint);
     }
@@ -1742,7 +1715,6 @@ code.copyable {
     }
 
     .mobile-card-text-header .mobile-card-date {
-        font-family: 'Libre Baskerville', Georgia, serif;
         font-size: 0.7rem;
         font-weight: 700;
         color: var(--ink);
@@ -1754,7 +1726,7 @@ code.copyable {
     }
 
     .mobile-card-text-body {
-        font-family: 'Libre Baskerville', Georgia, serif;
+        font-family: var(--font-serif);
         font-size: 0.6rem;
         color: var(--ink-light);
         line-height: 1.5;
@@ -1867,13 +1839,12 @@ code.copyable {
     }
 
     .viewer-top-date {
-        font-family: 'Libre Baskerville', Georgia, serif;
         font-size: 0.8rem;
         color: white;
     }
 
     .viewer-top-km {
-        font-family: 'Libre Baskerville', Georgia, serif;
+        font-family: var(--font-serif);
         font-size: 0.75rem;
         color: rgba(255,255,255,0.6);
     }
@@ -1927,7 +1898,7 @@ code.copyable {
     .viewer-content .viewer-text {
         padding: 2rem;
         color: white;
-        font-family: 'Libre Baskerville', Georgia, serif;
+        font-family: var(--font-serif);
         font-size: 1.1rem;
         line-height: 1.8;
         text-align: center;
@@ -1964,7 +1935,7 @@ code.copyable {
     }
 
     .viewer-meta-location {
-        font-family: 'Libre Baskerville', Georgia, serif;
+        font-family: var(--font-serif);
         font-size: 1.2rem;
         font-weight: 700;
         margin-bottom: 0.2rem;
