@@ -87,7 +87,8 @@ func TranscodeVideo(uploadsDir, filename string) {
 	}
 
 	srcPath := filepath.Join(uploadsDir, filename)
-	tmpPath := srcPath + ".transcoding"
+	base := strings.TrimSuffix(filename, filepath.Ext(filename))
+	tmpPath := filepath.Join(uploadsDir, base+"_transcoding.mp4")
 
 	cmd := exec.Command("ffmpeg",
 		"-i", srcPath,
