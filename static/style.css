@@ -326,8 +326,10 @@ h2 {
 
 .admin-stats {
     font-family: 'Libre Baskerville', Georgia, serif;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--ink-faint, #9a9488);
+    text-align: center;
+    margin-top: 0.5rem;
 }
 
 /* OwnTracks alternative links */

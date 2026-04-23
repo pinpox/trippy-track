@@ -68,13 +68,13 @@
                 </div>
             </div>
         </div>
-        <div class="admin-stats">
-            {{len .Trackpoints}} trackpoints &middot; {{len .Entries}} entries
-        </div>
         <form method="POST" action="/t/{{.Trip.ViewToken}}/admin/toggle-active" class="admin-toggle-active">
             <button type="submit" class="admin-share-btn admin-toggle-btn">{{if .Trip.IsActive}}End Trip{{else}}Continue Trip{{end}}</button>
         </form>
         <a href="/" class="admin-share-btn admin-all-trips-btn">All Trips</a>
+        <div class="admin-stats">
+            {{len .Trackpoints}} trackpoints &middot; {{len .Entries}} entries
+        </div>
     </section>
 
     {{if .Entries}}
