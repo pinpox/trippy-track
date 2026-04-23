@@ -466,7 +466,7 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 32MB max upload
-	if err := r.ParseMultipartForm(32 << 20); err != nil {
+	if err := r.ParseMultipartForm(1536 << 20); err != nil {
 		http.Error(w, "failed to parse form", http.StatusBadRequest)
 		return
 	}
@@ -741,7 +741,7 @@ func (s *Server) handleAddPhotos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseMultipartForm(32 << 20); err != nil {
+	if err := r.ParseMultipartForm(1536 << 20); err != nil {
 		http.Error(w, "failed to parse form", http.StatusBadRequest)
 		return
 	}
