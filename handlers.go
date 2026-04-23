@@ -521,7 +521,7 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		go GenerateThumbnails(s.uploadsDir, filename)
+		GenerateThumbnails(s.uploadsDir, filename)
 		go TranscodeVideo(s.uploadsDir, filename)
 
 		photoFiles = append(photoFiles, filename)
@@ -803,7 +803,7 @@ func (s *Server) handleAddPhotos(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		go GenerateThumbnails(s.uploadsDir, filename)
+		GenerateThumbnails(s.uploadsDir, filename)
 		go TranscodeVideo(s.uploadsDir, filename)
 
 		if err := addPhoto(s.db, entryID, filename, order); err != nil {

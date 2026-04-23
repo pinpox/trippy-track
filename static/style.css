@@ -330,6 +330,29 @@ h2 {
     color: var(--ink-faint, #9a9488);
 }
 
+/* OwnTracks alternative links */
+.admin-otrc-alt {
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 0.7rem;
+}
+
+.admin-otrc-alt a {
+    color: var(--ink-faint, #9a9488);
+    text-decoration: none;
+}
+
+.admin-otrc-alt a:hover {
+    color: var(--ink, #2c2c2c);
+}
+
+.admin-otrc-alt span {
+    color: var(--warm-grey, #c4bdb2);
+}
+
 /* Toggle active button */
 .admin-toggle-active {
     margin-top: 0.75rem;
