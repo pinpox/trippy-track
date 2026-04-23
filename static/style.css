@@ -58,7 +58,7 @@ h2 {
     background: #1a1a1a;
     color: white;
     text-decoration: none;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 1rem;
 }
 
@@ -119,7 +119,7 @@ h2 {
     flex: 1;
     padding: 0.7rem 1rem;
     border: 1px solid var(--warm-line, #d8d2c8);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.9rem;
     background: white;
@@ -135,7 +135,7 @@ h2 {
     background: var(--ink, #2c2c2c);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.85rem;
     cursor: pointer;
@@ -159,20 +159,20 @@ h2 {
     background: rgba(255, 255, 255, 0.6);
     text-decoration: none;
     color: inherit;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     transition: background 0.15s;
 }
 
 .trip-card:first-child {
-    border-radius: 4px 4px 0 0;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
 .trip-card:last-child {
-    border-radius: 0 0 4px 4px;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
 .trip-card:only-child {
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 .trip-card:hover {
@@ -284,7 +284,7 @@ h2 {
     background: var(--ink, #2c2c2c);
     color: var(--cream, #f5f0e8);
     padding: 0.6rem 0.8rem;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 0.75rem;
     font-family: monospace;
     cursor: pointer;
@@ -361,7 +361,7 @@ h2 {
 
 .admin-share-btn {
     padding: 0.5rem 1rem;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.8rem;
     cursor: pointer;
@@ -432,7 +432,7 @@ h2 {
     border: none;
     box-shadow: none;
     padding: 1.25rem;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
 }
 
 .admin-entries .entry-card p {
@@ -468,7 +468,7 @@ h2 {
     background: var(--ink, #2c2c2c);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.8rem;
     cursor: pointer;
@@ -483,7 +483,7 @@ h2 {
     background: none;
     color: var(--ink-faint, #9a9488);
     border: 1px solid var(--warm-line, #d8d2c8);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 0.8rem;
     cursor: pointer;
@@ -562,7 +562,7 @@ h2 {
 textarea {
     padding: 0.5rem 0.75rem;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 1rem;
     font-family: inherit;
     resize: vertical;
@@ -572,7 +572,7 @@ input[type="text"] {
     flex: 1;
     padding: 0.5rem 0.75rem;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 1rem;
 }
 
@@ -581,7 +581,7 @@ button {
     background: #2563eb;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 1rem;
     cursor: pointer;
 }
@@ -594,7 +594,7 @@ button:hover {
 .trip-card {
     background: white;
     padding: 1rem;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     margin-bottom: 0.5rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
@@ -619,7 +619,7 @@ code.copyable {
     background: #1a1a1a;
     color: #e5e5e5;
     padding: 0.75rem;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 0.8rem;
     word-break: break-all;
     margin: 0.5rem 0;
@@ -629,7 +629,7 @@ code.copyable {
 .entry-card {
     background: white;
     padding: 1rem;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     margin-bottom: 0.75rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
@@ -663,7 +663,7 @@ code.copyable {
     width: 120px;
     height: 90px;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 .photo-delete-form {
@@ -705,7 +705,7 @@ code.copyable {
     align-items: center;
     justify-content: center;
     border: 2px dashed #ccc;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 .photo-add-btn {
@@ -743,7 +743,7 @@ code.copyable {
     background: #2563eb;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 0.85rem;
     cursor: pointer;
 }
@@ -757,7 +757,7 @@ code.copyable {
     background: #e53e3e;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 0.85rem;
     cursor: pointer;
 }
@@ -783,7 +783,7 @@ code.copyable {
 .entry-edit-datetime input {
     padding: 0.4rem 0.5rem;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 0.9rem;
 }
 
@@ -819,6 +819,9 @@ code.copyable {
     --ink-faint: #9a9488;
     --warm-grey: #c4bdb2;
     --warm-line: #d8d2c8;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
     --sienna: #b85c38;
     --sienna-light: rgba(184, 92, 56, 0.15);
     --sienna-faint: rgba(184, 92, 56, 0.08);
@@ -859,7 +862,7 @@ code.copyable {
     font-family: 'Libre Baskerville', Georgia, serif;
     display: flex;
     align-items: center;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     white-space: nowrap;
     backdrop-filter: blur(8px);
     letter-spacing: 0.03em;
@@ -1345,7 +1348,7 @@ code.copyable {
     width: 90vw;
     height: 90vh;
     object-fit: contain;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 .lightbox-close {
@@ -1494,7 +1497,7 @@ code.copyable {
         font-size: 0.6rem;
         font-weight: 700;
         padding: 0.2rem 0.6rem;
-        border-radius: 4px 4px 0 0;
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0;
         white-space: nowrap;
         z-index: 6;
         transition: left 0.3s ease;
@@ -1578,7 +1581,7 @@ code.copyable {
         width: 200px;
         cursor: pointer;
         scroll-snap-align: center;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         overflow: hidden;
         background: white;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -1986,7 +1989,7 @@ code.copyable {
 
     .admin-share-btn {
         flex: 1;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
     }
 
     .admin-stats {
@@ -2021,14 +2024,14 @@ code.copyable {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
     }
 
     .admin-page .entry-photo-add {
         width: 100%;
         height: auto;
         aspect-ratio: 4/3;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
         border-color: var(--warm-line, #d8d2c8);
     }
 
@@ -2052,7 +2055,7 @@ code.copyable {
         aspect-ratio: 4/3;
         width: 100%;
         height: auto;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
     }
 
     /* Entry cards — tighter on mobile */
@@ -2085,7 +2088,7 @@ code.copyable {
         font-size: 0.85rem;
         padding: 0.6rem 1rem;
         text-align: center;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
     }
 
     /* Post Entry button — full width, touch-friendly */
@@ -2094,7 +2097,7 @@ code.copyable {
         align-self: stretch;
         min-height: 48px;
         font-size: 0.9rem;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
     }
 
     /* Share/action buttons — touch-friendly */
@@ -2123,7 +2126,7 @@ code.copyable {
         flex: 1;
         min-height: 44px;
         font-size: 0.85rem;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
     }
 
     /* Section title */
