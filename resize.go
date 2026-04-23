@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -74,6 +75,46 @@ func MediumPath(filename string) string {
 	}
 	base := strings.TrimSuffix(filename, filepath.Ext(filename))
 	return base + "_med" + ext
+}
+
+// TranscodeVideo re-encodes a video to a universally compatible H.264 format.
+// The original file is replaced in-place. This ensures videos recorded on mobile
+// devices play correctly across all browsers.
+func TranscodeVideo(uploadsDir, filename string) {
+	ext := strings.ToLower(filepath.Ext(filename))
+	if ext != ".mp4" && ext != ".webm" && ext != ".mov" && ext != ".avi" {
+		return
+	}
+
+	srcPath := filepath.Join(uploadsDir, filename)
+	tmpPath := srcPath + ".transcoding"
+
+	cmd := exec.Command("ffmpeg",
+		"-i", srcPath,
+		"-c:v", "libx264",
+		"-preset", "ultrafast",
+		"-crf", "18",
+		"-profile:v", "main",
+		"-movflags", "+faststart",
+		"-c:a", "aac",
+		"-y",
+		tmpPath,
+	)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("transcode: failed to transcode %s: %v\n%s", filename, err, output)
+		os.Remove(tmpPath)
+		return
+	}
+
+	if err := os.Rename(tmpPath, srcPath); err != nil {
+		log.Printf("transcode: failed to replace %s: %v", filename, err)
+		os.Remove(tmpPath)
+		return
+	}
+
+	log.Printf("transcode: %s done", filename)
 }
 
 // BackfillThumbnails generates thumbnails for all existing photos that don't have them.

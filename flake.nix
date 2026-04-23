@@ -50,6 +50,7 @@
               gopls
               gotools
               sqlite
+              ffmpeg
             ];
           };
         }
@@ -107,6 +108,7 @@
                 StateDirectory = "trippy-track";
                 WorkingDirectory = "${cfg.package}/share/trippy-track";
                 ExecStart = "${cfg.package}/bin/trippy-track";
+                Environment = "PATH=${pkgs.ffmpeg}/bin";
                 Restart = "on-failure";
                 RestartSec = 5;
 
