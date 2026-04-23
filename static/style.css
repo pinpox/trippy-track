@@ -905,6 +905,11 @@ code.copyable {
     color: var(--sienna);
 }
 
+/* Hide mobile edit link on desktop */
+.mobile-edit-link {
+    display: none;
+}
+
 .rss-link {
     position: absolute;
     top: 1.5rem;
@@ -1769,22 +1774,21 @@ code.copyable {
         display: none;
     }
 
-    .admin-link {
-        position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
-        z-index: 15;
-        background: rgba(44, 44, 44, 0.7);
-        color: white;
-        padding: 0.4rem 0.8rem;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        min-height: 44px;
-        min-width: 44px;
+    .mobile-edit-link {
         display: flex;
         align-items: center;
         justify-content: center;
-        backdrop-filter: blur(8px);
+        flex-shrink: 0;
+        min-width: 100px;
+        min-height: 44px;
+        padding: 0.5rem 1.2rem;
+        margin: 0 1rem;
+        font-family: 'Libre Baskerville', Georgia, serif;
+        font-size: 0.75rem;
+        color: var(--ink-faint);
+        text-decoration: none;
+        border: 1px solid var(--warm-line);
+        border-radius: 8px;
     }
 
     .maplibregl-ctrl-bottom-left,

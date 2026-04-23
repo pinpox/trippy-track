@@ -139,6 +139,7 @@
                 <span class="mobile-current-time">{{formatDate ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}} · {{formatClock ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}}</span>
             </div>
             {{end}}
+            {{if $.IsOwner}}<a href="/t/{{$.Trip.ViewToken}}/admin" class="mobile-edit-link">+ New Entry</a>{{end}}
         </div>
     </div>
     <!-- Mobile entry viewer -->
@@ -170,6 +171,7 @@
     const shareToken = "{{.Trip.ViewToken}}";
     const tripName = "{{.Trip.Name}}";
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const isOwner = {{if .IsOwner}}true{{else}}false{{end}};
 </script>
 <script src="/static/app.js"></script>
 </body>

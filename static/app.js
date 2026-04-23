@@ -219,6 +219,8 @@ document.addEventListener("DOMContentLoaded", function () {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(updateActiveEntry, 80);
     });
+    // Scroll desktop timeline to the bottom (latest entries)
+    timelineEl.scrollTop = timelineEl.scrollHeight;
     updateActiveEntry();
 
     // Stop timeline line at the current entry's dot
@@ -837,8 +839,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         trackEl.addEventListener("scroll", updateProgressBar);
+
+        // Focus last card for visitors, or scroll to "New Entry" for owners
+        var initialIdx = mobileCards.length - 1;
+        if (typeof isOwner !== "undefined" && isOwner) {
+            // Scroll to the very end (past last card, to the "+ New Entry" link)
+            trackEl.scrollLeft = trackEl.scrollWidth;
+        } else if (initialIdx >= 0) {
+            mobileCards[initialIdx].scrollIntoView({ inline: "center", block: "nearest" });
+        }
         updateProgressBar();
-        highlightCard(0);
+        highlightCard(Math.max(0, initialIdx));
 
         // Draggable progress badge
         var badgeDragging = false;
