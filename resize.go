@@ -96,6 +96,7 @@ func TranscodeVideo(uploadsDir, filename string) {
 		"-preset", "ultrafast",
 		"-crf", "18",
 		"-profile:v", "main",
+		"-pix_fmt", "yuv420p",
 		"-vf", "scale=1920:1920:force_original_aspect_ratio=decrease:force_divisible_by=2",
 		"-movflags", "+faststart",
 		"-c:a", "aac",
