@@ -1765,9 +1765,26 @@ code.copyable {
     }
 
     /* Hide desktop-only elements */
-    .rss-link,
-    .admin-link {
+    .rss-link {
         display: none;
+    }
+
+    .admin-link {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        z-index: 15;
+        background: rgba(44, 44, 44, 0.7);
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        min-height: 44px;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(8px);
     }
 
     .maplibregl-ctrl-bottom-left,
