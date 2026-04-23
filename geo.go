@@ -125,10 +125,17 @@ func ComputeStats(points []Trackpoint, entryCount int, isActive bool) TripStats 
 	stats.DurationDays = int(dur.Hours()) / 24
 	stats.DurationHours = int(dur.Hours()) % 24
 
-	// Last known speed
+	// Last known speed — zero out if GPS noise (<3 km/h) or stale (>15 min)
 	lastPoint := points[len(points)-1]
 	if lastPoint.Speed != nil {
-		stats.LastSpeed = lastPoint.Speed
+		speed := *lastPoint.Speed
+		stale := time.Since(lastPoint.Timestamp) > 15*time.Minute
+		if speed < 3 || stale {
+			zero := 0.0
+			stats.LastSpeed = &zero
+		} else {
+			stats.LastSpeed = lastPoint.Speed
+		}
 	}
 
 	return stats
