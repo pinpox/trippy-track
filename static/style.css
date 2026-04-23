@@ -2045,18 +2045,14 @@ code.copyable {
     }
 
     .admin-entries .entry-footer-actions {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 0.5rem;
         width: 100%;
     }
 
-    .admin-entries .entry-footer-actions .entry-delete-form {
-        flex: 1;
-    }
-
     .admin-entries .entry-edit-btn,
     .admin-entries .entry-delete-btn {
-        flex: 1;
         width: 100%;
         min-height: 44px;
         font-size: 0.85rem;
