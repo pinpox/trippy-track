@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"database/sql"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -307,12 +308,16 @@ func (s *Server) handleAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	otrcConfig := fmt.Sprintf(`{"_type":"configuration","mode":3,"monitoring":2,"url":"%s","autostartOnBoot":true,"cmd":true,"locatorDisplacement":10,"locatorInterval":60,"moveModeLocatorInterval":15,"ignoreInaccurateLocations":20,"ignoreStaleLocations":1.0,"pegLocatorFastestIntervalToInterval":false,"extendedData":true}`, trackingURL)
+	otrcDeepLink := "owntracks:///config?inline=" + base64.StdEncoding.EncodeToString([]byte(otrcConfig))
+
 	s.tmpl.ExecuteTemplate(w, "admin.html", map[string]any{
-		"Trip":        trip,
-		"Trackpoints": trackpoints,
-		"Entries":     entries,
-		"TrackingURL": trackingURL,
-		"ShareURL":    fmt.Sprintf("%s://%s/t/%s", scheme, r.Host, trip.ViewToken),
+		"Trip":         trip,
+		"Trackpoints":  trackpoints,
+		"Entries":      entries,
+		"TrackingURL":  trackingURL,
+		"ShareURL":     fmt.Sprintf("%s://%s/t/%s", scheme, r.Host, trip.ViewToken),
+		"OTRCDeepLink": otrcDeepLink,
 	})
 }
 
