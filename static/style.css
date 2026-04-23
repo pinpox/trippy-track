@@ -1563,6 +1563,12 @@ code.copyable {
         scrollbar-width: none;
     }
 
+    .mobile-timeline-track::after {
+        content: "";
+        flex-shrink: 0;
+        width: calc(50vw - 100px);
+    }
+
     .mobile-timeline-track::-webkit-scrollbar {
         display: none;
     }
