@@ -1733,60 +1733,28 @@ code.copyable {
     }
 
     .mobile-current-card {
-        flex-shrink: 0;
-        width: 200px;
-        scroll-snap-align: center;
-        border-radius: 10px;
-        overflow: hidden;
         border: 2px dashed var(--warm-line, #d8d2c8);
         background: transparent;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        z-index: 1;
+        box-shadow: none;
         text-decoration: none;
         color: inherit;
     }
 
-    .mobile-current-card-inner {
+    .mobile-current-card-area {
+        border: none;
+        background: transparent;
+    }
+
+    .mobile-current-card-content {
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        text-align: center;
-        padding: 1rem 0.75rem;
-        aspect-ratio: 4/3;
+        flex: 1;
     }
 
-    .mobile-current-card-label {
-        font-family: 'Libre Baskerville', Georgia, serif;
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: var(--ink);
-        margin: 0 0 0.4rem;
-    }
-
-    .mobile-current-card-icon {
-        font-size: 1.8rem;
+    i.mobile-current-card-icon {
+        font-size: 4rem !important;
         color: var(--warm-grey);
-        margin-bottom: 0.3rem;
-    }
-
-    .mobile-current-card-coords {
-        font-family: monospace;
-        font-size: 0.65rem;
-        color: var(--ink-faint);
-    }
-
-    .mobile-current-card-time {
-        font-family: 'Libre Baskerville', Georgia, serif;
-        font-size: 0.6rem;
-        color: var(--ink-faint);
-        margin-top: 0.15rem;
-    }
-
-    a.mobile-current-card:active {
-        transform: scale(0.96);
     }
 
     /* Stats pill adjustments */
