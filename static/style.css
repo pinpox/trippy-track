@@ -330,6 +330,11 @@ h2 {
     color: var(--ink-faint, #9a9488);
 }
 
+/* Camera button — hidden on desktop, shown on mobile */
+.entry-camera-add {
+    display: none;
+}
+
 /* Share action buttons */
 .admin-share-actions {
     display: flex;
@@ -2002,6 +2007,11 @@ code.copyable {
 
     .admin-page .photo-add-btn {
         font-size: 2rem;
+    }
+
+    /* Show camera button on mobile */
+    .admin-page .entry-camera-add {
+        display: flex;
     }
 
     /* New entry form photo grid */

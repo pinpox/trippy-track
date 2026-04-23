@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.469.0/font/lucide.min.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body class="admin-page">
@@ -48,8 +49,16 @@
                 <div class="entry-photo-add">
                     <div class="photo-add-form">
                         <label class="photo-add-btn" title="Add photos &amp; videos">
-                            +
+                            <i class="icon-images"></i>
                             <input type="file" id="new-entry-file-input" name="photos" multiple accept="image/*,video/*" hidden>
+                        </label>
+                    </div>
+                </div>
+                <div class="entry-photo-add entry-camera-add">
+                    <div class="photo-add-form">
+                        <label class="photo-add-btn" title="Take photo or video">
+                            <i class="icon-camera"></i>
+                            <input type="file" id="new-entry-camera-input" name="photos" accept="image/*,video/*" capture="environment" hidden>
                         </label>
                     </div>
                 </div>
@@ -83,8 +92,16 @@
                 <div class="entry-photo-add">
                     <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/entries/{{.ID}}/photos" enctype="multipart/form-data" class="photo-add-form">
                         <label class="photo-add-btn" title="Add photos">
-                            +
+                            <i class="icon-images"></i>
                             <input type="file" name="photos" multiple accept="image/*,video/*" onchange="this.form.submit()" hidden>
+                        </label>
+                    </form>
+                </div>
+                <div class="entry-photo-add entry-camera-add">
+                    <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/entries/{{.ID}}/photos" enctype="multipart/form-data" class="photo-add-form">
+                        <label class="photo-add-btn" title="Take photo or video">
+                            <i class="icon-camera"></i>
+                            <input type="file" name="photos" accept="image/*,video/*" capture="environment" onchange="this.form.submit()" hidden>
                         </label>
                     </form>
                 </div>
@@ -171,12 +188,17 @@
         input.files = dt.files;
     }
 
-    input.addEventListener('change', function() {
-        Array.from(input.files).forEach(function(file) {
+    var cameraInput = document.getElementById('new-entry-camera-input');
+
+    function addFiles(fileList) {
+        Array.from(fileList).forEach(function(file) {
             dt.items.add(file);
         });
         rebuildPreviews();
-    });
+    }
+
+    input.addEventListener('change', function() { addFiles(input.files); });
+    cameraInput.addEventListener('change', function() { addFiles(cameraInput.files); });
 })();
 </script>
 </body>
