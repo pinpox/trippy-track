@@ -29,7 +29,7 @@
             inherit version;
             src = ./.;
 
-            vendorHash = "sha256-UnLMf1SD8EnwF+qaoCgFTdd5/fAeSDAFFoCg5Gz9Db4=";
+            vendorHash = "sha256-cWTOKOg2Vm0L4mmDkThjgbTg3AMYnO/ZL0e9ipd7J44=";
 
             postInstall = ''
               mkdir -p $out/share/trippy-track
