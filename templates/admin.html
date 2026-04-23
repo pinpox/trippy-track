@@ -33,7 +33,7 @@
                     <div class="photo-add-form">
                         <label class="photo-add-btn" title="Take photo or video">
                             <i class="icon-camera"></i>
-                            <input type="file" id="new-entry-camera-input" name="photos" accept="image/*,video/*" capture="environment" hidden>
+                            <input type="file" id="new-entry-camera-input" accept="image/*,video/*" capture="environment" hidden>
                         </label>
                     </div>
                 </div>
@@ -153,6 +153,7 @@
                 vid.src = URL.createObjectURL(file);
                 vid.className = 'entry-thumb';
                 vid.preload = 'metadata';
+                vid.controls = true;
                 wrap.appendChild(vid);
             } else {
                 var img = document.createElement('img');
@@ -197,7 +198,10 @@
     }
 
     input.addEventListener('change', function() { addFiles(input.files); });
-    cameraInput.addEventListener('change', function() { addFiles(cameraInput.files); });
+    cameraInput.addEventListener('change', function() {
+        addFiles(cameraInput.files);
+        cameraInput.value = '';
+    });
 })();
 </script>
 </body>
