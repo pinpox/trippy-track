@@ -68,7 +68,7 @@
             {{len .Trackpoints}} trackpoints &middot; {{len .Entries}} entries
         </div>
         <form method="POST" action="/t/{{.Trip.ViewToken}}/admin/toggle-active" class="admin-toggle-active">
-            <button type="submit" class="admin-share-btn admin-toggle-btn">{{if .Trip.IsActive}}Stop travelling{{else}}Start travelling{{end}}</button>
+            <button type="submit" class="admin-share-btn admin-toggle-btn">{{if .Trip.IsActive}}End Trip{{else}}Continue Trip{{end}}</button>
         </form>
     </section>
 
