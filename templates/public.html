@@ -156,8 +156,7 @@
     </div>
     <div id="map">
         <div class="map-stats">
-            {{if .Stats.IsActive}}<span class="stats-live-dot"></span> Traveling{{end}}
-            <span class="stats-sep">&middot;</span>
+            {{if .Stats.IsActive}}<span class="stats-live-dot"></span> Traveling <span class="stats-sep">&middot;</span>{{end}}
             {{if gt .Stats.DurationDays 0}}{{.Stats.DurationDays}}d {{.Stats.DurationHours}}h{{else}}{{.Stats.DurationHours}}h{{end}}
             <span class="stats-sep">&middot;</span>
             {{.Stats.EntryCount}} entries
