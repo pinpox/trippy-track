@@ -839,6 +839,15 @@ func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
 
 	lastPoint, _ := getLatestTrackpoint(s.db, trip.ID)
 
+	// Distance from last entry to last known position
+	var lastPointDist float64
+	if lastPoint != nil && len(entries) > 0 {
+		lastEntry := entries[len(entries)-1]
+		if lastEntry.Lat != nil && lastEntry.Lon != nil {
+			lastPointDist = Haversine(*lastEntry.Lat, *lastEntry.Lon, lastPoint.Lat, lastPoint.Lon)
+		}
+	}
+
 	trackpoints, err := getTrackpoints(s.db, trip.ID)
 	if err != nil {
 		trackpoints = nil
@@ -851,11 +860,12 @@ func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.tmpl.ExecuteTemplate(w, "public.html", map[string]any{
-		"Trip":      trip,
-		"Timeline":  timeline,
-		"LastPoint": lastPoint,
-		"Stats":     stats,
-		"IsOwner":   isOwner,
+		"Trip":          trip,
+		"Timeline":      timeline,
+		"LastPoint":     lastPoint,
+		"LastPointDist": lastPointDist,
+		"Stats":         stats,
+		"IsOwner":       isOwner,
 	})
 }
 

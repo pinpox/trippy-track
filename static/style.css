@@ -1732,34 +1732,55 @@ code.copyable {
         flex: 1;
     }
 
-    .mobile-current-position {
+    .mobile-current-card {
         flex-shrink: 0;
+        width: 200px;
+        scroll-snap-align: center;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 2px dashed var(--warm-line, #d8d2c8);
+        background: transparent;
         display: flex;
         flex-direction: column;
+        position: relative;
+        z-index: 1;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .mobile-current-card-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
-        padding: 0 1.5rem;
-        min-width: 140px;
+        text-align: center;
+        padding: 1rem 0.75rem;
+        aspect-ratio: 4/3;
     }
 
-    .mobile-current-label {
+    .mobile-current-card-label {
         font-family: 'Libre Baskerville', Georgia, serif;
-        font-size: 1rem;
+        font-size: 0.85rem;
+        font-weight: 700;
         color: var(--ink);
-        margin: 0;
+        margin: 0 0 0.4rem;
     }
 
-    .mobile-current-coords {
+    .mobile-current-card-coords {
         font-family: monospace;
-        font-size: 0.75rem;
+        font-size: 0.65rem;
         color: var(--ink-faint);
-        margin-top: 0.2rem;
     }
 
-    .mobile-current-time {
+    .mobile-current-card-time {
         font-family: 'Libre Baskerville', Georgia, serif;
-        font-size: 0.7rem;
+        font-size: 0.6rem;
         color: var(--ink-faint);
         margin-top: 0.15rem;
+    }
+
+    a.mobile-current-card:active {
+        transform: scale(0.96);
     }
 
     /* Stats pill adjustments */
@@ -1775,20 +1796,7 @@ code.copyable {
     }
 
     .mobile-edit-link {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        min-width: 100px;
-        min-height: 44px;
-        padding: 0.5rem 1.2rem;
-        margin: 0 1rem;
-        font-family: 'Libre Baskerville', Georgia, serif;
-        font-size: 0.75rem;
-        color: var(--ink-faint);
-        text-decoration: none;
-        border: 1px solid var(--warm-line);
-        border-radius: 8px;
+        display: none;
     }
 
     .maplibregl-ctrl-bottom-left,

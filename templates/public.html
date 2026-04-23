@@ -133,13 +133,20 @@
             </div>
             {{end}}
             {{if $.LastPoint}}
-            <div class="mobile-current-position" data-lat="{{printf "%.6f" $.LastPoint.Lat}}" data-lon="{{printf "%.6f" $.LastPoint.Lon}}">
-                <p class="mobile-current-label">Last known position</p>
-                <span class="mobile-current-coords">{{printf "%.4f" $.LastPoint.Lat}}, {{printf "%.4f" $.LastPoint.Lon}}</span>
-                <span class="mobile-current-time">{{formatDate ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}} · {{formatClock ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}}</span>
+            {{if gt $.LastPointDist 0.0}}
+            <div class="mobile-card-connector">
+                <span class="mobile-card-connector-km">{{formatDist $.LastPointDist}}</span>
+                <div class="mobile-card-connector-line"></div>
             </div>
             {{end}}
-            {{if $.IsOwner}}<a href="/t/{{$.Trip.ViewToken}}/admin" class="mobile-edit-link">+ New Entry</a>{{end}}
+            <a {{if $.IsOwner}}href="/t/{{$.Trip.ViewToken}}/admin"{{end}} class="mobile-current-card" data-lat="{{printf "%.6f" $.LastPoint.Lat}}" data-lon="{{printf "%.6f" $.LastPoint.Lon}}">
+                <div class="mobile-current-card-inner">
+                    <p class="mobile-current-card-label">{{if $.IsOwner}}New Entry{{else}}Last known position{{end}}</p>
+                    <span class="mobile-current-card-coords">{{printf "%.4f" $.LastPoint.Lat}}, {{printf "%.4f" $.LastPoint.Lon}}</span>
+                    <span class="mobile-current-card-time">{{formatDate ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}} · {{formatClock ($.LastPoint.Timestamp.UTC.Format "2006-01-02T15:04:05Z")}}</span>
+                </div>
+            </a>
+            {{end}}
         </div>
     </div>
     <!-- Mobile entry viewer -->
