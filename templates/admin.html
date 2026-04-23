@@ -15,33 +15,8 @@
 <body class="admin-page">
 <div class="admin-container">
     <div class="admin-header">
-        <a href="/" class="admin-back">&lsaquo; Trips</a>
         <h1 class="admin-title">{{.Trip.Name}}</h1>
     </div>
-
-    <section class="admin-info">
-        <div class="admin-info-row">
-            <div class="admin-info-block">
-                <span class="admin-info-label">Share link</span>
-                <code class="admin-code admin-code-desktop"><a href="{{.ShareURL}}" class="admin-code-text">{{.ShareURL}}</a><span class="copy-icon" onclick="event.preventDefault(); event.stopPropagation(); navigator.clipboard.writeText('{{.ShareURL}}'); this.classList.add('copied'); setTimeout(function(){this.classList.remove('copied')}.bind(this), 1500)">&#x2398;</span></code>
-                <div class="admin-share-actions">
-                    <button type="button" class="admin-share-btn" onclick="navigator.clipboard.writeText('{{.ShareURL}}'); this.textContent='Copied!'; setTimeout(function(){this.textContent='Copy link'}.bind(this), 1500)">Copy link</button>
-                    <button type="button" class="admin-share-btn admin-share-btn-primary" onclick="if(navigator.share){navigator.share({title:'{{.Trip.Name}}',url:'{{.ShareURL}}'})}else{navigator.clipboard.writeText('{{.ShareURL}}'); this.textContent='Copied!'; setTimeout(function(){this.textContent='Share'}.bind(this), 1500)}">Share</button>
-                </div>
-            </div>
-            <div class="admin-info-block">
-                <span class="admin-info-label">OwnTracks URL <a href="/t/{{.Trip.ViewToken}}/admin/owntracks-config" class="config-download-link">Download config</a></span>
-                <code class="admin-code admin-code-desktop" onclick="navigator.clipboard.writeText('{{.TrackingURL}}'); this.classList.add('copied'); setTimeout(function(){this.classList.remove('copied')}.bind(this), 1500)"><span class="admin-code-text">{{.TrackingURL}}</span><span class="copy-icon">&#x2398;</span></code>
-                <div class="admin-share-actions">
-                    <button type="button" class="admin-share-btn" onclick="navigator.clipboard.writeText('{{.TrackingURL}}'); this.textContent='Copied!'; setTimeout(function(){this.textContent='Copy URL'}.bind(this), 1500)">Copy URL</button>
-                    <a href="/t/{{.Trip.ViewToken}}/admin/owntracks-config" class="admin-share-btn">Download config</a>
-                </div>
-            </div>
-        </div>
-        <div class="admin-stats">
-            {{len .Trackpoints}} trackpoints &middot; {{len .Entries}} entries
-        </div>
-    </section>
 
     <section class="admin-new-entry">
         <form method="POST" action="/t/{{.Trip.ViewToken}}/admin/entries" enctype="multipart/form-data" class="admin-entry-form">
@@ -68,6 +43,30 @@
             </div>
             <button type="submit">Post Entry</button>
         </form>
+    </section>
+
+    <section class="admin-info">
+        <div class="admin-info-row">
+            <div class="admin-info-block">
+                <span class="admin-info-label">Share link</span>
+                <code class="admin-code admin-code-desktop"><a href="{{.ShareURL}}" class="admin-code-text">{{.ShareURL}}</a><span class="copy-icon" onclick="event.preventDefault(); event.stopPropagation(); navigator.clipboard.writeText('{{.ShareURL}}'); this.classList.add('copied'); setTimeout(function(){this.classList.remove('copied')}.bind(this), 1500)">&#x2398;</span></code>
+                <div class="admin-share-actions">
+                    <a href="/" class="admin-share-btn">All Trips</a>
+                    <button type="button" class="admin-share-btn admin-share-btn-primary" onclick="if(navigator.share){navigator.share({title:'{{.Trip.Name}}',url:'{{.ShareURL}}'})}else{navigator.clipboard.writeText('{{.ShareURL}}'); this.textContent='Copied!'; setTimeout(function(){this.textContent='Share'}.bind(this), 1500)}">Share</button>
+                </div>
+            </div>
+            <div class="admin-info-block">
+                <span class="admin-info-label">OwnTracks URL <a href="/t/{{.Trip.ViewToken}}/admin/owntracks-config" class="config-download-link">Download config</a></span>
+                <code class="admin-code admin-code-desktop" onclick="navigator.clipboard.writeText('{{.TrackingURL}}'); this.classList.add('copied'); setTimeout(function(){this.classList.remove('copied')}.bind(this), 1500)"><span class="admin-code-text">{{.TrackingURL}}</span><span class="copy-icon">&#x2398;</span></code>
+                <div class="admin-share-actions">
+                    <button type="button" class="admin-share-btn" onclick="navigator.clipboard.writeText('{{.TrackingURL}}'); this.textContent='Copied!'; setTimeout(function(){this.textContent='Copy URL'}.bind(this), 1500)">Copy URL</button>
+                    <a href="/t/{{.Trip.ViewToken}}/admin/owntracks-config" class="admin-share-btn">Download config</a>
+                </div>
+            </div>
+        </div>
+        <div class="admin-stats">
+            {{len .Trackpoints}} trackpoints &middot; {{len .Entries}} entries
+        </div>
     </section>
 
     {{if .Entries}}

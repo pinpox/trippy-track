@@ -330,6 +330,14 @@ h2 {
     color: var(--ink-faint, #9a9488);
 }
 
+/* All Trips button */
+.admin-all-trips-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.75rem;
+}
+
 /* Camera button — hidden on desktop, shown on mobile */
 .entry-camera-add {
     display: none;
@@ -1931,12 +1939,13 @@ code.copyable {
     }
 
     .admin-header {
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
+        text-align: center;
     }
 
     .admin-title {
-        font-size: 1.4rem;
-        margin-top: 0.25rem;
+        font-size: 1.2rem;
+        margin-top: 0;
     }
 
     .admin-info {
