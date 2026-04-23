@@ -1766,6 +1766,12 @@ code.copyable {
         margin: 0 0 0.4rem;
     }
 
+    .mobile-current-card-icon {
+        font-size: 1.8rem;
+        color: var(--warm-grey);
+        margin-bottom: 0.3rem;
+    }
+
     .mobile-current-card-coords {
         font-family: monospace;
         font-size: 0.65rem;
