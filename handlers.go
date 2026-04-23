@@ -18,6 +18,28 @@ import (
 	"time"
 )
 
+// allowedExtensions is the set of file extensions accepted for upload.
+var allowedExtensions = map[string]bool{
+	".jpg":  true,
+	".jpeg": true,
+	".png":  true,
+	".gif":  true,
+	".webp": true,
+	".mp4":  true,
+	".webm": true,
+	".mov":  true,
+}
+
+// sanitizeExt extracts and validates the file extension from an upload filename.
+// Returns a lowercase extension if allowed, or empty string if rejected.
+func sanitizeExt(filename string) string {
+	ext := strings.ToLower(filepath.Ext(filepath.Base(filename)))
+	if allowedExtensions[ext] {
+		return ext
+	}
+	return ""
+}
+
 type Server struct {
 	db         *sql.DB
 	tmpl       *template.Template
@@ -477,10 +499,11 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 			firstExif, _ = extractExif(bytes.NewReader(data))
 		}
 
-		// Save file with random name
-		ext := filepath.Ext(fh.Filename)
+		// Save file with random name and validated extension
+		ext := sanitizeExt(fh.Filename)
 		if ext == "" {
-			ext = ".jpg"
+			log.Printf("upload rejected: unsupported file type %q", fh.Filename)
+			continue
 		}
 		b := make([]byte, 16)
 		rand.Read(b)
@@ -739,9 +762,10 @@ func (s *Server) handleAddPhotos(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		ext := filepath.Ext(fh.Filename)
+		ext := sanitizeExt(fh.Filename)
 		if ext == "" {
-			ext = ".jpg"
+			log.Printf("upload rejected: unsupported file type %q", fh.Filename)
+			continue
 		}
 		b := make([]byte, 16)
 		rand.Read(b)
