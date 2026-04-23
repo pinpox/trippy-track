@@ -330,6 +330,40 @@ h2 {
     color: var(--ink-faint, #9a9488);
 }
 
+/* Share action buttons */
+.admin-share-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.admin-share-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--ink, #2c2c2c);
+    border: 1px solid var(--warm-line, #d8d2c8);
+}
+
+.admin-share-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.admin-share-btn-primary {
+    background: var(--ink, #2c2c2c);
+    color: white;
+    border-color: var(--ink, #2c2c2c);
+}
+
+.admin-share-btn-primary:hover {
+    background: var(--ink-light, #5a5549);
+}
+
 .admin-section-title {
     font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 1.1rem;
@@ -356,6 +390,7 @@ h2 {
 .admin-entry-form textarea {
     font-family: 'Libre Baskerville', Georgia, serif;
     border-color: var(--warm-line, #d8d2c8);
+    background: white;
 }
 
 .admin-entry-form button {
@@ -369,10 +404,13 @@ h2 {
     background: var(--ink-light, #5a5549);
 }
 
+/* Entry cards — unified warm theme */
 .admin-entries .entry-card {
     background: rgba(255, 255, 255, 0.5);
     border: none;
     box-shadow: none;
+    padding: 1.25rem;
+    border-radius: 8px;
 }
 
 .admin-entries .entry-card p {
@@ -384,6 +422,95 @@ h2 {
 .admin-entries .entry-card-date {
     font-family: 'Libre Baskerville', Georgia, serif;
     color: var(--ink-faint, #9a9488);
+}
+
+.admin-entries .entry-photos {
+    margin-bottom: 0.5rem;
+}
+
+.admin-entries .entry-photo-add {
+    border-color: var(--warm-line, #d8d2c8);
+}
+
+.admin-entries .photo-add-btn {
+    color: var(--warm-grey, #c4bdb2);
+}
+
+.admin-entries .photo-add-btn:hover {
+    color: var(--ink-faint, #9a9488);
+}
+
+/* Unified button styles for admin entry actions */
+.admin-entries .entry-edit-btn {
+    padding: 0.4rem 0.9rem;
+    background: var(--ink, #2c2c2c);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.admin-entries .entry-edit-btn:hover {
+    background: var(--ink-light, #5a5549);
+}
+
+.admin-entries .entry-delete-btn {
+    padding: 0.4rem 0.9rem;
+    background: none;
+    color: var(--ink-faint, #9a9488);
+    border: 1px solid var(--warm-line, #d8d2c8);
+    border-radius: 4px;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.admin-entries .entry-delete-btn:hover {
+    color: #c53030;
+    border-color: #c53030;
+}
+
+/* Edit form within entries */
+.admin-entries .entry-edit-form textarea {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    border-color: var(--warm-line, #d8d2c8);
+    background: white;
+    font-size: 0.9rem;
+}
+
+.admin-entries .entry-edit-form button[type="submit"] {
+    background: var(--ink, #2c2c2c);
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 0.8rem;
+}
+
+.admin-entries .entry-edit-form button[type="submit"]:hover {
+    background: var(--ink-light, #5a5549);
+}
+
+.admin-entries .entry-edit-form button[type="button"] {
+    background: none;
+    color: var(--ink-faint, #9a9488);
+    border: 1px solid var(--warm-line, #d8d2c8);
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 0.8rem;
+}
+
+.admin-entries .entry-edit-form button[type="button"]:hover {
+    color: var(--ink, #2c2c2c);
+    border-color: var(--ink, #2c2c2c);
+}
+
+.admin-entries .entry-edit-datetime label {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    color: var(--ink-faint, #9a9488);
+}
+
+.admin-entries .entry-edit-datetime input {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    border-color: var(--warm-line, #d8d2c8);
 }
 
 /* Forms */
@@ -1787,5 +1914,188 @@ code.copyable {
     .viewer-meta-info {
         font-size: 0.75rem;
         color: rgba(255,255,255,0.7);
+    }
+}
+
+/* ========================================
+   Admin page — mobile optimizations
+   ======================================== */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 1rem 1rem 3rem;
+    }
+
+    .admin-header {
+        margin-bottom: 1rem;
+    }
+
+    .admin-title {
+        font-size: 1.4rem;
+        margin-top: 0.25rem;
+    }
+
+    .admin-info {
+        margin-bottom: 1.5rem;
+    }
+
+    .admin-info-row {
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Hide URL code blocks on mobile, show action buttons instead */
+    .admin-code-desktop {
+        display: none;
+    }
+
+    .admin-info-block .config-download-link {
+        display: none;
+    }
+
+    .admin-share-btn {
+        flex: 1;
+        border-radius: 6px;
+    }
+
+    .admin-stats {
+        font-size: 0.8rem;
+    }
+
+    /* New entry form */
+    .admin-entry-form {
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .admin-entry-form textarea {
+        rows: 3;
+        min-height: 80px;
+    }
+
+    /* Photos — 2-column grid on mobile */
+    .admin-page .entry-photos {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4rem;
+    }
+
+    .admin-page .entry-photo-wrap {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4/3;
+    }
+
+    .admin-page .entry-thumb {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+
+    .admin-page .entry-photo-add {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4/3;
+        border-radius: 6px;
+        border-color: var(--warm-line, #d8d2c8);
+    }
+
+    .admin-page .photo-add-btn {
+        font-size: 2rem;
+    }
+
+    /* New entry form photo grid */
+    .admin-entry-form .entry-photos {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4rem;
+    }
+
+    .admin-entry-form .entry-photo-add {
+        aspect-ratio: 4/3;
+        width: 100%;
+        height: auto;
+        border-radius: 6px;
+    }
+
+    /* Entry cards — tighter on mobile */
+    .admin-page .entry-card {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .admin-page .entry-card-date {
+        font-size: 0.8rem;
+        margin-bottom: 0.3rem;
+    }
+
+    /* Touch-optimized buttons (min 48px touch target per Apple/Material guidelines) */
+    .admin-entries .entry-footer {
+        margin-top: 0.75rem;
+    }
+
+    .admin-entries .entry-footer-actions {
+        display: flex;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .admin-entries .entry-footer-actions .entry-delete-form {
+        flex: 1;
+    }
+
+    .admin-entries .entry-edit-btn,
+    .admin-entries .entry-delete-btn {
+        flex: 1;
+        width: 100%;
+        min-height: 44px;
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+        text-align: center;
+        border-radius: 6px;
+    }
+
+    /* Post Entry button — full width, touch-friendly */
+    .admin-entry-form button[type="submit"] {
+        width: 100%;
+        align-self: stretch;
+        min-height: 48px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+    }
+
+    /* Share/action buttons — touch-friendly */
+    .admin-share-btn {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Photo delete button — always visible on touch, touch-friendly */
+    .admin-page .photo-delete-btn {
+        opacity: 1;
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
+    }
+
+    /* Edit form buttons — touch-friendly */
+    .admin-entries .entry-edit-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .admin-entries .entry-edit-actions button {
+        flex: 1;
+        min-height: 44px;
+        font-size: 0.85rem;
+        border-radius: 6px;
+    }
+
+    /* Section title */
+    .admin-section-title {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
     }
 }
