@@ -69,10 +69,12 @@
                 </div>
             </div>
         </div>
-        <form method="POST" action="/t/{{.Trip.ViewToken}}/admin/toggle-active" class="admin-toggle-active">
-            <button type="submit" class="outline secondary admin-share-btn admin-toggle-btn">{{if .Trip.IsActive}}End Trip{{else}}Continue Trip{{end}}</button>
-        </form>
-        <button type="button" class="outline secondary admin-share-btn admin-all-trips-btn" onclick="window.location='/'">All Trips</button>
+        <div class="admin-share-actions">
+            <form method="POST" action="/t/{{.Trip.ViewToken}}/admin/toggle-active" class="admin-toggle-active" style="flex:1">
+                <button type="submit" class="outline secondary admin-share-btn admin-toggle-btn" style="width:100%">{{if .Trip.IsActive}}End Trip{{else}}Continue Trip{{end}}</button>
+            </form>
+            <button type="button" class="outline secondary admin-share-btn admin-all-trips-btn" style="flex:1" onclick="window.location='/'">All Trips</button>
+        </div>
         <div class="admin-stats">
             {{len .Trackpoints}} trackpoints &middot; {{len .Entries}} entries
         </div>

@@ -134,12 +134,10 @@
             </div>
             {{end}}
             {{if $.LastPoint}}
-            {{if gt $.LastPointDist 0.0}}
             <div class="mobile-card-connector">
-                <span class="mobile-card-connector-km">{{formatDist $.LastPointDist}}</span>
+                {{if gt $.LastPointDist 0.0}}<span class="mobile-card-connector-km">{{formatDist $.LastPointDist}}</span>{{end}}
                 <div class="mobile-card-connector-line"></div>
             </div>
-            {{end}}
             {{if $.IsOwner}}
             <a href="/t/{{$.Trip.ViewToken}}/admin" class="mobile-entry-card mobile-current-card" data-lat="{{printf "%.6f" $.LastPoint.Lat}}" data-lon="{{printf "%.6f" $.LastPoint.Lon}}">
                 <div class="mobile-card-text-area mobile-current-card-area">
