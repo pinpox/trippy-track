@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +8,9 @@
     <link rel="icon" type="image/svg+xml" href="/static/favicon-dark.svg" media="(prefers-color-scheme: dark)">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.469.0/font/lucide.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body class="admin-page">
@@ -51,7 +52,7 @@
                 <span class="admin-info-label">Share link</span>
                 <code class="admin-code admin-code-desktop"><a href="{{.ShareURL}}" class="admin-code-text">{{.ShareURL}}</a><span class="copy-icon" onclick="event.preventDefault(); event.stopPropagation(); navigator.clipboard.writeText('{{.ShareURL}}'); this.classList.add('copied'); setTimeout(function(){this.classList.remove('copied')}.bind(this), 1500)">&#x2398;</span></code>
                 <div class="admin-share-actions">
-                    <a href="{{.ShareURL}}" class="admin-share-btn">View</a>
+                    <button type="button" class="outline admin-share-btn" onclick="window.location='{{.ShareURL}}'">View</button>
                     <button type="button" class="admin-share-btn admin-share-btn-primary" onclick="if(navigator.share){navigator.share({title:'{{.Trip.Name}}',url:'{{.ShareURL}}'})}else{navigator.clipboard.writeText('{{.ShareURL}}'); this.textContent='Copied!'; setTimeout(function(){this.textContent='Share'}.bind(this), 1500)}">Share</button>
                 </div>
             </div>
@@ -69,9 +70,9 @@
             </div>
         </div>
         <form method="POST" action="/t/{{.Trip.ViewToken}}/admin/toggle-active" class="admin-toggle-active">
-            <button type="submit" class="admin-share-btn admin-toggle-btn">{{if .Trip.IsActive}}End Trip{{else}}Continue Trip{{end}}</button>
+            <button type="submit" class="outline secondary admin-share-btn admin-toggle-btn">{{if .Trip.IsActive}}End Trip{{else}}Continue Trip{{end}}</button>
         </form>
-        <a href="/" class="admin-share-btn admin-all-trips-btn">All Trips</a>
+        <button type="button" class="outline secondary admin-share-btn admin-all-trips-btn" onclick="window.location='/'">All Trips</button>
         <div class="admin-stats">
             {{len .Trackpoints}} trackpoints &middot; {{len .Entries}} entries
         </div>
@@ -125,7 +126,7 @@
                     <textarea name="body" rows="3">{{if .Body}}{{.Body}}{{end}}</textarea>
                     <div class="entry-edit-actions">
                         <button type="submit">Save</button>
-                        <button type="button" onclick="var w=this.closest('.entry-text-wrap'); w.querySelector('.entry-edit-form').style.display='none'; w.querySelector('.entry-text-display').style.display='block';">Cancel</button>
+                        <button type="button" class="outline secondary" onclick="var w=this.closest('.entry-text-wrap'); w.querySelector('.entry-edit-form').style.display='none'; w.querySelector('.entry-text-display').style.display='block';">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -133,7 +134,7 @@
                 <div class="entry-footer-actions">
                     <button type="button" class="entry-edit-btn" onclick="var w=document.getElementById('entry-wrap-{{.ID}}'); w.querySelector('.entry-edit-form').style.display='block'; w.querySelector('.entry-text-display').style.display='none';">Edit</button>
                     <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/entries/{{.ID}}/delete" class="entry-delete-form" onsubmit="return confirm('Delete this entry?')">
-                        <button type="submit" class="entry-delete-btn">Delete</button>
+                        <button type="submit" class="entry-delete-btn outline secondary">Delete</button>
                     </form>
                 </div>
             </div>

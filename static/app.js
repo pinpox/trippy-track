@@ -7,13 +7,15 @@ document.addEventListener("DOMContentLoaded", function () {
         pitch: 25,
     });
 
-    map.addControl(new maplibregl.NavigationControl({
-        visualizePitch: true,
-    }));
-    map.addControl(new maplibregl.TerrainControl({
-        source: "terrain",
-        exaggeration: 1.5,
-    }));
+    if (!isMobile) {
+        map.addControl(new maplibregl.NavigationControl({
+            visualizePitch: true,
+        }));
+        map.addControl(new maplibregl.TerrainControl({
+            source: "terrain",
+            exaggeration: 1.5,
+        }));
+    }
 
     const markers = [];
 

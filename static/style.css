@@ -1,28 +1,27 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: var(--font-ui);
-    color: #1a1a1a;
-    background: #f5f5f5;
-}
-
-.container {
-    max-width: 640px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-}
-
-h1 {
-    margin-bottom: 1.5rem;
-}
-
-h2 {
-    margin: 1.5rem 0 0.5rem;
-    font-size: 1.1rem;
+/* Pico CSS theme overrides */
+:root,
+[data-theme="light"],
+:root:not([data-theme="dark"]) {
+    --pico-font-size: 100%;
+    --pico-block-spacing-vertical: 0;
+    --pico-block-spacing-horizontal: 0;
+    --pico-border-radius: var(--radius-sm);
+    --pico-primary: #2c2c2c;
+    --pico-primary-hover: #5a5549;
+    --pico-primary-background: #2c2c2c;
+    --pico-primary-hover-background: #5a5549;
+    --pico-primary-border: #2c2c2c;
+    --pico-primary-hover-border: #5a5549;
+    --pico-primary-focus: rgba(44, 44, 44, 0.25);
+    --pico-primary-inverse: white;
+    --pico-secondary: #9a9488;
+    --pico-secondary-hover: #5a5549;
+    --pico-secondary-background: #9a9488;
+    --pico-secondary-hover-background: #5a5549;
+    --pico-secondary-border: #d8d2c8;
+    --pico-secondary-hover-border: #5a5549;
+    --pico-secondary-focus: rgba(154, 148, 136, 0.25);
+    --pico-secondary-inverse: white;
 }
 
 /* Login page */
@@ -53,17 +52,7 @@ h2 {
 }
 
 .login-button {
-    display: inline-block;
-    padding: 0.75rem 2rem;
-    background: #1a1a1a;
-    color: white;
     text-decoration: none;
-    border-radius: var(--radius-sm);
-    font-size: 1rem;
-}
-
-.login-button:hover {
-    background: #333;
 }
 
 /* Index page */
@@ -116,30 +105,10 @@ h2 {
 
 .create-trip-form input {
     flex: 1;
-    padding: 0.7rem 1rem;
-    border: 1px solid var(--warm-line, #d8d2c8);
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-    background: white;
-    color: var(--ink, #2c2c2c);
 }
 
 .create-trip-form input::placeholder {
     color: var(--warm-grey, #c4bdb2);
-}
-
-.create-trip-form button {
-    padding: 0.7rem 1.2rem;
-    background: var(--ink, #2c2c2c);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.85rem;
-    cursor: pointer;
-}
-
-.create-trip-form button:hover {
-    background: var(--ink-light, #5a5549);
 }
 
 /* Trip cards */
@@ -375,29 +344,10 @@ h2 {
 }
 
 .admin-share-btn {
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    cursor: pointer;
     text-align: center;
     text-decoration: none;
-    background: rgba(255, 255, 255, 0.6);
-    color: var(--ink, #2c2c2c);
-    border: 1px solid var(--warm-line, #d8d2c8);
-}
-
-.admin-share-btn:hover {
-    background: rgba(255, 255, 255, 0.9);
-}
-
-.admin-share-btn-primary {
-    background: var(--ink, #2c2c2c);
-    color: white;
-    border-color: var(--ink, #2c2c2c);
-}
-
-.admin-share-btn-primary:hover {
-    background: var(--ink-light, #5a5549);
+    font-size: 0.9rem;
+    margin-bottom: 0;
 }
 
 .admin-section-title {
@@ -422,19 +372,8 @@ h2 {
     color: var(--ink-faint, #9a9488);
 }
 
-.admin-entry-form textarea {
-    border-color: var(--warm-line, #d8d2c8);
-    background: white;
-}
-
 .admin-entry-form button {
     align-self: flex-start;
-    background: var(--ink, #2c2c2c);
-    font-size: 0.85rem;
-}
-
-.admin-entry-form button:hover {
-    background: var(--ink-light, #5a5549);
 }
 
 /* Entry cards — unified warm theme */
@@ -472,62 +411,10 @@ h2 {
     color: var(--ink-faint, #9a9488);
 }
 
-/* Unified button styles for admin entry actions */
-.admin-entries .entry-edit-btn {
-    padding: 0.4rem 0.9rem;
-    background: var(--ink, #2c2c2c);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    cursor: pointer;
-}
-
-.admin-entries .entry-edit-btn:hover {
-    background: var(--ink-light, #5a5549);
-}
-
-.admin-entries .entry-delete-btn {
-    padding: 0.4rem 0.9rem;
-    background: none;
-    color: var(--ink-faint, #9a9488);
-    border: 1px solid var(--warm-line, #d8d2c8);
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    cursor: pointer;
-}
-
+/* Entry action buttons — Pico handles base styling */
 .admin-entries .entry-delete-btn:hover {
     color: #c53030;
     border-color: #c53030;
-}
-
-/* Edit form within entries */
-.admin-entries .entry-edit-form textarea {
-    border-color: var(--warm-line, #d8d2c8);
-    background: white;
-    font-size: 0.9rem;
-}
-
-.admin-entries .entry-edit-form button[type="submit"] {
-    background: var(--ink, #2c2c2c);
-    font-size: 0.8rem;
-}
-
-.admin-entries .entry-edit-form button[type="submit"]:hover {
-    background: var(--ink-light, #5a5549);
-}
-
-.admin-entries .entry-edit-form button[type="button"] {
-    background: none;
-    color: var(--ink-faint, #9a9488);
-    border: 1px solid var(--warm-line, #d8d2c8);
-    font-size: 0.8rem;
-}
-
-.admin-entries .entry-edit-form button[type="button"]:hover {
-    color: var(--ink, #2c2c2c);
-    border-color: var(--ink, #2c2c2c);
 }
 
 .admin-entries .entry-edit-datetime label {
@@ -559,66 +446,10 @@ h2 {
 .form-group label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #555;
+    color: var(--ink-faint, #9a9488);
 }
 
-textarea {
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: var(--radius-sm);
-    font-size: 1rem;
-    font-family: inherit;
-    resize: vertical;
-}
-
-input[type="text"] {
-    flex: 1;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: var(--radius-sm);
-    font-size: 1rem;
-}
-
-button, input, select {
-    font-family: inherit;
-}
-
-button {
-    padding: 0.5rem 1rem;
-    background: #2563eb;
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #1d4ed8;
-}
-
-/* Trip cards */
-.trip-card {
-    background: white;
-    padding: 1rem;
-    border-radius: var(--radius-sm);
-    margin-bottom: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.trip-card a {
-    text-decoration: none;
-    color: inherit;
-}
-
-.trip-card h3 {
-    margin-bottom: 0.25rem;
-}
-
-.date {
-    color: #666;
-    font-size: 0.85rem;
-}
+/* Pico handles button, input, textarea, select defaults */
 
 /* Copyable code blocks */
 code.copyable {
@@ -745,36 +576,8 @@ code.copyable {
     align-items: center;
 }
 
-.entry-edit-btn {
-    padding: 0.4rem 0.8rem;
-    background: #2563eb;
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.85rem;
-    cursor: pointer;
-}
+/* Pico handles base button styling */
 
-.entry-edit-btn:hover {
-    background: #1d4ed8;
-}
-
-.entry-delete-btn {
-    padding: 0.4rem 0.8rem;
-    background: #e53e3e;
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.85rem;
-    cursor: pointer;
-}
-
-.entry-delete-btn:hover {
-    background: #c53030;
-}
-
-.entry-text-wrap {
-}
 
 .entry-edit-datetime {
     margin-bottom: 0.5rem;
@@ -787,13 +590,6 @@ code.copyable {
     margin-bottom: 0.2rem;
 }
 
-.entry-edit-datetime input {
-    padding: 0.4rem 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-}
-
 .entry-edit-form textarea {
     width: 100%;
     min-height: 150px;
@@ -803,11 +599,6 @@ code.copyable {
     display: flex;
     gap: 0.5rem;
     margin-top: 0.5rem;
-}
-
-.entry-edit-actions button[type="button"] {
-    background: #eee;
-    color: #333;
 }
 
 .photo-add-form {
@@ -827,7 +618,6 @@ code.copyable {
     --warm-grey: #c4bdb2;
     --warm-line: #d8d2c8;
     --font-serif: 'Libre Baskerville', Georgia, serif;
-    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 16px;
