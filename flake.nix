@@ -40,6 +40,16 @@
         }
       );
 
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgsFor.${system};
+        in
+        {
+          trippy-track = self.packages.${system}.trippy-track;
+        }
+      );
+
       devShells = forAllSystems (
         system:
         with nixpkgsFor.${system};
