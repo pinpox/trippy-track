@@ -93,7 +93,7 @@ func (a *AuthService) ExchangeCode(ctx context.Context, code, codeVerifier strin
 		Subject           string `json:"sub"`
 		Email             string `json:"email"`
 		Name              string `json:"name"`
-		PreferredUsername  string `json:"preferred_username"`
+		PreferredUsername string `json:"preferred_username"`
 	}
 
 	if err := idToken.Claims(&claims); err != nil {

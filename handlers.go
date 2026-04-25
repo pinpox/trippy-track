@@ -832,7 +832,7 @@ func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
 	distances := DistanceBetweenEntries(entries)
 
 	type TimelineEntry struct {
-		Entry      Entry
+		Entry        Entry
 		DistFromPrev float64
 	}
 	var timeline []TimelineEntry

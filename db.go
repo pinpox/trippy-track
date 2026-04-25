@@ -103,9 +103,9 @@ func randomToken(n int) string {
 }
 
 type Trip struct {
-	ID         string
-	Name       string
-	CreatedAt  string
+	ID            string
+	Name          string
+	CreatedAt     string
 	ViewToken     string
 	TrackingToken string
 	IsActive      bool
@@ -163,8 +163,8 @@ func createTrip(db *sql.DB, name string, userID int) (*Trip, error) {
 		Name:          name,
 		ViewToken:     viewToken,
 		TrackingToken: trackingToken,
-		IsActive:   true,
-		UserID:     &userID,
+		IsActive:      true,
+		UserID:        &userID,
 	}, nil
 }
 
