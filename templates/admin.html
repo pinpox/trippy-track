@@ -128,13 +128,13 @@
                     <textarea name="body" rows="3">{{if .Body}}{{.Body}}{{end}}</textarea>
                     <div class="entry-edit-actions">
                         <button type="submit">Save</button>
-                        <button type="button" class="outline secondary" onclick="var w=this.closest('.entry-text-wrap'); w.querySelector('.entry-edit-form').style.display='none'; w.querySelector('.entry-text-display').style.display='block';">Cancel</button>
+                        <button type="button" class="outline secondary" onclick="var w=this.closest('.entry-text-wrap'); w.querySelector('.entry-edit-form').style.display='none'; w.querySelector('.entry-text-display').style.display='block'; w.closest('.entry-card').querySelector('.entry-footer-actions').style.display='';">Cancel</button>
                     </div>
                 </form>
             </div>
             <div class="entry-footer">
                 <div class="entry-footer-actions">
-                    <button type="button" class="entry-edit-btn" onclick="var w=document.getElementById('entry-wrap-{{.ID}}'); w.querySelector('.entry-edit-form').style.display='block'; w.querySelector('.entry-text-display').style.display='none';">Edit</button>
+                    <button type="button" class="entry-edit-btn" onclick="var w=document.getElementById('entry-wrap-{{.ID}}'); w.querySelector('.entry-edit-form').style.display='block'; w.querySelector('.entry-text-display').style.display='none'; this.closest('.entry-footer-actions').style.display='none';">Edit</button>
                     <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/entries/{{.ID}}/delete" class="entry-delete-form" onsubmit="return confirm('Delete this entry?')">
                         <button type="submit" class="entry-delete-btn outline secondary">Delete</button>
                     </form>
