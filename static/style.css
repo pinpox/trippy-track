@@ -563,6 +563,42 @@ code.copyable {
   height: 100%;
 }
 
+/* Upload progress overlay */
+.upload-progress {
+  position: relative;
+  padding: 0.75rem 1rem;
+  background: var(--cream-light, #faf7f2);
+  border: 1px solid var(--warm-line, #d8d2c8);
+  border-radius: var(--radius-sm, 4px);
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.upload-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(44, 44, 44, 0.08);
+  transition: width 0.15s ease;
+}
+
+.upload-progress-text {
+  position: relative;
+  font-size: 0.8rem;
+  color: var(--ink-light, #5a5549);
+}
+
+.upload-progress-text .upload-pct {
+  font-variant-numeric: tabular-nums;
+}
+
+.upload-error {
+  color: #b44;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
 /* ========================================
    Public trip view - split layout
    ======================================== */

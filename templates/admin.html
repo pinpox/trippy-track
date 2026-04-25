@@ -89,7 +89,7 @@
                     <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/entries/{{.ID}}/photos" enctype="multipart/form-data" class="photo-add-form">
                         <label class="photo-add-btn" title="Add photos">
                             <i class="icon-images"></i>
-                            <input type="file" name="photos" multiple accept="image/*,video/*" onchange="this.form.submit()" hidden>
+                            <input type="file" name="photos" multiple accept="image/*,video/*" onchange="uploadPhotos(this.form)" hidden>
                         </label>
                     </form>
                 </div>
@@ -97,7 +97,7 @@
                     <form method="POST" action="/t/{{$.Trip.ViewToken}}/admin/entries/{{.ID}}/photos" enctype="multipart/form-data" class="photo-add-form">
                         <label class="photo-add-btn" title="Take photo or video">
                             <i class="icon-camera"></i>
-                            <input type="file" name="photos" accept="image/*,video/*,android/allowCamera" capture="environment" onchange="this.form.submit()" hidden>
+                            <input type="file" name="photos" accept="image/*,video/*,android/allowCamera" capture="environment" onchange="uploadPhotos(this.form)" hidden>
                         </label>
                     </form>
                 </div>
@@ -144,6 +144,74 @@
     {{end}}
 </div>
 <script>
+// Upload a form via XHR with progress bar
+function uploadWithProgress(form, onDone) {
+    var data = new FormData(form);
+    var xhr = new XMLHttpRequest();
+
+    // Create progress element after the form
+    var prog = document.createElement('div');
+    prog.className = 'upload-progress';
+    prog.innerHTML = '<div class="upload-progress-bar" style="width:0%"></div>' +
+        '<span class="upload-progress-text">Uploading\u2026 <span class="upload-pct">0%</span></span>';
+    form.parentNode.insertBefore(prog, form.nextSibling);
+
+    var bar = prog.querySelector('.upload-progress-bar');
+    var pct = prog.querySelector('.upload-pct');
+
+    // Disable all submit buttons and file inputs in the form
+    var btns = form.querySelectorAll('button[type="submit"]');
+    btns.forEach(function(b) { b.disabled = true; });
+
+    xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+            var percent = Math.round(e.loaded / e.total * 100);
+            bar.style.width = percent + '%';
+            pct.textContent = percent + '%';
+        }
+    };
+
+    xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 400) {
+            pct.textContent = 'Done!';
+            bar.style.width = '100%';
+            if (onDone) onDone();
+            else window.location.reload();
+        } else {
+            prog.innerHTML = '<span class="upload-error">Upload failed (' + xhr.status + '). Please try again.</span>';
+            btns.forEach(function(b) { b.disabled = false; });
+        }
+    };
+
+    xhr.onerror = function() {
+        prog.innerHTML = '<span class="upload-error">Connection lost. Please try again.</span>';
+        btns.forEach(function(b) { b.disabled = false; });
+    };
+
+    xhr.open(form.method || 'POST', form.action);
+    xhr.send(data);
+}
+
+// Upload photos for existing entries (gallery/camera onchange)
+function uploadPhotos(form) {
+    uploadWithProgress(form);
+}
+
+// New entry form: intercept submit to show progress
+(function() {
+    var entryForm = document.querySelector('.admin-entry-form');
+    if (entryForm) {
+        entryForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var btn = entryForm.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'Uploading\u2026';
+            uploadWithProgress(entryForm);
+        });
+    }
+})();
+
+// Photo preview / selection for new entry
 (function() {
     var input = document.getElementById('new-entry-file-input');
     var container = document.getElementById('new-entry-photos');
