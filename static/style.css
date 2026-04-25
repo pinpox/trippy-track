@@ -105,6 +105,17 @@
 
 .create-trip-form input {
     flex: 1;
+    margin-bottom: 0;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--pico-secondary-border, #d8d2c8);
+    background: white;
+}
+
+.create-trip-form button {
+    margin-bottom: 0;
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
+    width: auto;
 }
 
 .create-trip-form input::placeholder {
@@ -121,6 +132,7 @@
 .trip-card {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
     padding: 1.2rem 1rem;
     background: rgba(255, 255, 255, 0.6);
     text-decoration: none;
@@ -156,6 +168,8 @@
     font-size: 0.8rem;
     color: var(--ink-faint, #9a9488);
     margin-right: 0.75rem;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .trip-card-arrow {
@@ -1923,5 +1937,40 @@ code.copyable {
     .admin-section-title {
         font-size: 1rem;
         margin-bottom: 0.75rem;
+    }
+}
+
+/* ========================================
+   Index page — mobile optimizations
+   ======================================== */
+@media (max-width: 768px) {
+    .index-container {
+        padding: 2rem 1rem;
+    }
+
+    .index-title {
+        font-size: 1.5rem;
+    }
+
+    .index-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .trip-card {
+        flex-wrap: wrap;
+        padding: 1rem;
+    }
+
+    .trip-card-name {
+        flex: 0 0 100%;
+    }
+
+    .trip-card-date {
+        font-size: 0.75rem;
+        margin-right: auto;
+    }
+
+    .trip-card-arrow {
+        display: none;
     }
 }
