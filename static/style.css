@@ -240,65 +240,6 @@
   margin-bottom: 0.3rem;
 }
 
-.config-download-link {
-  font-size: 0.7rem;
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--sienna, #b85c38);
-  text-decoration: none;
-  margin-left: 0.5rem;
-}
-
-.config-download-link:hover {
-  text-decoration: underline;
-}
-
-.admin-code {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  background: var(--ink, #2c2c2c);
-  color: var(--cream, #f5f0e8);
-  padding: 0.6rem 0.8rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  font-family: monospace;
-  cursor: pointer;
-}
-
-.admin-code:hover {
-  background: var(--ink-light, #5a5549);
-}
-
-.admin-code .admin-code-text {
-  flex: 1;
-  word-break: break-all;
-  color: var(--cream, #f5f0e8);
-  text-decoration: none;
-}
-
-.admin-code a.admin-code-text:hover {
-  text-decoration: underline;
-}
-
-.copy-icon {
-  flex-shrink: 0;
-  opacity: 0.5;
-}
-
-.admin-code:hover .copy-icon {
-  opacity: 1;
-}
-
-.admin-code.copied .copy-icon {
-  opacity: 1;
-}
-
-.admin-code.copied .copy-icon::after {
-  content: " Copied!";
-  font-size: 0.7rem;
-}
-
 .admin-stats {
   font-size: 0.8rem;
   color: var(--ink-faint, #9a9488);
@@ -358,10 +299,12 @@
 }
 
 .admin-share-btn {
+  flex: 1;
   text-align: center;
   text-decoration: none;
   font-size: 0.9rem;
   margin-bottom: 0;
+  border-radius: var(--radius-sm);
 }
 
 .admin-section-title {
@@ -1813,20 +1756,6 @@ code.copyable {
   .admin-info-row {
     gap: 0.75rem;
     margin-bottom: 0.5rem;
-  }
-
-  /* Hide URL code blocks on mobile, show action buttons instead */
-  .admin-code-desktop {
-    display: none;
-  }
-
-  .admin-info-block .config-download-link {
-    display: none;
-  }
-
-  .admin-share-btn {
-    flex: 1;
-    border-radius: var(--radius-sm);
   }
 
   .admin-stats {
