@@ -1062,7 +1062,10 @@ func buildGeoJSON(points []Trackpoint, entries []Entry) string {
 		}
 		body := ""
 		if e.Body != nil {
-			body = strings.ReplaceAll(*e.Body, `"`, `\"`)
+			b, _ := json.Marshal(*e.Body)
+			body = string(b) // already quoted, e.g. "hello\nworld"
+		} else {
+			body = `""`
 		}
 		photo := ""
 		for _, p := range e.Photos {
@@ -1074,7 +1077,7 @@ func buildGeoJSON(points []Trackpoint, entries []Entry) string {
 			}
 		}
 		features = append(features, fmt.Sprintf(
-			`{"type":"Feature","geometry":{"type":"Point","coordinates":[%.6f,%.6f]},"properties":{"type":"entry","id":%d,"body":"%s","timestamp":"%s","photo":"%s"}}`,
+			`{"type":"Feature","geometry":{"type":"Point","coordinates":[%.6f,%.6f]},"properties":{"type":"entry","id":%d,"body":%s,"timestamp":"%s","photo":"%s"}}`,
 			*e.Lon, *e.Lat, e.ID, body, e.Timestamp, photo,
 		))
 	}
