@@ -529,9 +529,9 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       // Get text — split on "---" page breaks, preserve paragraphs
-      var bodyEl = entryEl.querySelector(".timeline-body");
-      if (bodyEl && bodyEl.textContent.trim()) {
-        var rawText = bodyEl.textContent.trim();
+      var rawBody = entryEl.dataset.body;
+      if (rawBody && rawBody.trim()) {
+        var rawText = rawBody.trim();
         var textPages = rawText.split(/\n\s*---\s*\n/);
         textPages.forEach(function (pageText) {
           pageText = pageText.trim();

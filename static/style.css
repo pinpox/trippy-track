@@ -1728,6 +1728,7 @@ code.copyable {
 
   .viewer-content .viewer-text p {
     margin: 0 0 1em;
+    color: white;
   }
 
   .viewer-content .viewer-text p:last-child {

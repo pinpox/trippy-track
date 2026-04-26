@@ -31,7 +31,7 @@
         {{if .Timeline}}
         <div class="timeline-line">
             {{range .Timeline}}
-            <div class="timeline-entry {{if gt .DistFromPrev 0.0}}has-distance{{end}}" data-entry-id="{{.Entry.ID}}" {{if .Entry.Lat}}data-lat="{{printf "%.6f" (deref .Entry.Lat)}}" data-lon="{{printf "%.6f" (deref .Entry.Lon)}}"{{end}}>
+            <div class="timeline-entry {{if gt .DistFromPrev 0.0}}has-distance{{end}}" data-entry-id="{{.Entry.ID}}" {{if .Entry.Lat}}data-lat="{{printf "%.6f" (deref .Entry.Lat)}}" data-lon="{{printf "%.6f" (deref .Entry.Lon)}}"{{end}} {{if .Entry.Body}}data-body="{{.Entry.Body}}"{{end}}>
                 {{if gt .DistFromPrev 0.0}}
                 <span class="timeline-distance-label">{{formatDist .DistFromPrev}}</span>
                 {{end}}
