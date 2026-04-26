@@ -57,11 +57,38 @@ func GenerateThumbnails(uploadsDir, filename string) {
 	}
 }
 
+// GenerateVideoThumbnail extracts the first frame of a video as a JPEG thumbnail.
+func GenerateVideoThumbnail(uploadsDir, filename string) {
+	ext := strings.ToLower(filepath.Ext(filename))
+	if ext != ".mp4" && ext != ".webm" && ext != ".mov" && ext != ".avi" {
+		return
+	}
+
+	srcPath := filepath.Join(uploadsDir, filename)
+	base := strings.TrimSuffix(filename, filepath.Ext(filename))
+	thumbPath := filepath.Join(uploadsDir, base+"_thumb.jpg")
+
+	cmd := exec.Command("ffmpeg",
+		"-i", srcPath,
+		"-vframes", "1",
+		"-vf", fmt.Sprintf("scale=%d:-1", ThumbWidth),
+		"-y",
+		thumbPath,
+	)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("video thumb: failed for %s: %v\n%s", filename, err, output)
+		return
+	}
+	log.Printf("video thumb: %s done", filename)
+}
+
 // ThumbPath returns the thumbnail path for a filename.
 func ThumbPath(filename string) string {
 	ext := strings.ToLower(filepath.Ext(filename))
 	if ext == ".mp4" || ext == ".webm" || ext == ".mov" || ext == ".avi" {
-		return filename // Videos have no thumbnails
+		base := strings.TrimSuffix(filename, filepath.Ext(filename))
+		return base + "_thumb.jpg"
 	}
 	base := strings.TrimSuffix(filename, filepath.Ext(filename))
 	return base + "_thumb" + ext
@@ -131,25 +158,35 @@ func BackfillThumbnails(uploadsDir string) {
 	count := 0
 	for _, entry := range entries {
 		name := entry.Name()
-		if strings.Contains(name, "_thumb") || strings.Contains(name, "_med") {
+		if strings.Contains(name, "_thumb") || strings.Contains(name, "_med") || strings.Contains(name, "_transcoding") {
 			continue
 		}
 		ext := strings.ToLower(filepath.Ext(name))
-		if ext == ".mp4" || ext == ".webm" || ext == ".mov" || ext == ".avi" {
-			continue
-		}
-		if ext != ".jpg" && ext != ".jpeg" && ext != ".png" && ext != ".gif" && ext != ".webp" {
+		base := strings.TrimSuffix(name, filepath.Ext(name))
+
+		isVideo := ext == ".mp4" || ext == ".webm" || ext == ".mov" || ext == ".avi"
+		isImage := ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif" || ext == ".webp"
+
+		if !isVideo && !isImage {
 			continue
 		}
 
-		base := strings.TrimSuffix(name, filepath.Ext(name))
-		thumbPath := filepath.Join(uploadsDir, base+"_thumb"+ext)
+		thumbPath := filepath.Join(uploadsDir, base+"_thumb")
+		if isVideo {
+			thumbPath += ".jpg"
+		} else {
+			thumbPath += ext
+		}
 		if _, err := os.Stat(thumbPath); err == nil {
 			continue // Already has thumbnail
 		}
 
 		fmt.Printf("backfill: generating thumbnails for %s\n", name)
-		GenerateThumbnails(uploadsDir, name)
+		if isVideo {
+			GenerateVideoThumbnail(uploadsDir, name)
+		} else {
+			GenerateThumbnails(uploadsDir, name)
+		}
 		count++
 	}
 	if count > 0 {
