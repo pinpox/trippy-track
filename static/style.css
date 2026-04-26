@@ -1030,6 +1030,7 @@ code.copyable {
   font-weight: 400;
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
+  white-space: pre-line;
 }
 
 .timeline-meta {
@@ -1723,6 +1724,14 @@ code.copyable {
     line-height: 1.8;
     text-align: center;
     max-width: 90%;
+  }
+
+  .viewer-content .viewer-text p {
+    margin: 0 0 1em;
+  }
+
+  .viewer-content .viewer-text p:last-child {
+    margin-bottom: 0;
   }
 
   /* Tap zones */

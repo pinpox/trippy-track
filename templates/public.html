@@ -66,7 +66,7 @@
                         </div>
                     </div>
                     {{end}}
-                    {{if .Entry.Body}}<p class="timeline-body">{{.Entry.Body}}</p>{{end}}
+                    {{if .Entry.Body}}<p class="timeline-body">{{stripPageBreaks .Entry.Body}}</p>{{end}}
                 </div>
             </div>
             {{end}}
@@ -123,7 +123,7 @@
                         <span class="mobile-card-date">{{formatDate .Entry.Timestamp}}</span>
                         {{if .Entry.CountryCode}}<span class="mobile-card-country">{{countryFlag .Entry.CountryCode}} {{countryName .Entry.CountryCode}}</span>{{end}}
                     </div>
-                    <p class="mobile-card-text-body">{{if .Entry.Body}}{{.Entry.Body}}{{end}}</p>
+                    <p class="mobile-card-text-body">{{if .Entry.Body}}{{stripPageBreaks .Entry.Body}}{{end}}</p>
                 </div>
                 {{end}}
                 <div class="mobile-card-info">

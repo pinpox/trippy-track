@@ -528,12 +528,19 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
 
-      // Get text
+      // Get text — split on "---" page breaks, preserve paragraphs
       var bodyEl = entryEl.querySelector(".timeline-body");
       if (bodyEl && bodyEl.textContent.trim()) {
-        pages.push({
-          type: "text",
-          content: bodyEl.textContent.trim(),
+        var rawText = bodyEl.textContent.trim();
+        var textPages = rawText.split(/\n\s*---\s*\n/);
+        textPages.forEach(function (pageText) {
+          pageText = pageText.trim();
+          if (pageText) {
+            pages.push({
+              type: "text",
+              content: pageText,
+            });
+          }
         });
       }
 
@@ -690,7 +697,20 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         var txt = document.createElement("div");
         txt.className = "viewer-text";
-        txt.textContent = page.content || "No text";
+        if (page.content) {
+          // Preserve paragraphs: split on blank lines, render as <p> elements
+          var paragraphs = page.content.split(/\n\s*\n/);
+          paragraphs.forEach(function (para) {
+            para = para.trim();
+            if (para) {
+              var p = document.createElement("p");
+              p.textContent = para;
+              txt.appendChild(p);
+            }
+          });
+        } else {
+          txt.textContent = "No text";
+        }
         viewerContent.appendChild(txt);
       }
 

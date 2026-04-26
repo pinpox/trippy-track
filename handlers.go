@@ -12,6 +12,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"regexp"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -158,6 +159,13 @@ func newServer(db *sql.DB, addr string, uploadsDir string, auth *AuthService) (*
 		"toJSON": func(v any) template.JS {
 			b, _ := json.Marshal(v)
 			return template.JS(b)
+		},
+		"stripPageBreaks": func(s *string) string {
+			if s == nil {
+				return ""
+			}
+			re := regexp.MustCompile(`(?m)^\s*---\s*$\n?`)
+			return strings.TrimSpace(re.ReplaceAllString(*s, "\n"))
 		},
 		"sub": func(a, b int) int {
 			return a - b
