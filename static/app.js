@@ -84,11 +84,75 @@ document.addEventListener("DOMContentLoaded", function () {
           },
         });
 
-        // Add entry markers
+        // Add clustered entry source
         var entryFeatures = geojson.features.filter(function (f) {
           return f.properties.type === "entry";
         });
 
+        map.addSource("entries", {
+          type: "geojson",
+          data: { type: "FeatureCollection", features: entryFeatures },
+          cluster: true,
+          clusterMaxZoom: 14,
+          clusterRadius: 50,
+        });
+
+        // Cluster circles
+        map.addLayer({
+          id: "clusters",
+          type: "circle",
+          source: "entries",
+          filter: ["has", "point_count"],
+          paint: {
+            "circle-color": "#5a5549",
+            "circle-radius": 18,
+            "circle-stroke-width": 2.5,
+            "circle-stroke-color": "#fff",
+          },
+        });
+
+        // Cluster count labels
+        map.addLayer({
+          id: "cluster-count",
+          type: "symbol",
+          source: "entries",
+          filter: ["has", "point_count"],
+          layout: {
+            "text-field": "{point_count_abbreviated}",
+            "text-size": 13,
+            "text-font": ["Open Sans Bold"],
+          },
+          paint: {
+            "text-color": "#fff",
+          },
+        });
+
+        // Click cluster -> zoom to expand
+        map.on("click", "clusters", function (e) {
+          var features = map.queryRenderedFeatures(e.point, {
+            layers: ["clusters"],
+          });
+          var clusterId = features[0].properties.cluster_id;
+          map
+            .getSource("entries")
+            .getClusterExpansionZoom(clusterId)
+            .then(function (zoom) {
+              map.easeTo({
+                center: features[0].geometry.coordinates,
+                zoom: zoom,
+              });
+            });
+        });
+
+        map.on("mouseenter", "clusters", function () {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", "clusters", function () {
+          map.getCanvas().style.cursor = "";
+        });
+
+        // DOM markers for unclustered points
+        var markerPool = {}; // keyed by entry ID
         entryFeatures.forEach(function (f) {
           var el = document.createElement("div");
           if (f.properties.photo) {
@@ -100,14 +164,9 @@ document.addEventListener("DOMContentLoaded", function () {
             el.className = "map-marker";
           }
 
-          var marker = new maplibregl.Marker({ element: el })
-            .setLngLat(f.geometry.coordinates)
-            .addTo(map);
-
           // Click marker -> scroll to entry
           el.addEventListener("click", function () {
             if (typeof isMobile !== "undefined" && isMobile) {
-              // Mobile: scroll card strip to this entry
               var card = document.querySelector(
                 '.mobile-entry-card[data-entry-id="' + f.properties.id + '"]',
               );
@@ -119,7 +178,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
               }
             } else {
-              // Desktop: scroll timeline
               var entryEl = document.querySelector(
                 '.timeline-entry[data-entry-id="' + f.properties.id + '"]',
               );
@@ -130,11 +188,41 @@ document.addEventListener("DOMContentLoaded", function () {
             }
           });
 
-          markers.push({
-            marker: marker,
-            entryId: f.properties.id,
-          });
+          var marker = new maplibregl.Marker({ element: el })
+            .setLngLat(f.geometry.coordinates);
+
+          markerPool[f.properties.id] = marker;
+          markers.push({ marker: marker, entryId: f.properties.id });
         });
+
+        // Sync DOM markers: show only unclustered features
+        var activeMarkers = {};
+        function updateMarkers() {
+          var visible = {};
+          var features = map.querySourceFeatures("entries");
+          features.forEach(function (f) {
+            if (f.properties.cluster) return;
+            visible[f.properties.id] = true;
+          });
+          Object.keys(markerPool).forEach(function (id) {
+            var m = markerPool[id];
+            if (visible[id]) {
+              if (!activeMarkers[id]) {
+                m.addTo(map);
+                activeMarkers[id] = true;
+              }
+            } else {
+              if (activeMarkers[id]) {
+                m.remove();
+                delete activeMarkers[id];
+              }
+            }
+          });
+        }
+
+        map.on("move", updateMarkers);
+        map.on("moveend", updateMarkers);
+        updateMarkers();
 
         // Current position marker (last point of the track)
         var trackFeature = geojson.features.find(function (f) {
