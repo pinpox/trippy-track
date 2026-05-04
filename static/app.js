@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const map = new maplibregl.Map({
+  const map = window.map = new maplibregl.Map({
     container: "map",
     style: "https://tiles.openfreemap.org/styles/liberty",
     center: [10, 50],
@@ -22,6 +22,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const markers = [];
+  var activeMarkers = {};
+  var pendingHighlight = null;
 
   map.on("load", function () {
     // 3D terrain
@@ -94,61 +96,23 @@ document.addEventListener("DOMContentLoaded", function () {
           data: { type: "FeatureCollection", features: entryFeatures },
           cluster: true,
           clusterMaxZoom: 14,
-          clusterRadius: 50,
+          clusterRadius: 30,
         });
 
-        // Cluster circles
+        // Hidden layer to force MapLibre to load tiles for the entries source
         map.addLayer({
-          id: "clusters",
+          id: "entries-hidden",
           type: "circle",
           source: "entries",
-          filter: ["has", "point_count"],
-          paint: {
-            "circle-color": "#5a5549",
-            "circle-radius": 18,
-            "circle-stroke-width": 2.5,
-            "circle-stroke-color": "#fff",
-          },
+          paint: { "circle-radius": 0, "circle-opacity": 0 },
         });
 
-        // Cluster count labels
-        map.addLayer({
-          id: "cluster-count",
-          type: "symbol",
-          source: "entries",
-          filter: ["has", "point_count"],
-          layout: {
-            "text-field": "{point_count_abbreviated}",
-            "text-size": 13,
-            "text-font": ["Open Sans Bold"],
-          },
-          paint: {
-            "text-color": "#fff",
-          },
-        });
-
-        // Click cluster -> zoom to expand
-        map.on("click", "clusters", function (e) {
-          var features = map.queryRenderedFeatures(e.point, {
-            layers: ["clusters"],
-          });
-          var clusterId = features[0].properties.cluster_id;
-          map
-            .getSource("entries")
-            .getClusterExpansionZoom(clusterId)
-            .then(function (zoom) {
-              map.easeTo({
-                center: features[0].geometry.coordinates,
-                zoom: zoom,
-              });
-            });
-        });
-
-        map.on("mouseenter", "clusters", function () {
-          map.getCanvas().style.cursor = "pointer";
-        });
-        map.on("mouseleave", "clusters", function () {
-          map.getCanvas().style.cursor = "";
+        // Build a lookup: entry ID -> first photo URL
+        var entryPhotos = {};
+        entryFeatures.forEach(function (f) {
+          if (f.properties.photo) {
+            entryPhotos[f.properties.id] = "/uploads/" + f.properties.photo;
+          }
         });
 
         // DOM markers for unclustered points
@@ -195,15 +159,34 @@ document.addEventListener("DOMContentLoaded", function () {
           markers.push({ marker: marker, entryId: f.properties.id });
         });
 
-        // Sync DOM markers: show only unclustered features
-        var activeMarkers = {};
+        // Sync DOM markers and cluster markers
+        var clusterMarkers = {}; // keyed by cluster_id
+        var updateGen = 0; // generation counter to discard stale async results
+
         function updateMarkers() {
-          var visible = {};
+          if (!map.isSourceLoaded("entries")) return;
+          var gen = ++updateGen;
+          var src = map.getSource("entries");
           var features = map.querySourceFeatures("entries");
+
+          var visible = {};
+          var seenClusters = {};
+
           features.forEach(function (f) {
-            if (f.properties.cluster) return;
-            visible[f.properties.id] = true;
+            if (f.properties.cluster) {
+              var cid = f.properties.cluster_id;
+              if (!seenClusters[cid]) {
+                seenClusters[cid] = {
+                  coords: f.geometry.coordinates,
+                  count: f.properties.point_count,
+                };
+              }
+            } else {
+              visible[f.properties.id] = true;
+            }
           });
+
+          // Update individual markers
           Object.keys(markerPool).forEach(function (id) {
             var m = markerPool[id];
             if (visible[id]) {
@@ -211,17 +194,88 @@ document.addEventListener("DOMContentLoaded", function () {
                 m.addTo(map);
                 activeMarkers[id] = true;
               }
-            } else {
-              if (activeMarkers[id]) {
-                m.remove();
-                delete activeMarkers[id];
-              }
+            } else if (activeMarkers[id]) {
+              m.remove();
+              delete activeMarkers[id];
             }
+          });
+
+          // Apply pending highlight if the marker just became visible
+          if (pendingHighlight && activeMarkers[pendingHighlight]) {
+            markers.forEach(function (m) {
+              var el = m.marker.getElement();
+              if (String(m.entryId) === String(pendingHighlight)) {
+                el.classList.add("map-marker-active");
+              } else {
+                el.classList.remove("map-marker-active");
+              }
+            });
+            pendingHighlight = null;
+          }
+
+          // Remove all stale cluster markers
+          Object.keys(clusterMarkers).forEach(function (cid) {
+            if (!seenClusters[cid]) {
+              clusterMarkers[cid].remove();
+              delete clusterMarkers[cid];
+            }
+          });
+
+          // Add or update cluster markers
+          Object.keys(seenClusters).forEach(function (cid) {
+            var cluster = seenClusters[cid];
+
+            // If cluster already exists, update position and count
+            if (clusterMarkers[cid]) {
+              clusterMarkers[cid].setLngLat(cluster.coords);
+              var badge = clusterMarkers[cid].getElement().querySelector(".map-cluster-badge");
+              if (badge) badge.textContent = cluster.count;
+              return;
+            }
+
+            // Create new cluster marker — async photo lookup
+            src.getClusterLeaves(parseInt(cid), 100, 0).then(function (leaves) {
+              if (gen !== updateGen) return; // stale
+              if (!seenClusters[cid] && !clusterMarkers[cid]) return;
+
+              var photoUrl = null;
+              for (var i = 0; i < leaves.length; i++) {
+                if (entryPhotos[leaves[i].properties.id]) {
+                  photoUrl = entryPhotos[leaves[i].properties.id];
+                  break;
+                }
+              }
+
+              var el = document.createElement("div");
+              el.className = "map-cluster-marker";
+              if (photoUrl) {
+                var img = document.createElement("img");
+                img.src = photoUrl;
+                el.appendChild(img);
+              }
+              var badge = document.createElement("span");
+              badge.className = "map-cluster-badge";
+              badge.textContent = cluster.count;
+              el.appendChild(badge);
+
+              el.addEventListener("click", function () {
+                src.getClusterExpansionZoom(parseInt(cid)).then(function (zoom) {
+                  map.easeTo({ center: cluster.coords, zoom: zoom });
+                });
+              });
+
+              // Don't add if another update already removed this cluster
+              if (gen !== updateGen) return;
+
+              var m = new maplibregl.Marker({ element: el })
+                .setLngLat(cluster.coords)
+                .addTo(map);
+              clusterMarkers[cid] = m;
+            });
           });
         }
 
-        map.on("move", updateMarkers);
-        map.on("moveend", updateMarkers);
+        map.on("render", updateMarkers);
         updateMarkers();
 
         // Current position marker (last point of the track)
@@ -282,6 +336,26 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   });
 
+  // Fly to an entry, zooming in past its cluster if needed
+  var UNCLUSTER_ZOOM = 15; // clusterMaxZoom (14) + 1
+  function flyToEntry(lon, lat, entryId) {
+    if (activeMarkers && activeMarkers[entryId]) {
+      // Entry marker is already visible, just pan to it
+      map.flyTo({
+        center: [lon, lat],
+        zoom: Math.max(map.getZoom(), 10),
+        duration: 500,
+      });
+    } else {
+      // Entry is inside a cluster — zoom to guaranteed uncluster level
+      map.flyTo({
+        center: [lon, lat],
+        zoom: UNCLUSTER_ZOOM,
+        duration: 500,
+      });
+    }
+  }
+
   // Scroll timeline -> pan map (center-based tracking)
   var timelineEl = document.getElementById("timeline");
   var allEntries = Array.from(
@@ -316,11 +390,8 @@ document.addEventListener("DOMContentLoaded", function () {
     var lat = parseFloat(closest.dataset.lat);
     var lon = parseFloat(closest.dataset.lon);
     if (!isNaN(lat) && !isNaN(lon)) {
-      map.flyTo({
-        center: [lon, lat],
-        zoom: Math.max(map.getZoom(), 10),
-        duration: 500,
-      });
+      pendingHighlight = entryId;
+      flyToEntry(lon, lat, entryId);
     }
 
     highlightEntry(closest);
@@ -367,13 +438,10 @@ document.addEventListener("DOMContentLoaded", function () {
         var lat = parseFloat(entry.dataset.lat);
         var lon = parseFloat(entry.dataset.lon);
         if (!isNaN(lat) && !isNaN(lon)) {
-          map.flyTo({
-            center: [lon, lat],
-            zoom: Math.max(map.getZoom(), 12),
-            duration: 800,
-          });
-          highlightEntry(entry);
           var entryId = entry.dataset.entryId;
+          pendingHighlight = entryId;
+          flyToEntry(lon, lat, entryId);
+          highlightEntry(entry);
           markers.forEach(function (m) {
             var mel = m.marker.getElement();
             if (String(m.entryId) === String(entryId)) {
