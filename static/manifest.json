@@ -1,0 +1,15 @@
+{
+    "name": "Trippy Track",
+    "short_name": "TrpTrack",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#b85c38",
+    "icons": [
+        {
+            "src": "/static/favicon-light.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}

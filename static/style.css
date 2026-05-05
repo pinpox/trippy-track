@@ -726,6 +726,189 @@ code.copyable {
   color: var(--sienna);
 }
 
+.push-btn {
+  position: absolute;
+  top: 1.5rem;
+  right: 5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  background: none;
+  border: 1px solid var(--ink-faint);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+.push-btn:hover {
+  color: var(--sienna);
+  border-color: var(--sienna);
+}
+
+.map-push-bubble {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-faint);
+  font-size: 1.1rem;
+  transition: color 0.2s, background 0.2s;
+}
+
+.map-push-bubble:hover {
+  color: var(--sienna);
+}
+
+.map-push-bubble-active {
+  background: var(--sienna);
+  color: white;
+}
+
+.map-push-bubble-active:hover {
+  background: var(--ink);
+  color: white;
+}
+
+/* iOS install prompt */
+#ios-install-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.ios-prompt-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.3s;
+}
+
+.ios-prompt-visible .ios-prompt-backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.ios-prompt-sheet {
+  position: relative;
+  background: white;
+  border-radius: 1rem 1rem 0 0;
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 100%;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.ios-prompt-visible .ios-prompt-sheet {
+  transform: translateY(0);
+}
+
+.ios-prompt-content {
+  text-align: center;
+}
+
+.ios-prompt-icon {
+  font-size: 2rem;
+  color: var(--sienna);
+  margin-bottom: 0.5rem;
+}
+
+.ios-prompt-title {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 0.5rem;
+}
+
+.ios-prompt-text {
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  margin: 0 0 1.25rem;
+  line-height: 1.4;
+}
+
+.ios-prompt-steps {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.ios-prompt-step {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.ios-prompt-step-num {
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--sienna);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ios-prompt-share-icon {
+  flex-shrink: 0;
+  color: #007aff;
+}
+
+.ios-prompt-close {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--sienna);
+  color: white;
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ios-prompt-close:hover {
+  opacity: 0.9;
+}
+
+.ios-prompt-arrow {
+  position: absolute;
+  bottom: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  animation: ios-arrow-bounce 1.5s ease infinite;
+}
+
+@keyframes ios-arrow-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
+}
+
 .timeline-header h1 {
   font-family: var(--font-serif);
   font-size: 2rem;
@@ -1624,6 +1807,7 @@ code.copyable {
     color: var(--warm-grey);
   }
 
+
   /* Stats pill adjustments */
   .map-stats {
     top: 0.5rem;
@@ -1634,6 +1818,10 @@ code.copyable {
   /* Hide desktop-only elements */
   .rss-link {
     display: none;
+  }
+
+  .push-btn {
+    display: none !important;
   }
 
   .mobile-edit-link {

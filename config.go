@@ -13,6 +13,13 @@ type Config struct {
 	DatabaseURL string
 	UploadsDir  string
 	OIDC        OIDCConfig
+	VAPID       VAPIDConfig
+}
+
+type VAPIDConfig struct {
+	PublicKey  string
+	PrivateKey string
+	Contact   string
 }
 
 type OIDCConfig struct {
@@ -36,6 +43,11 @@ func LoadConfig() Config {
 			ClientID:     getEnv("OIDC_CLIENT_ID", ""),
 			ClientSecret: getEnv("OIDC_CLIENT_SECRET", ""),
 			RedirectURL:  getEnv("OIDC_REDIRECT_URL", "http://localhost:8080/callback"),
+		},
+		VAPID: VAPIDConfig{
+			PublicKey:  getEnv("VAPID_PUBLIC_KEY", ""),
+			PrivateKey: getEnv("VAPID_PRIVATE_KEY", ""),
+			Contact:    getEnv("VAPID_CONTACT", ""),
 		},
 	}
 }

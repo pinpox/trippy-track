@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="alternate" type="application/rss+xml" title="{{.Trip.Name}}" href="/t/{{.Trip.ViewToken}}/rss">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.469.0/font/lucide.min.css" media="print" onload="this.media='all'">
@@ -27,6 +30,9 @@
                 <svg width="14" height="14" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><circle cx="68" cy="189" r="36" fill="currentColor"/><path d="M32 32v32c88.4 0 160 71.6 160 160h32C224 118 138 32 32 32z" fill="currentColor"/><path d="M32 96v32c52.9 0 96 43.1 96 96h32c0-70.7-57.3-128-128-128z" fill="currentColor"/></svg>
                 RSS
             </a>
+            <button id="push-subscribe-btn" class="push-btn" style="display:none" data-token="{{.Trip.ViewToken}}" title="Get notified when new entries are posted">
+                <i class="icon-bell"></i> Notify me
+            </button>
         </div>
         {{if .Timeline}}
         <div class="timeline-line">
@@ -195,6 +201,9 @@
         <div class="viewer-meta"></div>
     </div>
     <div id="map">
+        <button id="map-push-btn" class="map-push-bubble" style="display:none" data-token="{{.Trip.ViewToken}}" title="Get notified when new entries are posted">
+            <i class="icon-bell"></i>
+        </button>
         <div class="map-stats">
             {{if .Stats.IsActive}}<span class="stats-live-dot"></span> Traveling <span class="stats-sep">&middot;</span>{{end}}
             {{if gt .Stats.DurationDays 0}}{{.Stats.DurationDays}}d {{.Stats.DurationHours}}h{{else}}{{.Stats.DurationHours}}h{{end}}
@@ -213,5 +222,6 @@
     const isOwner = {{if .IsOwner}}true{{else}}false{{end}};
 </script>
 <script src="/static/app.js"></script>
+<script src="/static/push.js"></script>
 </body>
 </html>

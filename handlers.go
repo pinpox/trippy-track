@@ -49,9 +49,10 @@ type Server struct {
 	uploadsDir string
 	sse        *SSEBroker
 	auth       *AuthService
+	config     Config
 }
 
-func newServer(db *sql.DB, addr string, uploadsDir string, auth *AuthService) (*Server, error) {
+func newServer(db *sql.DB, addr string, uploadsDir string, auth *AuthService, config Config) (*Server, error) {
 	funcMap := template.FuncMap{
 		"deref": func(f *float64) float64 {
 			if f == nil {
@@ -181,7 +182,7 @@ func newServer(db *sql.DB, addr string, uploadsDir string, auth *AuthService) (*
 	tmpl := template.Must(template.New("").Funcs(funcMap).ParseGlob("templates/*.html"))
 	template.Must(tmpl.ParseGlob("templates/partials/*.html"))
 
-	return &Server{db: db, tmpl: tmpl, addr: addr, uploadsDir: uploadsDir, sse: newSSEBroker(), auth: auth}, nil
+	return &Server{db: db, tmpl: tmpl, addr: addr, uploadsDir: uploadsDir, sse: newSSEBroker(), auth: auth, config: config}, nil
 }
 
 func (s *Server) routes() http.Handler {
@@ -197,12 +198,27 @@ func (s *Server) routes() http.Handler {
 	mux.HandleFunc("GET /callback", s.handleCallback)
 	mux.HandleFunc("GET /logout", s.handleLogout)
 
+	// PWA files (no auth, served from root for scope)
+	mux.HandleFunc("GET /service-worker.js", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Service-Worker-Allowed", "/")
+		http.ServeFile(w, r, "static/service-worker.js")
+	})
+	mux.HandleFunc("GET /manifest.json", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/manifest+json")
+		http.ServeFile(w, r, "static/manifest.json")
+	})
+
 	// Public view (no auth)
 	mux.HandleFunc("GET /t/{token}", s.handlePublicView)
 	mux.HandleFunc("GET /t/{token}/track", s.handlePublicTrack)
 	mux.HandleFunc("GET /t/{token}/entries", s.handlePublicEntries)
 	mux.HandleFunc("GET /t/{token}/sse", s.handleSSE)
 	mux.HandleFunc("GET /t/{token}/rss", s.handleRSS)
+
+	// Push notification endpoints (no auth)
+	mux.HandleFunc("GET /t/{token}/push/vapid-public-key", s.handleVAPIDPublicKey)
+	mux.HandleFunc("POST /t/{token}/push/subscribe", s.handlePushSubscribe)
+	mux.HandleFunc("POST /t/{token}/push/unsubscribe", s.handlePushUnsubscribe)
 
 	// OwnTracks tracking (no auth, token in query param)
 	mux.HandleFunc("POST /api/track", s.handleTrack)
@@ -621,6 +637,9 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 		Type: EventEntry,
 		Data: "reload",
 	})
+
+	// Send push notifications to trip subscribers
+	go s.sendPushNotifications(trip.ID, trip.Name, body, trip.ViewToken)
 
 	http.Redirect(w, r, "/t/"+token+"/admin", http.StatusSeeOther)
 }

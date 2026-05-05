@@ -207,7 +207,9 @@ func (a *AuthService) AuthMiddleware(next http.Handler) http.Handler {
 			strings.HasPrefix(r.URL.Path, "/callback") ||
 			strings.HasPrefix(r.URL.Path, "/static/") ||
 			strings.HasPrefix(r.URL.Path, "/uploads/") ||
-			strings.HasPrefix(r.URL.Path, "/api/") {
+			strings.HasPrefix(r.URL.Path, "/api/") ||
+			r.URL.Path == "/service-worker.js" ||
+			r.URL.Path == "/manifest.json" {
 			next.ServeHTTP(w, r)
 			return
 		}

@@ -72,6 +72,17 @@ CREATE TABLE IF NOT EXISTS photos (
     file_path  TEXT NOT NULL,
     sort_order INTEGER NOT NULL DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    trip_id    TEXT NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+    endpoint   TEXT NOT NULL UNIQUE,
+    key_p256dh TEXT NOT NULL,
+    key_auth   TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_trip ON push_subscriptions(trip_id);
 `
 
 func initDB(dbPath string) (*sql.DB, error) {
@@ -386,4 +397,47 @@ func maxPhotoOrder(db *sql.DB, entryID int64) int {
 	var maxOrder int
 	db.QueryRow("SELECT COALESCE(MAX(sort_order), -1) FROM photos WHERE entry_id = ?", entryID).Scan(&maxOrder)
 	return maxOrder
+}
+
+type PushSubscription struct {
+	ID        int64
+	TripID    string
+	Endpoint  string
+	KeyP256dh string
+	KeyAuth   string
+	CreatedAt string
+}
+
+func savePushSubscription(db *sql.DB, tripID, endpoint, p256dh, auth string) error {
+	_, err := db.Exec(
+		`INSERT OR REPLACE INTO push_subscriptions (trip_id, endpoint, key_p256dh, key_auth) VALUES (?, ?, ?, ?)`,
+		tripID, endpoint, p256dh, auth,
+	)
+	return err
+}
+
+func getPushSubscriptionsForTrip(db *sql.DB, tripID string) ([]PushSubscription, error) {
+	rows, err := db.Query(
+		"SELECT id, trip_id, endpoint, key_p256dh, key_auth, created_at FROM push_subscriptions WHERE trip_id = ?",
+		tripID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var subs []PushSubscription
+	for rows.Next() {
+		var s PushSubscription
+		if err := rows.Scan(&s.ID, &s.TripID, &s.Endpoint, &s.KeyP256dh, &s.KeyAuth, &s.CreatedAt); err != nil {
+			return nil, err
+		}
+		subs = append(subs, s)
+	}
+	return subs, rows.Err()
+}
+
+func deletePushSubscription(db *sql.DB, endpoint string) error {
+	_, err := db.Exec("DELETE FROM push_subscriptions WHERE endpoint = ?", endpoint)
+	return err
 }

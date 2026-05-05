@@ -33,7 +33,7 @@ func main() {
 	// Generate thumbnails for existing images that don't have them
 	go BackfillThumbnails(config.UploadsDir)
 
-	srv, err := newServer(db, config.Addr, config.UploadsDir, auth)
+	srv, err := newServer(db, config.Addr, config.UploadsDir, auth, config)
 	if err != nil {
 		log.Fatalf("init server: %v", err)
 	}
