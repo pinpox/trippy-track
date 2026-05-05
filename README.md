@@ -1,10 +1,10 @@
-<p align="center">
-  <img src="screenshot.png" alt="Trippy Track" width="600">
-</p>
-
 # Trippy Track
 
-Self-hosted travel journal with live GPS tracking, photo timeline, and a map your friends can follow.
+<p align="center">
+  <img src="screenshot.png" alt="Trippy Track" height="360">
+</p>
+
+<p align="center"><b>Self-hosted travel journal with live GPS tracking, photo timeline, and a map your friends can follow.</b></p>
 
 ## How it works
 
