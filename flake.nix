@@ -116,7 +116,7 @@
             environmentFile = lib.mkOption {
               type = lib.types.nullOr lib.types.path;
               default = null;
-              description = "Environment file with OIDC secrets (OIDC_ISSUER_URL, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET, OIDC_REDIRECT_URL)";
+              description = "Environment file with secrets (OIDC_ISSUER_URL, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET, OIDC_REDIRECT_URL, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_CONTACT)";
             };
 
             package = lib.mkOption {
@@ -132,6 +132,7 @@
               wantedBy = [ "multi-user.target" ];
               after = [ "network-online.target" ];
               wants = [ "network-online.target" ];
+              restartTriggers = lib.optionals (cfg.environmentFile != null) [ cfg.environmentFile ];
 
               environment = {
                 PORT = toString cfg.port;
