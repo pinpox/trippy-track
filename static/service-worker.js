@@ -3,8 +3,8 @@ self.addEventListener('push', function(event) {
     var title = data.title || 'Trip Update';
     var options = {
         body: data.body || 'New entry posted',
-        icon: '/static/favicon-light.svg',
-        badge: '/static/favicon-light.svg',
+        icon: '/static/icon-192.png',
+        badge: '/static/icon-192.png',
         data: { url: data.url || '/' },
         tag: 'trip-update-' + (data.url || ''),
         renotify: true
