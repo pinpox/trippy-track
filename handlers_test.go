@@ -79,7 +79,7 @@ func setupTestServer(t *testing.T) (*Server, string) {
 		t.Fatal(err)
 	}
 
-	srv, err := newServer(db, ":0", t.TempDir(), nil)
+	srv, err := newServer(db, ":0", t.TempDir(), nil, Config{})
 	if err != nil {
 		t.Fatal(err)
 	}

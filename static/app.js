@@ -225,11 +225,27 @@ document.addEventListener("DOMContentLoaded", function () {
           Object.keys(seenClusters).forEach(function (cid) {
             var cluster = seenClusters[cid];
 
-            // If cluster already exists, update position and count
+            // If cluster already exists, update position, count, and photo
             if (clusterMarkers[cid]) {
               clusterMarkers[cid].setLngLat(cluster.coords);
-              var badge = clusterMarkers[cid].getElement().querySelector(".map-cluster-badge");
+              var el = clusterMarkers[cid].getElement();
+              var badge = el.querySelector(".map-cluster-badge");
               if (badge) badge.textContent = cluster.count;
+
+              // Upgrade grey cluster to photo if a photo entry joined
+              if (!el.querySelector("img")) {
+                src.getClusterLeaves(parseInt(cid), 100, 0).then(function (leaves) {
+                  if (gen !== updateGen) return;
+                  for (var i = 0; i < leaves.length; i++) {
+                    if (entryPhotos[leaves[i].properties.id]) {
+                      var img = document.createElement("img");
+                      img.src = entryPhotos[leaves[i].properties.id];
+                      el.insertBefore(img, el.firstChild);
+                      break;
+                    }
+                  }
+                });
+              }
               return;
             }
 
