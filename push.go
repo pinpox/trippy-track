@@ -121,6 +121,7 @@ func (s *Server) sendPushNotifications(tripID, tripName, entryBody, viewToken st
 			VAPIDPublicKey:  s.config.VAPID.PublicKey,
 			VAPIDPrivateKey: s.config.VAPID.PrivateKey,
 			TTL:             86400,
+			Urgency:         webpush.UrgencyHigh,
 		})
 		if err != nil {
 			log.Printf("push send error to %s: %v", sub.Endpoint, err)

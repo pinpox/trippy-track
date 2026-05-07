@@ -209,6 +209,7 @@ func (s *Server) routes() http.Handler {
 	})
 
 	// Public view (no auth)
+	mux.HandleFunc("GET /t/{token}/manifest.json", s.handleTripManifest)
 	mux.HandleFunc("GET /t/{token}", s.handlePublicView)
 	mux.HandleFunc("GET /t/{token}/track", s.handlePublicTrack)
 	mux.HandleFunc("GET /t/{token}/entries", s.handlePublicEntries)
@@ -906,6 +907,31 @@ func (s *Server) handlePublicView(w http.ResponseWriter, r *http.Request) {
 		"Stats":         stats,
 		"IsOwner":       isOwner,
 	})
+}
+
+func (s *Server) handleTripManifest(w http.ResponseWriter, r *http.Request) {
+	token := r.PathValue("token")
+	trip, err := getTripByViewToken(s.db, token)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	manifest := map[string]any{
+		"name":             trip.Name + " — Trippy Track",
+		"short_name":       trip.Name,
+		"start_url":        "/t/" + trip.ViewToken,
+		"display":          "standalone",
+		"background_color": "#ffffff",
+		"theme_color":      "#b85c38",
+		"icons": []map[string]string{
+			{"src": "/static/favicon-light.svg", "sizes": "any", "type": "image/svg+xml"},
+			{"src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png"},
+		},
+	}
+
+	w.Header().Set("Content-Type", "application/manifest+json")
+	json.NewEncoder(w).Encode(manifest)
 }
 
 func (s *Server) handlePublicTrack(w http.ResponseWriter, r *http.Request) {
