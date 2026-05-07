@@ -1470,15 +1470,14 @@ code.copyable {
 @media (max-width: 768px) {
   html:has(.trip-view),
   html:has(.trip-view) body {
-    height: 100dvh;
+    height: 100%;
     overflow: hidden;
   }
 
   .trip-view {
     flex-direction: column;
-    height: 100dvh;
+    height: 100%;
     overflow: hidden;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   /* Hide desktop timeline on mobile */
