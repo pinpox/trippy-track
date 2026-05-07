@@ -506,6 +506,12 @@ func (s *Server) handleCreateEntry(w http.ResponseWriter, r *http.Request) {
 	body := strings.TrimSpace(r.FormValue("body"))
 	tsOverride := r.FormValue("timestamp")
 
+	hasPhotos := len(r.MultipartForm.File["photos"]) > 0
+	if body == "" && !hasPhotos {
+		http.Error(w, "entry must have text or photos", http.StatusBadRequest)
+		return
+	}
+
 	// Process uploaded photos
 	var photoFiles []string
 	var firstExif *ExifData

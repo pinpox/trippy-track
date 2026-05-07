@@ -203,6 +203,11 @@ function uploadPhotos(form) {
     if (entryForm) {
         entryForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            var body = entryForm.querySelector('#body').value.trim();
+            var photos = entryForm.querySelector('#new-entry-file-input').files;
+            if (!body && photos.length === 0) {
+                return;
+            }
             var btn = entryForm.querySelector('button[type="submit"]');
             btn.disabled = true;
             btn.textContent = 'Uploading\u2026';
