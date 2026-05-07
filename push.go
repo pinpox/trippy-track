@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 
@@ -122,12 +123,18 @@ func (s *Server) sendPushNotifications(tripID, tripName, entryBody, viewToken st
 			VAPIDPrivateKey: s.config.VAPID.PrivateKey,
 			TTL:             86400,
 			Urgency:         webpush.UrgencyHigh,
+			RecordSize:      2048,
 		})
 		if err != nil {
 			log.Printf("push send error to %s: %v", sub.Endpoint, err)
 			continue
 		}
+		body, _ := io.ReadAll(resp.Body)
 		resp.Body.Close()
+
+		if resp.StatusCode >= 300 {
+			log.Printf("push: endpoint=%s status=%d body=%s", sub.Endpoint, resp.StatusCode, string(body))
+		}
 
 		// Clean up invalid subscriptions
 		if resp.StatusCode == http.StatusGone || resp.StatusCode == http.StatusNotFound {
