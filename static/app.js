@@ -318,6 +318,7 @@ document.addEventListener("DOMContentLoaded", function () {
           })
             .setLngLat(lastCoord)
             .addTo(map);
+          currentPosMarker.getElement().style.zIndex = "10";
         }
 
         // Fit bounds to track + markers
