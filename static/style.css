@@ -1313,6 +1313,10 @@ code.copyable {
   transform: scale(1.15);
 }
 
+.maplibregl-marker:has(.map-marker-current) {
+  z-index: 10 !important;
+}
+
 .map-marker-current {
   width: 36px;
   height: 48px;
