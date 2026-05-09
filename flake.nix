@@ -121,7 +121,7 @@
 
             package = lib.mkOption {
               type = lib.types.package;
-              default = self.packages.${pkgs.system}.trippy-track;
+              default = self.packages.${pkgs.stdenv.hostPlatform.system}.trippy-track;
               description = "trippy-track package to use";
             };
           };
