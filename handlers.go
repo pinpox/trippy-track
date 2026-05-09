@@ -360,6 +360,14 @@ func (s *Server) handleTrack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Ended trips accept no new trackpoints. Respond 2xx so OwnTracks
+	// drops the message instead of queueing and retrying it.
+	if !trip.IsActive {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte("[]"))
+		return
+	}
+
 	// OwnTracks sends JSON POST
 	var payload struct {
 		Type string  `json:"_type"`

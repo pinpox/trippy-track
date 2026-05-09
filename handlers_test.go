@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -392,5 +393,58 @@ func TestTrackEndpointOrdering(t *testing.T) {
 			t.Errorf("entries not in chronological order: %s before %s",
 				entryTimestamps[i-1], entryTimestamps[i])
 		}
+	}
+}
+
+func TestTrackIngestRejectedForEndedTrip(t *testing.T) {
+	srv, viewToken := setupTestServer(t)
+	mux := srv.routes()
+
+	trip, err := getTripByViewToken(srv.db, viewToken)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count := func() int {
+		tps, err := getTrackpoints(srv.db, trip.ID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return len(tps)
+	}
+	tst := int64(1745150000)
+	push := func() {
+		t.Helper()
+		tst++ // distinct timestamps; identical ones are deduplicated
+		body := fmt.Sprintf(`{"_type":"location","lat":52.52,"lon":13.405,"tst":%d}`, tst)
+		req := httptest.NewRequest("POST", "/api/track?token="+trip.TrackingToken, strings.NewReader(body))
+		w := httptest.NewRecorder()
+		mux.ServeHTTP(w, req)
+		// Always 2xx so OwnTracks doesn't queue and retry the message.
+		if w.Code != http.StatusOK || w.Body.String() != "[]" {
+			t.Fatalf("got %d %q, want 200 \"[]\"", w.Code, w.Body.String())
+		}
+	}
+
+	before := count()
+	push()
+	if got := count(); got != before+1 {
+		t.Fatalf("active trip: got %d trackpoints, want %d", got, before+1)
+	}
+
+	if err := toggleTripActive(srv.db, trip.ID); err != nil {
+		t.Fatal(err)
+	}
+	push()
+	if got := count(); got != before+1 {
+		t.Fatalf("ended trip stored trackpoint: got %d, want %d", got, before+1)
+	}
+
+	if err := toggleTripActive(srv.db, trip.ID); err != nil {
+		t.Fatal(err)
+	}
+	push()
+	if got := count(); got != before+2 {
+		t.Fatalf("continued trip: got %d trackpoints, want %d", got, before+2)
 	}
 }
