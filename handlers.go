@@ -427,10 +427,22 @@ func (s *Server) handleTrack(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("trackpoint: trip=%s lat=%.6f lon=%.6f ts=%s", trip.ID, payload.Lat, payload.Lon, ts.Format(time.RFC3339))
 
-	s.sse.Publish(trip.ID, SSEEvent{
-		Type: EventTrackpoint,
-		Data: fmt.Sprintf(`{"lat":%.6f,"lon":%.6f}`, payload.Lat, payload.Lon),
-	})
+	removed, err := removeGPSSpikesAround(s.db, trip.ID, ts)
+	if err != nil {
+		log.Printf("remove gps spikes: %v", err)
+	}
+	selfRemoved := false
+	for _, sp := range removed {
+		log.Printf("removed gps spike: trip=%s lat=%.6f lon=%.6f ts=%s", trip.ID, sp.Lat, sp.Lon, sp.Timestamp.Format(time.RFC3339))
+		selfRemoved = selfRemoved || sp.Timestamp.Equal(ts)
+	}
+
+	if !selfRemoved {
+		s.sse.Publish(trip.ID, SSEEvent{
+			Type: EventTrackpoint,
+			Data: fmt.Sprintf(`{"lat":%.6f,"lon":%.6f}`, payload.Lat, payload.Lon),
+		})
+	}
 
 	// OwnTracks expects a JSON array response
 	w.Header().Set("Content-Type", "application/json")

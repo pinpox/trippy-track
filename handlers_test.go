@@ -448,3 +448,59 @@ func TestTrackIngestRejectedForEndedTrip(t *testing.T) {
 		t.Fatalf("continued trip: got %d trackpoints, want %d", got, before+2)
 	}
 }
+
+func TestTrackIngestRemovesGPSSpikes(t *testing.T) {
+	type fix struct {
+		lat, lon float64
+		tst      int64
+	}
+	// Real-world glitch: riding inland in Croatia, one fix jumps ~145 km to
+	// Premantura for a few seconds and comes back.
+	inland1 := fix{44.857470, 15.735855, 1789296246}
+	spike := fix{44.807026, 13.911464, 1789296296}
+	inland2 := fix{44.857448, 15.735958, 1789296307}
+	// A flight-sized jump that is not reverted must survive.
+	split := fix{43.508, 16.440, 1789296307 + 3600}
+	splitLater := fix{43.509, 16.441, 1789296307 + 3660}
+
+	tests := []struct {
+		name string
+		send []fix
+		want []fix
+	}{
+		{"spike removed once next fix arrives", []fix{inland1, spike, inland2}, []fix{inland1, inland2}},
+		{"late-delivered spike removed on arrival", []fix{inland1, inland2, spike}, []fix{inland1, inland2}},
+		{"plausible long jump kept", []fix{inland2, split, splitLater}, []fix{inland2, split, splitLater}},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			srv, _ := setupTestServer(t)
+			mux := srv.routes()
+			trip, err := createTrip(srv.db, "Spike Trip", 1)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, f := range tc.send {
+				body := fmt.Sprintf(`{"_type":"location","lat":%f,"lon":%f,"tst":%d,"acc":19}`, f.lat, f.lon, f.tst)
+				req := httptest.NewRequest("POST", "/api/track?token="+trip.TrackingToken, strings.NewReader(body))
+				w := httptest.NewRecorder()
+				mux.ServeHTTP(w, req)
+				if w.Code != http.StatusOK {
+					t.Fatalf("POST: got %d", w.Code)
+				}
+			}
+			got, err := getTrackpoints(srv.db, trip.ID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(got) != len(tc.want) {
+				t.Fatalf("got %d trackpoints, want %d: %+v", len(got), len(tc.want), got)
+			}
+			for i, w := range tc.want {
+				if got[i].Timestamp.Unix() != w.tst {
+					t.Errorf("point %d: got ts %d, want %d", i, got[i].Timestamp.Unix(), w.tst)
+				}
+			}
+		})
+	}
+}

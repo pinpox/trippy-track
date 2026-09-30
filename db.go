@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"slices"
 	"time"
 )
 
@@ -240,10 +241,14 @@ func insertTrackpoint(db *sql.DB, tp Trackpoint) error {
 }
 
 func getTrackpoints(db *sql.DB, tripID string) ([]Trackpoint, error) {
-	rows, err := db.Query(
+	return queryTrackpoints(db,
 		"SELECT trip_id, lat, lon, altitude, speed, bearing, hdop, timestamp FROM trackpoints WHERE trip_id = ? ORDER BY timestamp ASC",
 		tripID,
 	)
+}
+
+func queryTrackpoints(db *sql.DB, query string, args ...any) ([]Trackpoint, error) {
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -260,6 +265,42 @@ func getTrackpoints(db *sql.DB, tripID string) ([]Trackpoint, error) {
 		points = append(points, tp)
 	}
 	return points, rows.Err()
+}
+
+// removeGPSSpikesAround deletes glitch points (see isGPSSpike) among the
+// trackpoints whose time neighbours changed when the point at ts was
+// inserted: its predecessor, itself, and its successor. Returns the
+// removed points.
+func removeGPSSpikesAround(db *sql.DB, tripID string, ts time.Time) ([]Trackpoint, error) {
+	tsStr := ts.UTC().Format(time.RFC3339)
+	const cols = "SELECT trip_id, lat, lon, altitude, speed, bearing, hdop, timestamp FROM trackpoints"
+
+	before, err := queryTrackpoints(db, cols+" WHERE trip_id = ? AND timestamp < ? ORDER BY timestamp DESC LIMIT 2", tripID, tsStr)
+	if err != nil {
+		return nil, err
+	}
+	after, err := queryTrackpoints(db, cols+" WHERE trip_id = ? AND timestamp >= ? ORDER BY timestamp ASC LIMIT 3", tripID, tsStr)
+	if err != nil {
+		return nil, err
+	}
+	slices.Reverse(before)
+	window := append(before, after...)
+
+	var removed []Trackpoint
+	for i := 1; i+1 < len(window); {
+		if !isGPSSpike(window[i-1], window[i], window[i+1]) {
+			i++
+			continue
+		}
+		if _, err := db.Exec("DELETE FROM trackpoints WHERE trip_id = ? AND timestamp = ?",
+			tripID, window[i].Timestamp.UTC().Format(time.RFC3339)); err != nil {
+			return removed, err
+		}
+		removed = append(removed, window[i])
+		// Re-check the new neighbourhood at the same index.
+		window = slices.Delete(window, i, i+1)
+	}
+	return removed, nil
 }
 
 func createEntry(db *sql.DB, tripID, body string, lat, lon *float64, locationName *string, timestamp string, weatherCode *int, temperature *float64, countryCode *string) (int64, error) {

@@ -74,6 +74,40 @@ func Haversine(lat1, lon1, lat2, lon2 float64) float64 {
 	return R * 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
 }
 
+// maxPlausibleSpeedKmh bounds the ground speed implied by two consecutive
+// fixes. It sits above airliner ground speed so flights survive, while GPS
+// glitches that jump tens of km within seconds imply far higher speeds.
+const maxPlausibleSpeedKmh = 1200
+
+// impliedSpeedKmh returns the speed needed to travel from a to b, after
+// granting both fixes their reported accuracy radius.
+func impliedSpeedKmh(a, b Trackpoint) float64 {
+	d := Haversine(a.Lat, a.Lon, b.Lat, b.Lon)
+	if a.HDOP != nil {
+		d -= *a.HDOP / 1000
+	}
+	if b.HDOP != nil {
+		d -= *b.HDOP / 1000
+	}
+	if d <= 0 {
+		return 0
+	}
+	h := b.Timestamp.Sub(a.Timestamp).Hours()
+	if h <= 0 {
+		return math.Inf(1)
+	}
+	return d / h
+}
+
+// isGPSSpike reports whether p, lying in time between a and c, is a glitch:
+// reaching p from a and returning to c are both implausibly fast, while
+// travelling from a to c directly is not.
+func isGPSSpike(a, p, c Trackpoint) bool {
+	return impliedSpeedKmh(a, p) > maxPlausibleSpeedKmh &&
+		impliedSpeedKmh(p, c) > maxPlausibleSpeedKmh &&
+		impliedSpeedKmh(a, c) <= maxPlausibleSpeedKmh
+}
+
 // DistanceBetweenEntries computes the distance in km between consecutive entries.
 // Returns a slice of length len(entries), where index i holds the distance
 // from entry i-1 to entry i. Index 0 is always 0.
